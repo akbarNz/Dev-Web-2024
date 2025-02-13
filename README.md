@@ -2,7 +2,7 @@ Création de playlist en fonction de différents moods qui vont venir se créer 
 
 
 
-#Langage utilisé : 
+# Langage utilisé : 
 - JavaScript
 - Html
 - Css

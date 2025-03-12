@@ -32,11 +32,12 @@ CREATE TABLE Reservations (
     id SERIAL PRIMARY KEY,
     artiste_id INT REFERENCES Utilisateurs(id) ON DELETE CASCADE,
     studio_id INT REFERENCES Studios(id) ON DELETE CASCADE,
-    date_debut TIMESTAMP,
-    date_fin TIMESTAMP,
+    date_reservation DATE, -- Date de réservation (sans heure)
+	nbr_personne INT NOT NULL, -- Nombre de personnes (obligatoire)
+    heure_debut TIME, -- Heure de début (sans date)
+    heure_fin TIME, -- Heure de fin (sans date)
     statut statut_réservation,
-    prix_total DECIMAL,
-    date_reservation TIMESTAMP DEFAULT NOW()
+    prix_total DECIMAL
 );
 
 Table Notifications + ENUM : 

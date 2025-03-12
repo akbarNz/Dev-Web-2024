@@ -1,3 +1,41 @@
+create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste')
+
+CREATE TABLE Utilisateurs (
+    id SERIAL PRIMARY KEY,
+    nom TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    role role_utilisateurs NOT NULL DEFAULT 'artiste',
+    date_inscription TIMESTAMP DEFAULT NOW(),
+    verifie BOOLEAN DEFAULT FALSE,
+    deux_facteur_active BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE Villes (
+    code_postal INTEGER PRIMARY KEY,
+    ville VARCHAR NOT NULL
+);
+
+CREATE TYPE statut_studio AS ENUM ('en attente', 'validé', 'refusé');
+
+CREATE TABLE Studios (
+    id SERIAL PRIMARY KEY,
+    nom VARCHAR(255) NOT NULL,
+    description TEXT,
+    adresse VARCHAR(255),
+    latitude FLOAT,
+    longitude FLOAT,
+    prix_par_heure DECIMAL(10,2) CHECK (prix_par_heure >= 0),  
+    equipements JSON,
+    photo_url VARCHAR(500),
+    proprietaire_id SERIAL NOT NULL, 
+    statut statut_studio NOT NULL DEFAULT 'en attente',  
+    date_creation TIMESTAMP DEFAULT NOW(),
+code_postal INTEGER,
+    CONSTRAINT fk_proprietaire FOREIGN KEY (proprietaire_id) 
+     REFERENCES Utilisateurs(id) ON DELETE CASCADE
+CONSTRAINT fk_studios_villes FOREIGN KEY (code_postal) REFERENCES villes(code_postal)
+);
+
 CREATE TABLE Messages(
 id SERIAL Primary KEY,
 expediteur_id INT NOT NULL,
@@ -47,18 +85,6 @@ CREATE TABLE Notifications (
     CONSTRAINT fk_utilisateur FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE
 );
 
-create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste')
-
-CREATE TABLE Utilisateurs (
-    id SERIAL PRIMARY KEY,
-    nom TEXT NOT NULL,
-    email TEXT UNIQUE NOT NULL,
-    role role_utilisateurs NOT NULL DEFAULT 'artiste',
-    date_inscription TIMESTAMP DEFAULT NOW(),
-    verifie BOOLEAN DEFAULT FALSE,
-    deux_facteur_active BOOLEAN DEFAULT FALSE
-);
-
 
 CREATE TABLE Favoris (
     id SERIAL PRIMARY KEY,
@@ -67,29 +93,3 @@ CREATE TABLE Favoris (
     date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
-CREATE TABLE Villes (
-    code_postal INTEGER PRIMARY KEY,
-    ville VARCHAR NOT NULL
-);
-
-CREATE TYPE statut_studio AS ENUM ('en attente', 'validé', 'refusé');
-
-CREATE TABLE Studios (
-    id SERIAL PRIMARY KEY,
-    nom VARCHAR(255) NOT NULL,
-    description TEXT,
-    adresse VARCHAR(255),
-    latitude FLOAT,
-    longitude FLOAT,
-    prix_par_heure DECIMAL(10,2) CHECK (prix_par_heure >= 0),  
-    equipements JSON,
-    photo_url VARCHAR(500),
-    proprietaire_id SERIAL NOT NULL, 
-    statut statut_studio NOT NULL DEFAULT 'en attente',  
-    date_creation TIMESTAMP DEFAULT NOW(),
-code_postal INTEGER,
-    CONSTRAINT fk_proprietaire FOREIGN KEY (proprietaire_id) 
-     REFERENCES Utilisateurs(id) ON DELETE CASCADE
-CONSTRAINT fk_studios_villes FOREIGN KEY (code_postal) REFERENCES villes(code_postal)
-);

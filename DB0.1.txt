@@ -32,7 +32,7 @@ CREATE TABLE Studios (
     date_creation TIMESTAMP DEFAULT NOW(),
 code_postal INTEGER,
     CONSTRAINT fk_proprietaire FOREIGN KEY (proprietaire_id) 
-     REFERENCES Utilisateurs(id) ON DELETE CASCADE
+     REFERENCES Utilisateurs(id) ON DELETE CASCADE,
 CONSTRAINT fk_studios_villes FOREIGN KEY (code_postal) REFERENCES villes(code_postal)
 );
 

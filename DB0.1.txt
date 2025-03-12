@@ -1,7 +1,3 @@
-Commandes DB : 
-
-Table Message : 
-
 CREATE TABLE Messages(
 id SERIAL Primary KEY,
 expediteur_id INT NOT NULL,
@@ -13,7 +9,6 @@ Constraint fk_envoie FOREIGN KEY(expediteur_id) REFERENCES Utilisateurs(id) ON D
 Constraint fk_recoit FOREIGN KEY(destinataire_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE
 )
 
-Table Avis : 
 
 CREATE TABLE Avis (
     id SERIAL PRIMARY KEY,
@@ -24,7 +19,6 @@ CREATE TABLE Avis (
     date_creation TIMESTAMP DEFAULT NOW()
 );
 
-Table Statut + son ENUM : 
 
 CREATE TYPE statut_réservation AS ENUM ('confirmée', 'annulée', 'modifiée');
 
@@ -40,7 +34,6 @@ CREATE TABLE Reservations (
     prix_total DECIMAL
 );
 
-Table Notifications + ENUM : 
 
 Create TYPE type_notif as ENUM ('reservation', 'paiement', 'avis', 'administratif')
 
@@ -54,7 +47,6 @@ CREATE TABLE Notifications (
     CONSTRAINT fk_utilisateur FOREIGN KEY (utilisateur_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE
 );
 
-Table Utilisateur + ENUM :
 create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste')
 
 CREATE TABLE Utilisateurs (
@@ -67,7 +59,6 @@ CREATE TABLE Utilisateurs (
     deux_facteur_active BOOLEAN DEFAULT FALSE
 );
 
-Table Favoris : 
 
 CREATE TABLE Favoris (
     id SERIAL PRIMARY KEY,
@@ -76,14 +67,12 @@ CREATE TABLE Favoris (
     date_ajout TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-Table Ville : 
 
 CREATE TABLE Villes (
     code_postal INTEGER PRIMARY KEY,
     ville VARCHAR NOT NULL
 );
 
-Table studio  + ENUM :
 CREATE TYPE statut_studio AS ENUM ('en attente', 'validé', 'refusé');
 
 CREATE TABLE Studios (

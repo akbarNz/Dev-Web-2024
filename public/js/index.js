@@ -1,44 +1,89 @@
-async function getStudio() {
+// Fonction pour récupérer et afficher les studios
+async function fetchAndUpdateStudios(prixMin, prixMax) {
   try {
-    const response = await fetch("http://localhost:5001/reserv");
+    const response = await fetch(`http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}`);
     if (!response.ok) {
-      console.error("Erreur lors de la récupération des données !");
+      console.error("Erreur lors de la récupération des studios !");
       return;
     }
     const data = await response.json();
-
-    const studioSelect = document.getElementById('studio');
-    const artisteSelect = document.getElementById('nom');
-
-    if (!studioSelect || !artisteSelect) {
-      console.error("Les éléments <select> sont introuvables !");
-      return;
-    }
-
-    let studioOptions = "";
-    let artisteOptions = "";
-
-    data.forEach((studio, index) => {
-      const studioNameElement = document.getElementById(`studio-name-${index + 1}`);
-      const studioImageElement = document.getElementById(`studio-image-${index + 1}`);
-      const studioPriceElement = document.getElementById(`studio-price-${index + 1}`);
-
-      if (studioNameElement) studioNameElement.innerHTML = studio.nom_stud;
-      if (studioImageElement) studioImageElement.src = studio.photo_url;
-      if (studioPriceElement) studioPriceElement.innerHTML = studio.prix_par_heure;
-
-      studioOptions += `<option value="${studio.id_stud}">${studio.nom_stud}</option>`;
-      artisteOptions += `<option value="${studio.id_uti}">${studio.nom_uti}</option>`;
-    });
-
-    studioSelect.innerHTML = studioOptions;
-    artisteSelect.innerHTML = artisteOptions;
-
+    updateStudios(data);
   } catch (error) {
-    console.error("Erreur lors de la récupération des messages :", error);
+    console.error("Erreur lors de la récupération des données :", error);
     alert("Erreur lors de la récupération des studios !");
   }
 }
+
+// Fonction pour initialiser les prix min/max et afficher les studios par défaut
+async function getStudio() {
+  try {
+    const prixResponse = await fetch("http://localhost:5001/prixMinMax");
+    if (!prixResponse.ok) {
+      console.error("Erreur lors de la récupération des prix min et max !");
+      return;
+    }
+    const prixData = await prixResponse.json();
+
+    const prixMinInput = document.getElementById('prixMin');
+    const prixMaxInput = document.getElementById('prixMax');
+
+    if (prixMinInput && prixMaxInput) {
+      prixMinInput.value = prixData.prix_min;
+      prixMaxInput.value = prixData.prix_max;
+      prixMinInput.min = prixData.prix_min;
+      prixMaxInput.min = prixData.prix_min;
+      prixMinInput.max = prixData.prix_max;
+      prixMaxInput.max = prixData.prix_max;        
+    }
+
+    await fetchAndUpdateStudios(prixData.prix_min, prixData.prix_max);
+
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données :", error);
+    alert("Erreur lors de la récupération des studios !");
+  }
+}
+
+// Gestionnaire d'événements pour le filtre
+document.getElementById('filtrer').addEventListener('click', async (event) => {
+  event.preventDefault();
+  const prixMin = document.getElementById('prixMin').value;
+  const prixMax = document.getElementById('prixMax').value;
+  await fetchAndUpdateStudios(prixMin, prixMax);
+});
+
+// Fonction pour mettre à jour le DOM avec les studios
+function updateStudios(data) {
+  const studioSelect = document.getElementById('studio');
+  const artisteSelect = document.getElementById('nom');
+
+  if (!studioSelect || !artisteSelect) {
+    console.error("Les éléments <select> sont introuvables !");
+    return;
+  }
+
+  let studioOptions = "";
+  let artisteOptions = "";
+
+  data.forEach((studio, index) => {
+    const studioNameElement = document.getElementById(`studio-name-${index + 1}`);
+    const studioImageElement = document.getElementById(`studio-image-${index + 1}`);
+    const studioPriceElement = document.getElementById(`studio-price-${index + 1}`);
+
+    if (studioNameElement) studioNameElement.innerHTML = studio.nom_stud;
+    if (studioImageElement) studioImageElement.src = studio.photo_url;
+    if (studioPriceElement) studioPriceElement.innerHTML = studio.prix_par_heure;
+
+    studioOptions += `<option value="${studio.id_stud}">${studio.nom_stud}</option>`;
+    artisteOptions += `<option value="${studio.id_uti}">${studio.nom_uti}</option>`;
+  });
+
+  studioSelect.innerHTML = studioOptions;
+  artisteSelect.innerHTML = artisteOptions;
+}
+
+// Appeler getStudio() au chargement de la page
+getStudio();
 
 async function reservStud(event) {
   event.preventDefault();
@@ -86,6 +131,7 @@ async function reservStud(event) {
   }
 }
 
-document.querySelector('form').addEventListener('submit', reservStud);
+
+document.querySelector('form').addEventListener('submit', reservStud); 
 
 getStudio();

@@ -268,3 +268,101 @@ button {
 button:hover {
     background-color: #0056b3;
 }
+
+/* Conteneur pour les formulaires */
+.form-container {
+    display: flex;
+    gap: 20px; /* Espace entre les deux formulaires */
+    padding: 20px;
+    max-width: 1200px; /* Largeur maximale du conteneur */
+    margin: 0 auto; /* Centrer le conteneur */
+}
+
+/* Formulaire de filtrage sur la gauche */
+.filter-sidebar {
+    width: 250px; /* Largeur du filtre */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-sidebar h2 {
+    font-size: 20px;
+    margin-bottom: 15px;
+}
+
+.filter-sidebar label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.filter-sidebar input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.filter-sidebar button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.filter-sidebar button:hover {
+    background-color: #0056b3;
+}
+
+/* Formulaire de réservation sur la droite */
+.reservation-form {
+    flex-grow: 1; /* Prend tout l'espace restant */
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.reservation-form h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.reservation-form label {
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.reservation-form input,
+.reservation-form select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.reservation-form button {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    width: 100%;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.reservation-form button:hover {
+    background-color: #0056b3;
+}

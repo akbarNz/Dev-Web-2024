@@ -20,26 +20,46 @@ app.get("/", (req, res) => {
 const pool = new Pool({
     user: "postgres",
     host: "localhost",
-    database: "Projet_dev",
-    password: "dev_projet",
+    database: "testtri",
+    password: "WICJTYHIFHIF1@",
     port: 5432,
 });
 
 // Route pour récupérer les studios
 app.get("/reserv", async (req, res) => {
-    try {
-        const result = await pool.query(`
-            SELECT S.id AS id_stud, S.nom AS nom_stud, S.prix_par_heure, S.photo_url,
-                   U.id AS id_uti, U.nom AS nom_uti
-            FROM studios AS S
-            JOIN utilisateurs AS U ON S.proprietaire_id = U.id
-          `);     
-          res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erreur serveur');
-    }
+  try {
+    // Récupérer les paramètres de requête
+    const { prixMin, prixMax } = req.query;
+
+// Exécuter la requête SQL directement
+const result = await pool.query(`
+  SELECT S.id AS id_stud, S.nom AS nom_stud, S.prix_par_heure, S.photo_url,
+         U.id AS id_uti, U.nom AS nom_uti
+  FROM studios AS S
+  JOIN utilisateurs AS U ON S.proprietaire_id = U.id
+  WHERE S.prix_par_heure >= $1 AND S.prix_par_heure <= $2
+`, [prixMin, prixMax]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
 });
+
+app.get("/prixMinMax", async (req, res) => {
+  try {
+      const result = await pool.query(`
+          SELECT MIN(prix_par_heure) AS prix_min, MAX(prix_par_heure) AS prix_max
+          FROM studios;
+      `);
+      res.json(result.rows[0]);
+  } catch (err) {
+      console.error(err);
+      res.status(500).send('Erreur serveur');
+  }
+});
+
 
 // Route pour enregistrer une réservation
 app.post('/reserve', async (req, res) => {

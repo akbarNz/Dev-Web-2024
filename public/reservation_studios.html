@@ -63,13 +63,32 @@
         </div>
     </section>
 
-    <!--Formulaire de réservation d'un studios-->
-<br><br>
-    <section class="form-container">
-        <div class="form-wrapper">
+    <!-- Conteneur pour les formulaires de filtrage et de réservation(us perso Benjamin Wera) -->
+    <div class="form-container">
+        <!-- Formulaire de filtrage sur la gauche -->
+        <aside class="filter-sidebar">
+            <h2>Filtrer les studios</h2>
+            <form id="filterForm">
+                <label for="prixMin">Prix minimum :</label>
+                <input type="number" id="prixMin" name="prixMin" step="1" />
+
+                <label for="prixMax">Prix maximum :</label>
+                <input type="number" id="prixMax" name="prixMax" step="1" />
+
+                <label for="noteMin">Note moyenne minimum</label>
+                <input type="number" id="noteMin" name="noteMin" step="0.5" max="5" min="0" value="0">
+
+                <label for="noteMax">Note moyenne maximum</label>
+                <input type="number" id="noteMax" name="noteMax" step="0.5" max="5" min="0" value="5">
+
+                <button type="submit" id="filtrer">Filtrer</button>
+            </form>
+        </aside>
+
+        <!-- Formulaire de réservation sur la droite -->
+        <div class="reservation-form">
             <h1>Réserver un studio</h1>
             <form action="/reserve" method="POST">
-
                 <label for="nom">Votre nom</label>
                 <select name="nom" id="nom"></select>
 
@@ -88,16 +107,11 @@
                 <label for="heure_fin">Heure de fin</label>
                 <input type="time" id="heure_fin" name="heure_fin" required>
 
-                <label for="prixParHeure">Prix par heure</label>
-                <span id="prixParHeure">0</span>
-
-                <label for="prixTotal">Prix total</label>
-                <span id="prixTotal"></span>
-
                 <button type="submit">Réserver</button>
             </form>
         </div>
-    </section>
-    <script src="js/index.js"></script>
+    </div>
+
+<script src="js/index.js"></script>
 </body>
 </html>

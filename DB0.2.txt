@@ -102,25 +102,25 @@ INSERT INTO Studios (nom, description, adresse, latitude, longitude, prix_par_he
 VALUES 
   ('Studio Paris 1', 'Studio moderne au centre de Paris', '10 Rue de Paris', 48.8566, 2.3522, 50.00, '["micro", "mixer", "enceintes"]', 'studio1.jpg', 2, 'validé', 75001),
   ('Studio Lyon', 'Un studio bien équipé à Lyon', '15 Rue de Lyon', 45.7640, 4.8357, 40.00, '["piano", "batterie", "enceintes"]', 'studio2.jpg', 2, 'validé', 69001),
-  ('Studio Marseille', 'Studio avec une vue sur la mer', '20 Rue de Marseille', 43.2965, 5.3698, 45.00, '["synthé", "mixer", "enceintes"]', 'studio3.jpg', 3, 'validé', 13001);
+  ('Studio Marseille', 'Studio avec une vue sur la mer', '20 Rue de Marseille', 43.2965, 5.3698, 45.00, '["synthé", "mixer", "enceintes"]', 'studio3.jpg', 1, 'validé', 13001);
 
 INSERT INTO Avis (artiste_id, studio_id, note, commentaire)
-VALUES 
-  (4, 1, 5, 'Super studio, très bien équipé !'),
-  (5, 1, 4, 'Très bon mais un peu cher.'),
-  (4, 2, 3, 'Bien mais manque du matériel.'),
-  (5, 3, 5, 'Top qualité et très belle vue !');
+VALUES
+  (4, 9, 5, 'Super studio, très bien équipé !'),
+  (5, 9, 4, 'Très bon mais un peu cher.'),
+  (3, 7, 3, 'Bien mais manque du matériel.'),
+  (5, 8, 5, 'Top qualité et très belle vue !');
 
 INSERT INTO Reservations (artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, statut, prix_total)
 VALUES 
-  (4, 1, '2024-03-15', 3, '10:00', '12:00', 'confirmée', 100.00),
-  (5, 2, '2024-03-16', 2, '14:00', '16:00', 'confirmée', 80.00),
-  (4, 3, '2024-03-17', 4, '18:00', '20:00', 'annulée', 90.00);
+  (3, 7, '2024-03-15', 3, '10:00', '12:00', 'confirmée', 100.00),
+  (5, 8, '2024-03-16', 2, '14:00', '16:00', 'confirmée', 80.00),
+  (4, 9, '2024-03-17', 4, '18:00', '20:00', 'annulée', 90.00);
 
 INSERT INTO Favoris (artiste_id, studio_id)
 VALUES 
-  (4, 1),
-  (5, 3);
+  (4, 7),
+  (5, 8);
 
 INSERT INTO Messages (expediteur_id, destinataire_id, contenu)
 VALUES 

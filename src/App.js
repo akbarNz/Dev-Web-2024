@@ -1,25 +1,30 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import FilterForm from "./Filtrage";
+import ReservationForm from "./FormulaireReservation";
 
-function App() {
+const StudioReservation = () => {
+  const [filters, setFilters] = useState({
+    prixMin: "",
+    prixMax: "",
+    noteMin: 0,
+    noteMax: 5,
+  });
+
+  const [reservation, setReservation] = useState({
+    nom: "",
+    studio: "",
+    date_reservation: "",
+    nbr_personne: "",
+    heure_debut: "",
+    heure_fin: "",
+  });
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reoad.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="form-container">
+      <FilterForm filters={filters} setFilters={setFilters} />
+      <ReservationForm reservation={reservation} setReservation={setReservation} />
     </div>
   );
-}
+};
 
-export default App;
+export default StudioReservation;

@@ -18,7 +18,7 @@ const ReservationForm = ({ reservation, setReservation }) => {
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5001/reserve", {
+      const response = await fetch("http://localhost:5001/reserv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservation),

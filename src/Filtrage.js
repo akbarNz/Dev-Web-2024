@@ -28,10 +28,10 @@ const FilterForm = ({ filters, setFilters, setStudios }) => {
       <h2>Filtrer les studios</h2>
       <form onSubmit={handleFilterSubmit}>
         <label>Prix minimum :</label>
-        <input type="number" name="prixMin" value={filters.prixMin} onChange={handleFilterChange} step="1" />
+        <input type="number" name="prixMin" value={filters.prixMin} onChange={handleFilterChange} step="1" min="0" />
 
         <label>Prix maximum :</label>
-        <input type="number" name="prixMax" value={filters.prixMax} onChange={handleFilterChange} step="1" />
+        <input type="number" name="prixMax" value={filters.prixMax} onChange={handleFilterChange} step="1" min="0"/>
 
         <button type="submit">Filtrer</button>
       </form>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import FilterForm from "./Filtrage";
 import ReservationForm from "./FormulaireReservation";
+import Header from "./Header";
+import Wrapper from "./Wrapper";
 
 const StudioReservation = () => {
   const [filters, setFilters] = useState({
@@ -20,10 +22,17 @@ const StudioReservation = () => {
   });
 
   return (
-    <div className="form-container">
-      <FilterForm filters={filters} setFilters={setFilters} />
-      <ReservationForm reservation={reservation} setReservation={setReservation} />
-    </div>
+  <div> 
+    <Header /> {}
+    <Wrapper /> 
+  <div className="form-container">
+    <FilterForm filters={filters} setFilters={setFilters} />
+    <ReservationForm
+      reservation={reservation}
+      setReservation={setReservation}
+    />
+  </div>
+</div>
   );
 };
 

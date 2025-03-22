@@ -5,10 +5,23 @@ const ReservationForm = ({ reservation, setReservation }) => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5001/reserv")
+    // Récupération des studios avec des valeurs par défaut pour prixMin et prixMax
+    fetch("http://localhost:5001/reserv?prixMin=0&prixMax=1000")
       .then((res) => res.json())
-      .then(setStudios)
+      .then((data) => {
+        setStudios(data);
+        console.log("Studios chargés:", data);
+      })
       .catch((err) => console.error("Erreur chargement studios:", err));
+    
+    // Récupération des utilisateurs
+    fetch("http://localhost:5001/users")
+      .then((res) => res.json())
+      .then((data) => {
+        setUsers(data);
+        console.log("Utilisateurs chargés:", data);
+      })
+      .catch((err) => console.error("Erreur chargement utilisateurs:", err));
   }, []);
 
   const handleReservationChange = (e) => {
@@ -35,7 +48,8 @@ const ReservationForm = ({ reservation, setReservation }) => {
       <h1>Réserver un studio</h1>
       <form onSubmit={handleReservationSubmit}>
         <label>Votre nom</label>
-        <select name="nom" value={reservation.nom} onChange={handleReservationChange}>
+        <select name="nom" value={reservation.nom} onChange={handleReservationChange} required>
+          <option value="">Sélectionnez votre nom</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>{user.nom}</option>
           ))}
@@ -43,6 +57,7 @@ const ReservationForm = ({ reservation, setReservation }) => {
 
         <label>Choisir un studio</label>
         <select name="studio" value={reservation.studio} onChange={handleReservationChange} required>
+          <option value="">Sélectionnez un studio</option>
           {studios.map((studio) => (
             <option key={studio.id_stud} value={studio.id_stud}>{studio.nom_stud}</option>
           ))}
@@ -52,7 +67,7 @@ const ReservationForm = ({ reservation, setReservation }) => {
         <input type="date" name="date_reservation" value={reservation.date_reservation} onChange={handleReservationChange} required />
 
         <label>Nombre de personnes</label>
-        <input type="number" name="nbr_personne" value={reservation.nbr_personne} onChange={handleReservationChange} />
+        <input type="number" name="nbr_personne" value={reservation.nbr_personne} onChange={handleReservationChange} required min="1" />
 
         <label>Heure de début</label>
         <input type="time" name="heure_debut" value={reservation.heure_debut} onChange={handleReservationChange} required />

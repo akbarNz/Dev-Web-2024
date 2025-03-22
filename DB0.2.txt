@@ -97,7 +97,16 @@ INSERT INTO Villes (code_postal, ville) VALUES
   (75001, 'Paris'),
   (69001, 'Lyon'),
   (13001, 'Marseille');
-  
+
+INSERT INTO Utilisateurs (nom, email, role, verifie, deux_facteur_active)
+VALUES 
+  ('Admin', 'admin@example.com', 'admin', TRUE, FALSE),
+  ('Propriétaire 1', 'prop1@example.com', 'propriétaire', TRUE, FALSE),
+  ('Propriétaire 2', 'prop2@example.com', 'propriétaire', TRUE, FALSE),
+  ('Artiste 1', 'artiste1@example.com', 'artiste', TRUE, FALSE),
+  ('Artiste 2', 'artiste2@example.com', 'artiste', TRUE, FALSE);
+
+
 INSERT INTO Studios (nom, description, adresse, latitude, longitude, prix_par_heure, equipements, photo_url, proprietaire_id, statut, code_postal)
 VALUES 
   ('Studio Paris 1', 'Studio moderne au centre de Paris', '10 Rue de Paris', 48.8566, 2.3522, 50.00, '["micro", "mixer", "enceintes"]', 'studio1.jpg', 2, 'validé', 75001),

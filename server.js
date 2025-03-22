@@ -47,18 +47,16 @@ const result = await pool.query(`
   }
 });
 
-// Route pour récupérer les utilisateurs
-app.get("/users", async (req, res) => {
+//Route pour récupérer les artistes
+app.get("/artiste", async (req, res) => {
   try {
-    const result = await pool.query(`SELECT S.id AS id_stud, S.nom AS nom_stud, S.prix_par_heure, S.photo_url,
-         U.id AS id_uti, U.nom AS nom_uti
-  FROM studios AS S
-  JOIN utilisateurs AS U ON S.proprietaire_id = U.id
-  WHERE S.prix_par_heure >= $1 AND S.prix_par_heure <= $2`);
+    console.log("Requête reçue sur /artiste");
+    const result = await pool.query(`SELECT * FROM utilisateurs WHERE role = 'artiste'`);
+    console.log("Artistes récupérés :", result.rows);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Erreur serveur');
+    console.error("Erreur lors de la récupération des artistes :", err);
+    res.status(500).send('Erreur Serveur !');
   }
 });
 
@@ -97,7 +95,7 @@ app.post('/reserve', async (req, res) => {
   });
   
 // Démarrer le serveur
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
     console.log(`Serveur lancé sur http://localhost:${PORT}`);
 });

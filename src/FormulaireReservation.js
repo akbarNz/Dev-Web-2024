@@ -18,8 +18,8 @@ const ReservationForm = ({ reservation, setReservation }) => {
     };
 
     // Charger les studios, utilisateurs et artistes
-    fetchData("http://localhost:5002/reserv?prixMin=0&prixMax=1000", setStudios, "Studios");
-    fetchData("http://localhost:5002/artiste", setArtistes, "Artistes");
+    fetchData("http://localhost:5001/reserv?prixMin=0&prixMax=1000", setStudios, "Studios");
+    fetchData("http://localhost:5001/artiste", setArtistes, "Artistes");
   }, []);
 
   // Gestion du changement de la réservation
@@ -31,7 +31,7 @@ const ReservationForm = ({ reservation, setReservation }) => {
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5002/reserv", {
+      const response = await fetch("http://localhost:5001/reserv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservation),

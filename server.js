@@ -95,7 +95,7 @@ app.post('/reserve', async (req, res) => {
   });
   
 // Démarrer le serveur
-const PORT = process.env.PORT || 5002;
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`Serveur lancé sur http://localhost:${PORT}`);
 });

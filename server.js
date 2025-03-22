@@ -20,8 +20,8 @@ app.get("/", (req, res) => {
 const pool = new Pool({
     user: "postgres",
     host: "localhost",
-    database: "testtri",
-    password: "WICJTYHIFHIF1@",
+    database: "Projet_v2",
+    password: "dev_projet",
     port: 5432,
 });
 
@@ -40,6 +40,21 @@ const result = await pool.query(`
   WHERE S.prix_par_heure >= $1 AND S.prix_par_heure <= $2
 `, [prixMin, prixMax]);
 
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+// Route pour récupérer les utilisateurs
+app.get("/users", async (req, res) => {
+  try {
+    const result = await pool.query(`SELECT S.id AS id_stud, S.nom AS nom_stud, S.prix_par_heure, S.photo_url,
+         U.id AS id_uti, U.nom AS nom_uti
+  FROM studios AS S
+  JOIN utilisateurs AS U ON S.proprietaire_id = U.id
+  WHERE S.prix_par_heure >= $1 AND S.prix_par_heure <= $2`);
     res.json(result.rows);
   } catch (err) {
     console.error(err);

@@ -374,5 +374,13 @@ button:hover {
 }
 
 .divOutput span {
-  margin: 20px;
+  margin: 30px;
+}
+
+.titreFiltre {
+  text-align: center;
+}
+
+.ratingStar {
+  text-align: center;
 }

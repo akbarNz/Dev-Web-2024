@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import MultiRangeSlider from "multi-range-slider-react";
+import Rating from '@mui/material/Rating';
 
 const FilterForm = ({ filters, setFilters}) => {
   const [minValue, set_minValue] = useState(null);
@@ -14,7 +15,7 @@ const FilterForm = ({ filters, setFilters}) => {
         set_minInit(data.prix_min);
         set_maxInit(data.prix_max);
         set_minValue(data.prix_min);
-        set_maxInit(data.prix_max);
+        set_maxValue(data.prix_max);
         setFilters((prev) => ({ ...prev, prixMin: data.prix_min, prixMax: data.prix_max }));
       })
       .catch((err) => console.error("Erreur au chargement de prix min et max:", err));
@@ -30,9 +31,16 @@ const FilterForm = ({ filters, setFilters}) => {
     }));
   };
 
+  const handleRating = (event, newValue) => {
+    setFilters((prev) => ({
+      ...prev,
+      noteMin: newValue,
+    }));
+  };
+
   return (
     <aside className="filter-sidebar">
-      <h2>Filtrer les studios</h2>
+      <h2 className="titreFiltre">Filtrer les studios</h2>
       <div className="App">
         <MultiRangeSlider
           min={minInit}
@@ -56,7 +64,15 @@ const FilterForm = ({ filters, setFilters}) => {
             <span>{minValue} €</span>
             <span>{maxValue} €</span>
           </div>
-        </div>      
+      </div>
+      <div className="ratingStar">
+        <Rating 
+          name="half-rating"
+          size="large" 
+          onChange={handleRating}
+          defaultValue={0} 
+          precision={0.5} />
+      </div>    
     </aside>
   );
 };

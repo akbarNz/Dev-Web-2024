@@ -11,11 +11,6 @@ app.use(cors());
 // Serve les fichiers statiques depuis le dossier 'public'
 app.use(express.static("public"));
 
-// Route pour servir un fichier HTML spécifique
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "reservation_studios.html"));
-});
-
 // Configuration de PostgreSQL
 const pool = new Pool({
     user: "postgres",
@@ -29,16 +24,23 @@ const pool = new Pool({
 app.get("/reserv", async (req, res) => {
   try {
     // Récupérer les paramètres de requête
-    const { prixMin, prixMax } = req.query;
+    const { prixMin, prixMax, noteMin } = req.query;
 
 // Exécuter la requête SQL directement
 const result = await pool.query(`
-  SELECT S.id AS id_stud, S.nom AS nom_stud, S.prix_par_heure, S.photo_url,
-         U.id AS id_uti, U.nom AS nom_uti
+  SELECT S.id AS id_stud, 
+        S.nom AS nom_stud, 
+        S.prix_par_heure,
+      moyenne_note
   FROM studios AS S
-  JOIN utilisateurs AS U ON S.proprietaire_id = U.id
-  WHERE S.prix_par_heure >= $1 AND S.prix_par_heure <= $2
-`, [prixMin, prixMax]);
+  JOIN (
+      SELECT studio_id, AVG(note) AS moyenne_note
+      FROM avis
+      GROUP BY studio_id
+      HAVING AVG(note) BETWEEN $3 AND 5
+  ) AS A ON S.id = A.studio_id
+  WHERE S.prix_par_heure BETWEEN $1 AND $2;
+`, [prixMin, prixMax, noteMin]);
 
     res.json(result.rows);
   } catch (err) {

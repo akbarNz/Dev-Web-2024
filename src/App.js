@@ -30,6 +30,8 @@ const StudioReservation = () => {
     <ReservationForm
       reservation={reservation}
       setReservation={setReservation}
+      prixMin={filters.prixMin} 
+      prixMax={filters.prixMax} 
     />
   </div>
 </div>

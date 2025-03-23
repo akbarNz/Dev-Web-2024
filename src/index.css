@@ -366,3 +366,13 @@ button:hover {
 .reservation-form button:hover {
   background-color: #0056b3;
 }
+
+.divOutput {
+  display: flex;
+  justify-content: center;
+  margin: 10px;
+}
+
+.divOutput span {
+  margin: 20px;
+}

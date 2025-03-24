@@ -74,7 +74,7 @@ const ReservationForm = ({ reservation, setReservation }) => {
           <option value="">Sélectionnez un studio</option>
           {studios.map((studio) => (
             <option key={studio.id_stud} value={studio.id_stud}>
-              {studio.nom_stud}
+              {studio.nom_stud} - Prix : {studio.prix_par_heure}
             </option>
           ))}
         </select>

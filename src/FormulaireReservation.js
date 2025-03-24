@@ -15,7 +15,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
       .catch((err) => console.error("Erreur chargement studios:", err));
     
     // Récupération des utilisateurs
-    fetch("http://localhost:5001/users")
+    fetch("http://localhost:5001/artiste")
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);

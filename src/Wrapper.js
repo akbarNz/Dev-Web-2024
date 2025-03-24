@@ -7,7 +7,7 @@ const StudioSection = () => {
   useEffect(() => {
     const fetchStudios = async () => {
       try {
-        const response = await fetch("http://localhost:5001/reserv?prixMin=0&prixMax=1000"); // Remplacez par votre endpoint API avec les paramètres nécessaires
+        const response = await fetch("http://localhost:5001/reserv?prixMin=0&prixMax=1000&noteMin=0"); // Remplacez par votre endpoint API avec les paramètres nécessaires
         const data = await response.json();
         setStudios(data);
       } catch (error) {

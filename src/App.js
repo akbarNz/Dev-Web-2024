@@ -9,7 +9,6 @@ const StudioReservation = () => {
     prixMin: "",
     prixMax: "",
     noteMin: 0,
-    noteMax: 5,
   });
 
   const [reservation, setReservation] = useState({
@@ -30,6 +29,9 @@ const StudioReservation = () => {
     <ReservationForm
       reservation={reservation}
       setReservation={setReservation}
+      prixMin={filters.prixMin} 
+      prixMax={filters.prixMax}
+      noteMin={filters.noteMin}
     />
   </div>
 </div>

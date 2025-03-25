@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Map from './Map';
 
 const GeolocationComponent = () => {
     // State to store location coordinates and error
@@ -33,6 +34,10 @@ const GeolocationComponent = () => {
         navigator.geolocation.getCurrentPosition(handleSuccess, handleError);
     }, []);
 
+    const mapCenter = location.latitude && location.longitude
+    ? { lat: location.latitude, lng: location.longitude }
+    : null;
+
     // Render different states
     if (loading) return <div>Loading location...</div>;
     if (error) return <div>Error: {error}</div>;
@@ -42,6 +47,7 @@ const GeolocationComponent = () => {
             <h2>Your Location:</h2>
             <p>Latitude: {location.latitude}</p>
             <p>Longitude: {location.longitude}</p>
+            <Map center={mapCenter} />
         </div>
     );
 };

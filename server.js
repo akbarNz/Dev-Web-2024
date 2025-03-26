@@ -26,24 +26,39 @@ app.get("/reserv", async (req, res) => {
     // Récupérer les paramètres de requête
     const { prixMin, prixMax, noteMin } = req.query;
 
-// Exécuter la requête SQL directement
-const result = await pool.query(`
-  SELECT S.id AS id_stud, 
-        S.nom AS nom_stud, 
-        S.prix_par_heure,
-      moyenne_note
-  FROM studios AS S
-  JOIN (
-      SELECT studio_id, AVG(note) AS moyenne_note
-      FROM avis
-      GROUP BY studio_id
-      HAVING AVG(note) BETWEEN $3 AND 5
-  ) AS A ON S.id = A.studio_id
-  WHERE S.prix_par_heure BETWEEN $1 AND $2;
-`, [prixMin, prixMax, noteMin]);
+    // Exécuter la requête SQL directement
+    const result = await pool.query(`
+      SELECT S.id AS id_stud, 
+            S.nom AS nom_stud, 
+            S.prix_par_heure,
+          moyenne_note
+      FROM studios AS S
+      JOIN (
+          SELECT studio_id, AVG(note) AS moyenne_note
+          FROM avis
+          GROUP BY studio_id
+          HAVING AVG(note) BETWEEN $3 AND 5
+      ) AS A ON S.id = A.studio_id
+      WHERE S.prix_par_heure BETWEEN $1 AND $2;
+    `, [prixMin, prixMax, noteMin]);
 
     res.json(result.rows);
   } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
+app.get("/equipements", async (req, res) => {
+  try {
+    const { equipements } = req.query;
+
+    const result = await pool.query(`
+      SELECT DISTINCT eq AS equipements
+      FROM studios, json_array_elements_text(studios.equipements) AS eq;
+      `, []);
+    res.json(result.rows);
+  } catch(err){
     console.error(err);
     res.status(500).send('Erreur serveur');
   }

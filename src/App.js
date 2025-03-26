@@ -3,8 +3,9 @@ import FilterForm from "./Filtrage";
 import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
+import ModifProfil from "./ModifProfil";
 
-const StudioReservation = () => {
+const App = () => {
   const [filters, setFilters] = useState({
     prixMin: "",
     prixMax: "",
@@ -20,22 +21,30 @@ const StudioReservation = () => {
     heure_fin: "",
   });
 
+  const [showProfileForm, setShowProfileForm] = useState(false);
+
   return (
-  <div> 
-    <Header /> {}
-    <Wrapper /> 
-  <div className="form-container">
-    <FilterForm filters={filters} setFilters={setFilters} />
-    <ReservationForm
-      reservation={reservation}
-      setReservation={setReservation}
-      prixMin={filters.prixMin} 
-      prixMax={filters.prixMax}
-      noteMin={filters.noteMin}
-    />
-  </div>
-</div>
+    <div> 
+      <Header setShowProfileForm={setShowProfileForm} />
+      {showProfileForm ? (
+        <ModifProfil onBack={() => setShowProfileForm(false)} />
+      ) : (
+        <>
+          <Wrapper />
+          <div className="form-container">
+            <FilterForm filters={filters} setFilters={setFilters} />
+            <ReservationForm
+              reservation={reservation}
+              setReservation={setReservation}
+              prixMin={filters.prixMin} 
+              prixMax={filters.prixMax}
+              noteMin={filters.noteMin}
+            />
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 
-export default StudioReservation;
+export default App;

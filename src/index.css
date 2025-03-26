@@ -86,8 +86,9 @@ nav ul li:hover .submenu {
   transform: translateY(0);
 }
 
-/* Style du bouton "S’enregistrer" */
 .register-btn {
+  width: auto;
+  padding: 10px 20px; 
   background: #ff5733;
   color: white;
   padding: 10px 20px;
@@ -95,6 +96,8 @@ nav ul li:hover .submenu {
   text-decoration: none;
   font-weight: bold;
   transition: 0.3s ease-in-out;
+  border: none;
+  cursor: pointer;
 }
 
 .register-btn:hover {
@@ -102,6 +105,7 @@ nav ul li:hover .submenu {
   color: #ff5733;
   box-shadow: 0 0 10px rgba(255, 87, 51, 0.5);
 }
+
 
 h1 {
   animation: slideIn 2s ease-out forwards;

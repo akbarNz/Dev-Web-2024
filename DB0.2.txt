@@ -1,4 +1,4 @@
-create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste')
+create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste');
 
 CREATE TABLE Utilisateurs (
     id SERIAL PRIMARY KEY,
@@ -45,7 +45,7 @@ date_envoi TIMESTAMP DEFAULT NOW(),
 lu BOOLEAN DEFAULT FALSE, 
 Constraint fk_envoie FOREIGN KEY(expediteur_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE,
 Constraint fk_recoit FOREIGN KEY(destinataire_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE
-)
+);
 
 
 CREATE TABLE Avis (
@@ -73,7 +73,7 @@ CREATE TABLE Reservations (
 );
 
 
-Create TYPE type_notif as ENUM ('reservation', 'paiement', 'avis', 'administratif')
+Create TYPE type_notif as ENUM ('reservation', 'paiement', 'avis', 'administratif');
 
 CREATE TABLE Notifications (
     id SERIAL PRIMARY KEY, 

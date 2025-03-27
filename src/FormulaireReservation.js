@@ -16,7 +16,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
       .catch((err) => console.error("Erreur chargement studios:", err));
     
     // Récupération des utilisateurs
-    fetch("http://localhost:5001/users")
+    fetch("http://localhost:5001/artiste")
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);
@@ -60,7 +60,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
         <select name="studio" value={reservation.studio} onChange={handleReservationChange} required>
           <option value="">Sélectionnez un studio</option>
           {studios.map((studio) => (
-            <option key={studio.id_stud} value={studio.id_stud}>{studio.nom_stud}</option>
+            <option key={studio.id_stud} value={studio.id_stud}>{studio.nom_stud} - Prix : {studio.prix_par_heure}</option>
           ))}
         </select>
 

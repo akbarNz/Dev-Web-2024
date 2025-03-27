@@ -1,12 +1,18 @@
 import { useState, useEffect } from "react";
 import MultiRangeSlider from "multi-range-slider-react";
 import Rating from '@mui/material/Rating';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 const FilterForm = ({ filters, setFilters}) => {
   const [minValue, set_minValue] = useState(null);
   const [maxValue, set_maxValue] = useState(null);
   const [minInit, set_minInit] = useState(null);
   const [maxInit, set_maxInit] = useState(null);
+  const [equipements, setEquipements] = useState([]);
+  const [selectedEquipements, setSelectedEquipements] = useState([]);
+
 
   useEffect(() => {
     fetch("http://localhost:5001/prixMinMax")
@@ -19,7 +25,22 @@ const FilterForm = ({ filters, setFilters}) => {
         setFilters((prev) => ({ ...prev, prixMin: data.prix_min, prixMax: data.prix_max }));
       })
       .catch((err) => console.error("Erreur au chargement de prix min et max:", err));
+  
+    fetch("http://localhost:5001/equipements")
+      .then((res) => res.json())
+      .then((data) => {
+        setEquipements(data);
+      })  
+      .catch((err) => console.error("Erreur au chargement des equipements:", err));
   }, [setFilters]);
+  
+  // Nouvel effet pour mettre à jour les équipements sélectionnés
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      selectedEquipements: selectedEquipements,
+    }));
+  }, [selectedEquipements, setFilters]);
 
   const handleInput = (e) => {
     set_minValue(e.minValue);
@@ -38,9 +59,20 @@ const FilterForm = ({ filters, setFilters}) => {
     }));
   };
 
+  const handleCheckboxChange = (equipement) => {
+    setSelectedEquipements((prevSelected) =>
+      prevSelected.includes(equipement)
+        ? prevSelected.filter((e) => e !== equipement)
+        : [...prevSelected, equipement]
+    );
+  };
+  
+
   return (
     <aside className="filter-sidebar">
       <h2 className="titreFiltre">Filtrer les studios</h2>
+
+      <h3>Prix par heure</h3>
       <div className="App">
         <MultiRangeSlider
           min={minInit}
@@ -65,6 +97,8 @@ const FilterForm = ({ filters, setFilters}) => {
             <span>{maxValue} €</span>
           </div>
       </div>
+
+      <h3>Avis des clients</h3>
       <div className="ratingStar">
         <Rating 
           name="half-rating"
@@ -72,7 +106,23 @@ const FilterForm = ({ filters, setFilters}) => {
           onChange={handleRating}
           defaultValue={0} 
           precision={0.5} />
-      </div>    
+      </div>
+
+      <h3>Choisissez vos équipements</h3>
+      <FormGroup>
+        {equipements.map((item, index) => (
+          <FormControlLabel
+            key={index}
+            control={
+              <Checkbox
+                checked={selectedEquipements.includes(item.equipements)}
+                onChange={() => handleCheckboxChange(item.equipements)}
+              />
+            }
+            label={item.equipements}
+          />
+        ))}
+      </FormGroup>
     </aside>
   );
 };

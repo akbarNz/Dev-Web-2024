@@ -23,27 +23,65 @@ const pool = new Pool({
 // Route pour récupérer les studios
 app.get("/reserv", async (req, res) => {
   try {
-    // Récupérer les paramètres de requête
-    const { prixMin, prixMax, noteMin } = req.query;
+    const { prixMin, prixMax, noteMin, selectedEquipements } = req.query;
+    
+    let equipementsArray = [];
+    if (selectedEquipements) {
+      try {
+        equipementsArray = JSON.parse(decodeURIComponent(selectedEquipements));
+      } catch (e) {
+        console.error("Erreur de parsing des équipements:", e);
+      }
+    }
 
-// Exécuter la requête SQL directement
-const result = await pool.query(`
-  SELECT S.id AS id_stud, 
-        S.nom AS nom_stud, 
-        S.prix_par_heure,
-      moyenne_note
-  FROM studios AS S
-  JOIN (
-      SELECT studio_id, AVG(note) AS moyenne_note
-      FROM avis
-      GROUP BY studio_id
-      HAVING AVG(note) BETWEEN $3 AND 5
-  ) AS A ON S.id = A.studio_id
-  WHERE S.prix_par_heure BETWEEN $1 AND $2;
-`, [prixMin, prixMax, noteMin]);
+    let query = `
+      SELECT S.id AS id_stud, 
+            S.nom AS nom_stud, 
+            S.prix_par_heure,
+            A.moyenne_note
+      FROM studios AS S
+      JOIN (
+          SELECT studio_id, AVG(note) AS moyenne_note
+          FROM avis
+          GROUP BY studio_id
+          HAVING AVG(note) >= $3
+      ) AS A ON S.id = A.studio_id
+      WHERE S.prix_par_heure BETWEEN $1 AND $2
+    `;
 
+    let values = [prixMin || 0, prixMax || 1000, noteMin || 0];
+
+    if (equipementsArray.length > 0) {
+      query += ` AND (
+        SELECT COUNT(*) FROM json_array_elements_text(S.equipements) AS elem
+        WHERE elem = ANY($4)
+      ) = $5`;
+      values.push(equipementsArray);
+      values.push(equipementsArray.length);
+    }    
+
+    console.log("Final query:", query);
+    console.log("Query values:", values);
+
+    const result = await pool.query(query, values);
     res.json(result.rows);
   } catch (err) {
+    console.error("Erreur détaillée:", err);
+    res.status(500).json({ error: 'Erreur serveur', details: err.message });
+  }
+});
+
+
+app.get("/equipements", async (req, res) => {
+  try {
+    const { equipements } = req.query;
+
+    const result = await pool.query(`
+      SELECT DISTINCT eq AS equipements
+      FROM studios, json_array_elements_text(studios.equipements) AS eq;
+      `, []);
+    res.json(result.rows);
+  } catch(err){
     console.error(err);
     res.status(500).send('Erreur serveur');
   }

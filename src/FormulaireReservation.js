@@ -7,7 +7,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
   useEffect(() => {
     // Récupération des studios avec des valeurs par défaut pour prixMin et prixMax
     console.log(selectedEquipements)
-    fetch(`http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${noteMin}&equipements=${selectedEquipements }`)
+    fetch(`http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${noteMin}&selectedEquipements=${encodeURIComponent(JSON.stringify(selectedEquipements))}`)
       .then((res) => res.json())
       .then((data) => {
         setStudios(data);

@@ -25,21 +25,22 @@ const FilterForm = ({ filters, setFilters}) => {
         setFilters((prev) => ({ ...prev, prixMin: data.prix_min, prixMax: data.prix_max }));
       })
       .catch((err) => console.error("Erreur au chargement de prix min et max:", err));
-
+  
     fetch("http://localhost:5001/equipements")
       .then((res) => res.json())
       .then((data) => {
         setEquipements(data);
-        console.log(data);
       })  
       .catch((err) => console.error("Erreur au chargement des equipements:", err));
-
-      setFilters((prev) => ({
-        ...prev,
-        selectedEquipements: selectedEquipements,
-      }));
-
-  }, [setFilters, selectedEquipements]);
+  }, [setFilters]);
+  
+  // Nouvel effet pour mettre à jour les équipements sélectionnés
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...prev,
+      selectedEquipements: selectedEquipements,
+    }));
+  }, [selectedEquipements, setFilters]);
 
   const handleInput = (e) => {
     set_minValue(e.minValue);

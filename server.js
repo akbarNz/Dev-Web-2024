@@ -24,6 +24,15 @@ const pool = new Pool({
 app.get("/reserv", async (req, res) => {
   try {
     const { prixMin, prixMax, noteMin, selectedEquipements } = req.query;
+    
+    let equipementsArray = [];
+    if (selectedEquipements) {
+      try {
+        equipementsArray = JSON.parse(decodeURIComponent(selectedEquipements));
+      } catch (e) {
+        console.error("Erreur de parsing des équipements:", e);
+      }
+    }
 
     let query = `
       SELECT S.id AS id_stud, 
@@ -35,26 +44,30 @@ app.get("/reserv", async (req, res) => {
           SELECT studio_id, AVG(note) AS moyenne_note
           FROM avis
           GROUP BY studio_id
-          HAVING AVG(note) BETWEEN $3 AND 5
+          HAVING AVG(note) >= $3
       ) AS A ON S.id = A.studio_id
       WHERE S.prix_par_heure BETWEEN $1 AND $2
     `;
 
-    let values = [prixMin, prixMax, noteMin];
+    let values = [prixMin || 0, prixMax || 1000, noteMin || 0];
 
-    if (selectedEquipements && selectedEquipements.length > 0) {
-      query += ` AND EXISTS (
-        SELECT 1 FROM jsonb_array_elements_text(S.equipement) AS eq
-        WHERE eq = ANY($4)
-      )`;
-      values.push(selectedEquipements);
-    }
+    if (equipementsArray.length > 0) {
+      query += ` AND (
+        SELECT COUNT(*) FROM json_array_elements_text(S.equipements) AS elem
+        WHERE elem = ANY($4)
+      ) = $5`;
+      values.push(equipementsArray);
+      values.push(equipementsArray.length);
+    }    
+
+    console.log("Final query:", query);
+    console.log("Query values:", values);
 
     const result = await pool.query(query, values);
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Erreur serveur');
+    console.error("Erreur détaillée:", err);
+    res.status(500).json({ error: 'Erreur serveur', details: err.message });
   }
 });
 
@@ -73,6 +86,7 @@ app.get("/equipements", async (req, res) => {
     res.status(500).send('Erreur serveur');
   }
 });
+
 
 // Route pour récupérer les utilisateurs
 app.get("/users", async (req, res) => {

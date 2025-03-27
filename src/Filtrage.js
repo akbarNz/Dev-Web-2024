@@ -33,7 +33,13 @@ const FilterForm = ({ filters, setFilters}) => {
         console.log(data);
       })  
       .catch((err) => console.error("Erreur au chargement des equipements:", err));
-  }, [setFilters]);
+
+      setFilters((prev) => ({
+        ...prev,
+        selectedEquipements: selectedEquipements,
+      }));
+
+  }, [setFilters, selectedEquipements]);
 
   const handleInput = (e) => {
     set_minValue(e.minValue);
@@ -52,14 +58,14 @@ const FilterForm = ({ filters, setFilters}) => {
     }));
   };
 
-  // Gérer la sélection des checkboxes
   const handleCheckboxChange = (equipement) => {
     setSelectedEquipements((prevSelected) =>
       prevSelected.includes(equipement)
-        ? prevSelected.filter((e) => e !== equipement) // Désélection
-        : [...prevSelected, equipement] // Sélection
+        ? prevSelected.filter((e) => e !== equipement)
+        : [...prevSelected, equipement]
     );
   };
+  
 
   return (
     <aside className="filter-sidebar">

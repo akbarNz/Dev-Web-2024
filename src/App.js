@@ -9,6 +9,7 @@ const StudioReservation = () => {
     prixMin: "",
     prixMax: "",
     noteMin: 0,
+    selectedEquipements: [],
   });
 
   const [reservation, setReservation] = useState({
@@ -32,6 +33,7 @@ const StudioReservation = () => {
       prixMin={filters.prixMin} 
       prixMax={filters.prixMax}
       noteMin={filters.noteMin}
+      selectedEquipements={filters.selectedEquipements}
     />
   </div>
 </div>

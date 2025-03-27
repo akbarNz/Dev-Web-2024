@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 
-const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMin }) => {
+const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMin, selectedEquipements }) => {
   const [studios, setStudios] = useState([]);
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
     // Récupération des studios avec des valeurs par défaut pour prixMin et prixMax
-    fetch(`http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${noteMin}`)
+    console.log(selectedEquipements)
+    fetch(`http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${noteMin}&equipements=${selectedEquipements }`)
       .then((res) => res.json())
       .then((data) => {
         setStudios(data);
@@ -22,7 +23,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
         console.log("Utilisateurs chargés:", data);
       })
       .catch((err) => console.error("Erreur chargement utilisateurs:", err));
-  }, [prixMin, prixMax, noteMin]);
+  }, [prixMin, prixMax, noteMin, selectedEquipements]);
 
   const handleReservationChange = (e) => {
     setReservation({ ...reservation, [e.target.name]: e.target.value });

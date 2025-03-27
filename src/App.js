@@ -10,6 +10,7 @@ const App = () => {
     prixMin: "",
     prixMax: "",
     noteMin: 0,
+    selectedEquipements: [],
   });
 
   const [reservation, setReservation] = useState({
@@ -39,7 +40,8 @@ const App = () => {
               prixMin={filters.prixMin} 
               prixMax={filters.prixMax}
               noteMin={filters.noteMin}
-            />
+              selectedEquipements={filters.selectedEquipements}
+    />
           </div>
         </>
       )}

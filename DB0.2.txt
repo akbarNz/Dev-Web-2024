@@ -4,6 +4,8 @@ CREATE TABLE Utilisateurs (
     id SERIAL PRIMARY KEY,
     nom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    numero_telephone TEXT NOT NULL,
+    photo_url VARCHAR(500),
     role role_utilisateurs NOT NULL DEFAULT 'artiste',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,

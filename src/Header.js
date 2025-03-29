@@ -32,7 +32,7 @@ const Header = ({ setShowProfileForm }) => {
           <li><a href="#">A propos</a></li>
           <li><a href="#">Contact</a></li>
         </ul>
-        <a href="#" className="register-btn">S'enregistrer</a>
+        {/* <a href="#" className="register-btn">S'enregistrer</a> */}
         <button className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
       </nav>
     </header>

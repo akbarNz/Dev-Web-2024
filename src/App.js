@@ -3,6 +3,7 @@ import FilterForm from "./Filtrage";
 import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
+import Cloudinary_test from "./Cloudinary";
 
 const StudioReservation = () => {
   const [filters, setFilters] = useState({
@@ -35,6 +36,7 @@ const StudioReservation = () => {
       noteMin={filters.noteMin}
       selectedEquipements={filters.selectedEquipements}
     />
+    <Cloudinary_test />
   </div>
 </div>
   );

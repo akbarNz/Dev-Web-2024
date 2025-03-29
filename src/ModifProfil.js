@@ -16,7 +16,7 @@ const ModifProfil = ({ onBack }) => {
       try {
         const response = await fetch("http://localhost:5001/getUserInfo?id=4"); //id à récupérer plus tard directement du login
         const data = await response.json();
-        
+
         // Ajouter le "+" devant le numéro de téléphone
         const formattedNumero = `+${data.numero_telephone}`;
         
@@ -63,17 +63,20 @@ const ModifProfil = ({ onBack }) => {
   };
 
   return (
-    <div className="form-wrapper">
+  <div className="profil-container">
+    <div className="form-wrapper-profil">
       <h2>Modifier mon profil</h2>
       <form onSubmit={handleSubmit}>
-        {/* Affichage et mise à jour de la photo de profil */}
+        {/* Affichage et mise à jour de la photo de profil (encore à faire dynamiquement) */}
         <label>
-          Photo de profil :
-          {profil.photo_profil_url && (
+          {/*
+        {profil.photo_profil_url && (
             <div>
               <img src={profil.photo_profil_url} alt="Photo de profil" className="profil-photo" />
             </div>
-          )}
+          )}*/}
+          <img src="logo512.png" alt="Photo de profil" className="profil-photo" />
+        <label className="left_label">Changer de photo</label>
           <input
             type="url"
             name="photo_profil_url"
@@ -83,17 +86,17 @@ const ModifProfil = ({ onBack }) => {
           />
         </label>
 
-        <label>
+        <label className="left_label">
           Nom :
           <input type="text" name="nom" value={profil.nom} onChange={handleChange} required />
         </label>
 
-        <label>
+        <label className="left_label">
           Email :
           <input type="email" name="email" value={profil.email} onChange={handleChange} required />
         </label>
 
-        <label>
+        <label className="left_label">
           Numéro de téléphone :
           <PhoneInput
             defaultCountry="BE"
@@ -102,7 +105,7 @@ const ModifProfil = ({ onBack }) => {
           />
         </label>
 
-        <label>
+        <label className="left_label">
           Rôle :
           <select name="role" value={profil.role} onChange={handleChange} required>
             <option value="propriétaire">Propriétaire</option>
@@ -111,9 +114,10 @@ const ModifProfil = ({ onBack }) => {
         </label>
 
         <button type="submit" className="register-btn">Enregistrer</button>
-        <button type="button" className="register-btn" onClick={onBack}>Retour</button>
       </form>
     </div>
+    <button id="backbutton" type="button" className="register-btn" onClick={onBack}>Retour</button>
+  </div>
   );
 };
 

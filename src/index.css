@@ -223,7 +223,7 @@ h1 {
   height: 100vh;
 }
 
-.form-wrapper {
+.form-wrapper-profil {
   background-color: #f9f9f9;
   padding: 30px;
   border-radius: 8px;
@@ -389,10 +389,57 @@ button:hover {
   text-align: center;
 }
 
+/*Page Profil*/
+
+/*Formulaire de modification*/
+
+.form-wrapper-profil {
+  max-width: 60%; /* Ajuste selon ton besoin */
+  margin: 10% auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.form-wrapper-profil form {
+  background-color: #fff; /* Optionnel : fond blanc */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  width: 100%; /* Largeur fixe */
+  text-align: center;
+}
+
+.form-wrapper-profil h2 {
+  text-align: center;
+}
+
+.form-wrapper-profil .left_label {
+  text-align: left;
+}
+
+.form-wrapper-profil h2 {
+  text-align: center;
+}
+
 .profil-photo {
   width: 100px;
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
+}
+
+.form-wrapper-profil button {
+  margin: 0 10%;
+}
+
+.profil-container #backbutton {
+  margin-left: 5%;
+  border: groove, 2px;
+  border-color: black;
+  background-color: #007BFF;
+  
 }

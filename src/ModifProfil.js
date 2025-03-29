@@ -1,18 +1,26 @@
 import { useState, useEffect } from "react";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
 
 const ModifProfil = ({ onBack }) => {
   const [profil, setProfil] = useState({
+    photo_profil_url: "",
     nom: "",
     email: "",
-    role: "artiste",
+    numero_telephone: "",
+    role: ""
   });
 
   useEffect(() => {
     const fetchProfil = async () => {
       try {
-        const response = await fetch("http://localhost:5001/getUserInfo?id=2");
+        const response = await fetch("http://localhost:5001/getUserInfo?id=4"); //id à récupérer plus tard directement du login
         const data = await response.json();
-        setProfil(data);
+        
+        // Ajouter le "+" devant le numéro de téléphone
+        const formattedNumero = `+${data.numero_telephone}`;
+        
+        setProfil({ ...data, numero_telephone: formattedNumero });
       } catch (error) {
         console.error("Erreur lors de la récupération du profil :", error);
       }
@@ -25,13 +33,23 @@ const ModifProfil = ({ onBack }) => {
     setProfil({ ...profil, [e.target.name]: e.target.value });
   };
 
+    const handlePhoneChange = (value) => {
+    setProfil({ ...profil, numero_telephone: value });
+  }; 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    //retirer le + et les espace dans le numéro
+    const formattedPhone = profil.numero_telephone.replace(/[\s+]/g, '');
+    console.log(formattedPhone)
+
+    const updatedProfil = { ...profil, numero_telephone: formattedPhone };
     try {
       const response = await fetch("http://localhost:5001/saveUserInfo", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(profil),
+        body: JSON.stringify(updatedProfil),
       });
 
       if (!response.ok) {
@@ -48,14 +66,42 @@ const ModifProfil = ({ onBack }) => {
     <div className="form-wrapper">
       <h2>Modifier mon profil</h2>
       <form onSubmit={handleSubmit}>
+        {/* Affichage et mise à jour de la photo de profil */}
+        <label>
+          Photo de profil :
+          {profil.photo_profil_url && (
+            <div>
+              <img src={profil.photo_profil_url} alt="Photo de profil" className="profil-photo" />
+            </div>
+          )}
+          <input
+            type="url"
+            name="photo_profil_url"
+            placeholder="URL de la photo"
+            value={profil.photo_profil_url}
+            onChange={handleChange}
+          />
+        </label>
+
         <label>
           Nom :
           <input type="text" name="nom" value={profil.nom} onChange={handleChange} required />
         </label>
+
         <label>
           Email :
           <input type="email" name="email" value={profil.email} onChange={handleChange} required />
         </label>
+
+        <label>
+          Numéro de téléphone :
+          <PhoneInput
+            defaultCountry="BE"
+            value={profil.numero_telephone}
+            onChange={handlePhoneChange}
+          />
+        </label>
+
         <label>
           Rôle :
           <select name="role" value={profil.role} onChange={handleChange} required>
@@ -63,6 +109,7 @@ const ModifProfil = ({ onBack }) => {
             <option value="artiste">Artiste</option>
           </select>
         </label>
+
         <button type="submit" className="register-btn">Enregistrer</button>
         <button type="button" className="register-btn" onClick={onBack}>Retour</button>
       </form>

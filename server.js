@@ -157,16 +157,16 @@ app.get('/getUserInfo', async (req, res) => {
 app.post('/saveUserInfo', async (req, res) => {
   try {
     console.log("Données reçues :", req.body);
-    const { id, nom, email, role } = req.body;
+    const { id, photo_profil_url, nom, email, numero_telephone, role } = req.body;
 
     const query = `
       UPDATE utilisateurs
-      SET nom = $1, email = $2, role = $3
-      WHERE id = $4
+      SET photo_profil_url = $1, nom = $2, email = $3, numero_telephone = $4, role = $5
+      WHERE id = $6
       RETURNING *;
     `;
 
-    const values = [nom, email, role, id];
+    const values = [photo_profil_url, nom, email, numero_telephone, role, id];
 
     const result = await pool.query(query, values);
 

@@ -4,8 +4,8 @@ CREATE TABLE Utilisateurs (
     id SERIAL PRIMARY KEY,
     nom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
-    numero_telephone TEXT NOT NULL,
-    photo_url VARCHAR(500),
+    numero_telephone TEXT UNIQUE NOT NULL,
+    photo_profil_url VARCHAR(500),
     role role_utilisateurs NOT NULL DEFAULT 'artiste',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
@@ -100,13 +100,13 @@ INSERT INTO Villes (code_postal, ville) VALUES
   (69001, 'Lyon'),
   (13001, 'Marseille');
 
-INSERT INTO Utilisateurs (nom, email, role, verifie, deux_facteur_active)
+INSERT INTO Utilisateurs (nom, email, numero_telephone, role, verifie, deux_facteur_active)
 VALUES 
-  ('Admin', 'admin@example.com', 'admin', TRUE, FALSE),
-  ('Propriétaire 1', 'prop1@example.com', 'propriétaire', TRUE, FALSE),
-  ('Propriétaire 2', 'prop2@example.com', 'propriétaire', TRUE, FALSE),
-  ('Artiste 1', 'artiste1@example.com', 'artiste', TRUE, FALSE),
-  ('Artiste 2', 'artiste2@example.com', 'artiste', TRUE, FALSE);
+  ('Admin', 'admin@example.com', '0468314567', 'admin', TRUE, FALSE),
+  ('Propriétaire 1', 'prop1@example.com', '0468894567', 'propriétaire', TRUE, FALSE),
+  ('Propriétaire 2', 'prop2@example.com', '0468004567', 'propriétaire', TRUE, FALSE),
+  ('Artiste 1', 'artiste1@example.com', '0468314500', 'artiste', TRUE, FALSE),
+  ('Artiste 2', 'artiste2@example.com', '0460014567', 'artiste', TRUE, FALSE);
 
 
 INSERT INTO Studios (nom, description, adresse, latitude, longitude, prix_par_heure, equipements, photo_url, proprietaire_id, statut, code_postal)

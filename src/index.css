@@ -438,8 +438,5 @@ button:hover {
 
 .profil-container #backbutton {
   margin-left: 5%;
-  border: groove, 2px;
-  border-color: black;
-  background-color: #007BFF;
-  
+  background-color: rgb(0, 82, 175);
 }

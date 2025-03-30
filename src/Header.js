@@ -33,7 +33,7 @@ const Header = ({ setShowProfileForm }) => {
           <li><a href="#">Contact</a></li>
         </ul>
         {/* <a href="#" className="register-btn">S'enregistrer</a> */}
-        <button className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
+        <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
       </nav>
     </header>
   );

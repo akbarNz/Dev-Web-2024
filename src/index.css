@@ -384,3 +384,68 @@ button:hover {
 .ratingStar {
   text-align: center;
 }
+
+.studio-selection-container {
+  display: flex;
+  align-items: center;
+  margin: 15px 0;
+}
+
+.studio-nav-button {
+  background-color: #f0f0f0;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.studio-nav-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.studio-cards-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.studio-card {
+  width: 100%;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.studio-card.selected {
+  border-color: #0070f3;
+  box-shadow: 0 0 10px rgba(0, 112, 243, 0.3);
+}
+
+.studio-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.studio-info {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.studio-info h3 {
+  margin: 5px 0;
+}
+
+.studio-price {
+  font-weight: bold;
+  color: #0070f3;
+}

@@ -1,14 +1,11 @@
-// Header.js
 import React, { useState, useEffect } from "react";
 
-const Header = () => {
-  // Exemple de données récupérées depuis une base de données
+const Header = ({ setShowProfileForm }) => {
   const [menuItems, setMenuItems] = useState([]);
 
   useEffect(() => {
-    // Simuler une récupération de données depuis une base de données
     const fetchMenuItems = async () => {
-      const response = await fetch("/api/menu-items"); // Remplacez par votre endpoint API
+      const response = await fetch("/api/menu-items");
       const data = await response.json();
       setMenuItems(data);
     };
@@ -35,7 +32,8 @@ const Header = () => {
           <li><a href="#">A propos</a></li>
           <li><a href="#">Contact</a></li>
         </ul>
-        <a href="#" className="register-btn">S'enregistrer</a>
+        {/* <a href="#" className="register-btn">S'enregistrer</a> */}
+        <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
       </nav>
     </header>
   );

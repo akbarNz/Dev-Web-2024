@@ -1,9 +1,11 @@
-create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste')
+create TYPE role_utilisateurs as ENUM ('admin', 'propriétaire', 'artiste');
 
 CREATE TABLE Utilisateurs (
     id SERIAL PRIMARY KEY,
     nom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    numero_telephone TEXT UNIQUE NOT NULL,
+    photo_profil_url VARCHAR(500),
     role role_utilisateurs NOT NULL DEFAULT 'artiste',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
@@ -45,7 +47,7 @@ date_envoi TIMESTAMP DEFAULT NOW(),
 lu BOOLEAN DEFAULT FALSE, 
 Constraint fk_envoie FOREIGN KEY(expediteur_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE,
 Constraint fk_recoit FOREIGN KEY(destinataire_id) REFERENCES Utilisateurs(id) ON DELETE CASCADE
-)
+);
 
 
 CREATE TABLE Avis (
@@ -73,7 +75,7 @@ CREATE TABLE Reservations (
 );
 
 
-Create TYPE type_notif as ENUM ('reservation', 'paiement', 'avis', 'administratif')
+Create TYPE type_notif as ENUM ('reservation', 'paiement', 'avis', 'administratif');
 
 CREATE TABLE Notifications (
     id SERIAL PRIMARY KEY, 
@@ -98,13 +100,13 @@ INSERT INTO Villes (code_postal, ville) VALUES
   (69001, 'Lyon'),
   (13001, 'Marseille');
 
-INSERT INTO Utilisateurs (nom, email, role, verifie, deux_facteur_active)
+INSERT INTO Utilisateurs (nom, email, numero_telephone, role, verifie, deux_facteur_active)
 VALUES 
-  ('Admin', 'admin@example.com', 'admin', TRUE, FALSE),
-  ('Propriétaire 1', 'prop1@example.com', 'propriétaire', TRUE, FALSE),
-  ('Propriétaire 2', 'prop2@example.com', 'propriétaire', TRUE, FALSE),
-  ('Artiste 1', 'artiste1@example.com', 'artiste', TRUE, FALSE),
-  ('Artiste 2', 'artiste2@example.com', 'artiste', TRUE, FALSE);
+  ('Admin', 'admin@example.com', '32468314567', 'admin', TRUE, FALSE),
+  ('Propriétaire 1', 'prop1@example.com', '32468894567', 'propriétaire', TRUE, FALSE),
+  ('Propriétaire 2', 'prop2@example.com', '32468004567', 'propriétaire', TRUE, FALSE),
+  ('Artiste 1', 'artiste1@example.com', '32468314500', 'artiste', TRUE, FALSE),
+  ('Artiste 2', 'artiste2@example.com', '32460014567', 'artiste', TRUE, FALSE);
 
 
 INSERT INTO Studios (nom, description, adresse, latitude, longitude, prix_par_heure, equipements, photo_url, proprietaire_id, statut, code_postal)

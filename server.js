@@ -116,23 +116,23 @@ app.get("/prixMinMax", async (req, res) => {
 
 // Route pour enregistrer une réservation
 app.post('/reserve', async (req, res) => {
-    const { artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin } = req.body;
-  
-    try {
-      const query = `
-        INSERT INTO reservations (artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin) 
-        VALUES ($1, $2, $3, $4, $5, $6) RETURNING *;
-      `;
-  
-      const values = [artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin];
-      const result = await pool.query(query, values);
-  
-      res.status(201).json({ message: 'Réservation enregistrée !', reservation: result.rows[0] });
-    } catch (error) {
-      console.error('Erreur lors de l’insertion :', error);
-      res.status(500).json({ error: 'Erreur serveur' });
-    }
-  });
+  const { artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO reservations (artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total) 
+      VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
+    `;
+
+    const values = [artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total];
+    const result = await pool.query(query, values);
+
+    res.status(201).json({ message: 'Réservation enregistrée !', reservation: result.rows[0] });
+  } catch (error) {
+    console.error(`Erreur lors de l'insertion :, error`);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
   
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;

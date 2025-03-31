@@ -47,6 +47,13 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
     if (selectedStudio) {
       const total = timeDiff * selectedStudio.prix_par_heure;
       setPrixTotal(total);
+      
+      // Mettre à jour le prix total dans l'objet reservation
+      setReservation(prev => ({
+        ...prev,
+        prix_total: total
+      }));
+      
       console.log("Prix total calculé :", total);
     }
   };
@@ -63,11 +70,11 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
 
       const diff = calculateTimeDifference(startTime, endTime);
       setTimeDifference(diff);
-      calculatePrixTotal(reservation.studio, diff);
+      calculatePrixTotal(reservation.studio_id, diff);
     }
 
     // Si le studio change, recalculer le prix total
-    if (name === 'studio') {
+    if (name === 'studio_id') {
       calculatePrixTotal(value, timeDifference);
     }
   };
@@ -75,14 +82,27 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5001/reserv", {
+      // Préparer les données selon le format attendu par l'API
+      const reservationData = {
+        artiste_id: parseInt(reservation.artiste_id),
+        studio_id: parseInt(reservation.studio_id),
+        date_reservation: reservation.date_reservation,
+        nbr_personne: parseInt(reservation.nbr_personne),
+        heure_debut: reservation.heure_debut,
+        heure_fin: reservation.heure_fin,
+        prix_total: prixTotal // Utiliser prixTotal ici
+      };
+
+      console.log("Données envoyées:", reservationData);
+
+      // Utiliser la route /reserve au lieu de /reserv
+      const response = await fetch("http://localhost:5001/reserve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reservation),
+        body: JSON.stringify(reservationData),
       });
       const result = await response.json();
       alert(result.message);
-      console.log(reservation.prix_par_heure);
     } catch (error) {
       console.error("Erreur lors de la réservation :", error);
     }
@@ -93,7 +113,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
       <h1>Réserver un studio</h1>
       <form onSubmit={handleReservationSubmit}>
         <label>Votre nom</label>
-        <select name="nom" value={reservation.nom} onChange={handleReservationChange} required>
+        <select name="artiste_id" value={reservation.artiste_id} onChange={handleReservationChange} required>
           <option value="">Sélectionnez votre nom</option>
           {users.map((user) => (
             <option key={user.id} value={user.id}>{user.nom}</option>
@@ -101,7 +121,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
         </select>
 
         <label>Choisir un studio</label>
-        <select name="studio" value={reservation.studio} onChange={handleReservationChange} required>
+        <select name="studio_id" value={reservation.studio_id} onChange={handleReservationChange} required>
           <option value="">Sélectionnez un studio</option>
           {studios.map((studio) => (
             <option key={studio.id_stud} value={studio.id_stud}>{studio.nom_stud} - Prix : {studio.prix_par_heure}</option>

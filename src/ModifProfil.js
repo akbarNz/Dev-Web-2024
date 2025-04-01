@@ -24,7 +24,7 @@ const ModifProfil = ({ onBack }) => {
         const data = await response.json();
 
         setProfil({ ...data, numero_telephone: `+${data.numero_telephone}` });
-        setPublicId(data.photo_profil_url); // Charger l'image Cloudinary existante
+        setPublicId(data.photo_profil_url); // Charger l'image
       } catch (error) {
         console.error("Erreur lors de la récupération du profil :", error);
       }
@@ -36,13 +36,13 @@ const ModifProfil = ({ onBack }) => {
   const uploadImage = async (files) => {
     const formData = new FormData();
     formData.append("file", files[0]);
-    formData.append("upload_preset", "rnvyghre"); // Ton preset Cloudinary
+    formData.append("upload_preset", "rnvyghre");
 
     try {
       const response = await Axios.post("https://api.cloudinary.com/v1_1/dpszia6xf/image/upload", formData);
       setPublicId(response.data.public_id);
 
-      // Met à jour le profil avec l'ID de l'image
+      // Met à jour le profil direct
       setProfil((prev) => ({ ...prev, photo_profil_url: response.data.public_id }));
     } catch (error) {
       console.error("Erreur lors de l'upload :", error);

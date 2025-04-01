@@ -133,6 +133,27 @@ app.post('/reserve', async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur' });
   }
 });
+
+// Route pour créer un nouveau studio 
+app.post('/enregi', async(req, res) => {
+  const { artiste_id, nom_stud, adresse, prix_par_heure, equipement } = req.body;
+
+  try {
+    const query = 
+    `INSERT INTO studio (artiste_id, nom_stud, adresse, prix_par_heure, equipement)
+     VALUES ($1, $2, $3, $4, $5) RETURNING *;
+    `;
+
+    const values = [artiste_id, nom_stud, adresse, prix_par_heure, equipement];
+    const result = await pool.query(query, values);
+
+    res.status(201).json({ message: "L'enregistrement est bien réalisé !" });
+  }
+  catch (error) {
+    console.error(`Erreur lors de l'insertion : ${error}`);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
   
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;

@@ -3,6 +3,7 @@ import FilterForm from "./Filtrage";
 import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
+import Enregi from "./FormulaireEnregiStudio"; 
 
 const StudioReservation = () => {
   const [filters, setFilters] = useState({

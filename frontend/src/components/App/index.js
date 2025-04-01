@@ -1,7 +1,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
+// config imports
+import config from '../../config/env';
 // component imports
-import GeolocationComponent from './components/GeolocationComponent'; 
+import GeolocationComponent from '../GeolocationComponent/GeolocationComponent'; 
+
+console.log('API URL:', config.apiUrl);
 
 const App = () => (
     <div>

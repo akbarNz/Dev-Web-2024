@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Map from '../Map';
+import Map from '../../../../../src/components/Map';
 
 // Mock google maps
 const mockAdvancedMarkerElement = jest.fn();

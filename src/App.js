@@ -3,8 +3,8 @@ import FilterForm from "./Filtrage";
 import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
-import Cloudinary_test from "./Cloudinary";
-import Enregi from "./FormulaireEnregiStudio"; 
+import Cloudinary from "./Cloudinary";
+//import Enregi from "./FormulaireEnregiStudio"; 
 
 const StudioReservation = () => {
   const [filters, setFilters] = useState({
@@ -37,7 +37,7 @@ const StudioReservation = () => {
       noteMin={filters.noteMin}
       selectedEquipements={filters.selectedEquipements}
     />
-    <Cloudinary_test />
+    <Cloudinary />
   </div>
 </div>
   );

@@ -1,0 +1,26 @@
+.geolocation-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2em;
+}
+
+.error {
+    color: #dc3545;
+    text-align: center;
+    padding: 20px;
+    font-size: 1.2em;
+}
+
+.custom-marker {
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}

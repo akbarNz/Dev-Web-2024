@@ -8,7 +8,11 @@ const studioRoutes = require('./routes/api/studios');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+      ? 'your-production-domain.com'
+      : 'http://localhost:9090'
+}));
 app.use(express.json());
 app.use(logger);
 

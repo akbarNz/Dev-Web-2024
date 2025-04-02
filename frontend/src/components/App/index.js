@@ -5,7 +5,7 @@ import config from '../../config/env';
 // component imports
 import GeolocationComponent from '../GeolocationComponent/GeolocationComponent'; 
 
-console.log('API URL:', config.apiUrl);
+console.log('APP URL:', config.apiUrl);
 
 const App = () => (
     <div>

@@ -7,17 +7,31 @@ const containerStyle = {
     height: '400px'
 };
 
-const Map = ({ center, zoom = defaultMapConfig.zoom }) => {
+const Map = ({ center, zoom = defaultMapConfig.zoom, markers = [] }) => {
     const onLoad = (map) => {
-        if (center) {
-            const { google } = window;
-            if (google) {
+        const { google } = window;
+        if (google) {
+            markers.forEach(marker => {
                 new google.maps.marker.AdvancedMarkerElement({
-                    position: center,
+                    position: marker.position,
                     map: map,
+                    title: marker.title,
+                    ...(marker.icon && {
+                        content: createMarkerContent(marker.icon)
+                    })
                 });
-            }
+            });
         }
+    };
+
+    const createMarkerContent = (iconUrl) => {
+        const element = document.createElement('div');
+        element.className = 'custom-marker';
+        element.style.backgroundImage = `url(${iconUrl})`;
+        element.style.width = '40px';
+        element.style.height = '40px';
+        element.style.backgroundSize = 'contain';
+        return element;
     };
 
     return (

@@ -50,7 +50,7 @@ class Studio {
                     photo_url: studioData.photo_url,
                     code_postal: parseInt(studioData.code_postal),
                     proprietaire_id: parseInt(studioData.proprietaire_id),
-                    statut: studioData.statut || 'en attente'
+                    statut: studioData.statut
                 }
             });
         } catch (err) {

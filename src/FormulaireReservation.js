@@ -1,6 +1,14 @@
 import { useState, useEffect } from "react";
+import { InputLabel, Select, MenuItem } from "@mui/material";
 
-const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMin, selectedEquipements }) => {
+const ReservationForm = ({
+  reservation,
+  setReservation,
+  prixMin,
+  prixMax,
+  noteMin,
+  selectedEquipements,
+}) => {
   const [studios, setStudios] = useState([]);
   const [users, setUsers] = useState([]);
   const [timeDifference, setTimeDifference] = useState(0);
@@ -8,9 +16,13 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
 
   useEffect(() => {
     // Récupération des studios avec des valeurs par défaut pour prixMin et prixMax
-    console.log(selectedEquipements)
+    console.log(selectedEquipements);
     const validNoteMin = noteMin ?? 0;
-    fetch(`http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${validNoteMin}&selectedEquipements=${encodeURIComponent(JSON.stringify(selectedEquipements))}`)
+    fetch(
+      `http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${validNoteMin}&selectedEquipements=${encodeURIComponent(
+        JSON.stringify(selectedEquipements)
+      )}`
+    )
       .then((res) => res.json())
       .then((data) => {
         setStudios(data);
@@ -45,17 +57,19 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
   };
 
   const calculatePrixTotal = (studioId, timeDiff) => {
-    const selectedStudio = studios.find((studio) => studio.id_stud === parseInt(studioId));
+    const selectedStudio = studios.find(
+      (studio) => studio.id_stud === parseInt(studioId)
+    );
     if (selectedStudio) {
       const total = timeDiff * selectedStudio.prix_par_heure;
       setPrixTotal(total);
-      
+
       // Mettre à jour le prix total dans l'objet reservation
-      setReservation(prev => ({
+      setReservation((prev) => ({
         ...prev,
-        prix_total: total
+        prix_total: total,
       }));
-      
+
       console.log("Prix total calculé :", total);
     }
   };
@@ -66,9 +80,10 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
     setReservation({ ...reservation, [name]: value });
 
     // Si les champs sont heure_debut ou heure_fin, calculer la différence
-    if (name === 'heure_debut' || name === 'heure_fin') {
-      const startTime = name === 'heure_debut' ? value : reservation.heure_debut;
-      const endTime = name === 'heure_fin' ? value : reservation.heure_fin;
+    if (name === "heure_debut" || name === "heure_fin") {
+      const startTime =
+        name === "heure_debut" ? value : reservation.heure_debut;
+      const endTime = name === "heure_fin" ? value : reservation.heure_fin;
 
       const diff = calculateTimeDifference(startTime, endTime);
       setTimeDifference(diff);
@@ -76,7 +91,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
     }
 
     // Si le studio change, recalculer le prix total
-    if (name === 'studio_id') {
+    if (name === "studio_id") {
       calculatePrixTotal(value, timeDifference);
     }
   };
@@ -92,7 +107,7 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
         nbr_personne: parseInt(reservation.nbr_personne),
         heure_debut: reservation.heure_debut,
         heure_fin: reservation.heure_fin,
-        prix_total: prixTotal // Utiliser prixTotal ici
+        prix_total: prixTotal, // Utiliser prixTotal ici
       };
 
       console.log("Données envoyées:", reservationData);
@@ -114,33 +129,82 @@ const ReservationForm = ({ reservation, setReservation, prixMin, prixMax, noteMi
     <div className="reservation-form">
       <h1>Réserver un studio</h1>
       <form onSubmit={handleReservationSubmit}>
-        <label>Votre nom</label>
-        <select name="artiste_id" value={reservation.artiste_id} onChange={handleReservationChange} required>
-          <option value="">Sélectionnez votre nom</option>
+        <InputLabel id="artiste-select-label">Votre nom</InputLabel>
+        <Select
+          labelId="artiste-select-label"
+          id="artiste-select"
+          name="artiste_id"
+          value={reservation.artiste_id}
+          onChange={handleReservationChange}
+          required
+        >
+          <MenuItem value="">
+            <em>Sélectionnez votre nom</em>
+          </MenuItem>
           {users.map((user) => (
-            <option key={user.id} value={user.id}>{user.nom}</option>
+            <MenuItem key={user.id} value={user.id}>
+              {user.nom}
+            </MenuItem>
           ))}
-        </select>
+        </Select>
 
-        <label>Choisir un studio</label>
-        <select name="studio_id" value={reservation.studio_id} onChange={handleReservationChange} required>
-          <option value="">Sélectionnez un studio</option>
+        <InputLabel id="studio-select-label">Choisir un studio</InputLabel>
+        <Select
+          labelId="studio-select-label"
+          id="studio-select"
+          name="studio_id"
+          value={reservation.studio_id}
+          onChange={handleReservationChange}
+          required
+        >
+          <MenuItem value="">
+            <em>Sélectionnez un studio</em>
+          </MenuItem>
           {studios.map((studio) => (
-            <option key={studio.id_stud} value={studio.id_stud}>{studio.nom_stud} - Prix : {studio.prix_par_heure}</option>
+            <MenuItem key={studio.id_stud} value={studio.id_stud}>
+              {studio.nom_stud} - Prix : {studio.prix_par_heure}
+            </MenuItem>
           ))}
-        </select>
+        </Select>
 
         <label>Date de réservation</label>
-        <input type="date" name="date_reservation" value={reservation.date_reservation} onChange={handleReservationChange} required />
+        <input
+          type="date"
+          name="date_reservation"
+          value={reservation.date_reservation}
+          onChange={handleReservationChange}
+          required
+        />
 
         <label>Nombre de personnes</label>
-        <input type="number" name="nbr_personne" value={reservation.nbr_personne} onChange={handleReservationChange} required min="1" />
+        <input
+          type="number"
+          name="nbr_personne"
+          value={reservation.nbr_personne}
+          onChange={handleReservationChange}
+          required
+          min="1"
+        />
 
         <label>Heure de début</label>
-        <input type="time" name="heure_debut" value={reservation.heure_debut} onChange={handleReservationChange} required />
+        <input
+          type="time"
+          name="heure_debut"
+          value={reservation.heure_debut}
+          onChange={handleReservationChange}
+          required
+        />
 
-        <label><strong>Heure de fin</strong></label>
-        <input type="time" name="heure_fin" value={reservation.heure_fin} onChange={handleReservationChange} required />
+        <label>
+          <strong>Heure de fin</strong>
+        </label>
+        <input
+          type="time"
+          name="heure_fin"
+          value={reservation.heure_fin}
+          onChange={handleReservationChange}
+          required
+        />
 
         <label>Prix total :</label>
         <span id="prixTotal">{prixTotal.toFixed(2)}€</span>

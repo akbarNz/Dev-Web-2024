@@ -15,8 +15,8 @@ app.use(express.static("public"));
 const pool = new Pool({
     user: "postgres",
     host: "localhost",
-    database: "Projet_v2",
-    password: "dev_projet",
+    database: "testtri",
+    password: "WICJTYHIFHIF1@",
     port: 5432,
 });
 
@@ -38,7 +38,8 @@ app.get("/reserv", async (req, res) => {
       SELECT S.id AS id_stud, 
             S.nom AS nom_stud, 
             S.prix_par_heure,
-            A.moyenne_note
+            A.moyenne_note,
+            S.photo_url
       FROM studios AS S
       JOIN (
           SELECT studio_id, AVG(note) AS moyenne_note
@@ -134,27 +135,70 @@ app.post('/reserve', async (req, res) => {
   }
 });
 
-// Route pour créer un nouveau studio 
-app.post('/enregi', async(req, res) => {
-  const { artiste_id, nom_stud, adresse, prix_par_heure, equipement } = req.body;
-
+// Route pour récupérer les données du profil utilisateur
+app.get('/getUserInfo', async (req, res) => {
   try {
-    const query = 
-    `INSERT INTO studio (artiste_id, nom_stud, adresse, prix_par_heure, equipement)
-     VALUES ($1, $2, $3, $4, $5) RETURNING *;
+    const userId = req.query.id;
+    if (!userId) {
+      return res.status(400).json({ error: "ID utilisateur manquant" });
+    }
+    const result = await pool.query('SELECT * FROM utilisateurs WHERE id = $1', [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+  
+  res.json(result.rows[0]);
+} catch (error) {
+    console.log(error);
+    res.status(500).send("Erreur serveur")
+  }
+})
+
+app.post('/saveUserInfo', async (req, res) => {
+  try {
+    console.log("Données reçues :", req.body);
+    const { id, photo_profil_url, nom, email, numero_telephone, role } = req.body;
+
+    const query = `
+      UPDATE utilisateurs
+      SET photo_profil_url = $1, nom = $2, email = $3, numero_telephone = $4, role = $5
+      WHERE id = $6
+      RETURNING *;
     `;
 
-    const values = [artiste_id, nom_stud, adresse, prix_par_heure, equipement];
+    const values = [photo_profil_url, nom, email, numero_telephone, role, id];
+
     const result = await pool.query(query, values);
 
-    res.status(201).json({ message: "L'enregistrement est bien réalisé !" });
-  }
-  catch (error) {
-    console.error(`Erreur lors de l'insertion : ${error}`);
-    res.status(500).json({ error: 'Erreur serveur' });
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    res.json({ message: "Profil mis à jour avec succès", user: result.rows[0] });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
-  
+
+app.get('/historique', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      select r.studio_id, r.date_reservation as date, r.nbr_personne, r.heure_debut, r.heure_fin, r.statut, r.prix_total, s.nom, s.adresse, s.photo_url 
+      from reservations as r
+      join studios as s on r.artiste_id = s.id
+      where artiste_id = 4
+      order by date DESC;
+      `);
+    res.json(result.rows);
+  } catch(err){
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

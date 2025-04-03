@@ -131,6 +131,10 @@ const ReservationForm = ({
       <form onSubmit={handleReservationSubmit}>
         <InputLabel id="artiste-select-label">Votre nom</InputLabel>
         <Select
+          sx={{
+            width: '100%',
+            height: '45px',
+          }}
           labelId="artiste-select-label"
           id="artiste-select"
           name="artiste_id"
@@ -150,6 +154,10 @@ const ReservationForm = ({
 
         <InputLabel id="studio-select-label">Choisir un studio</InputLabel>
         <Select
+          sx={{
+            width: '100%',
+            height: '45px',
+          }}
           labelId="studio-select-label"
           id="studio-select"
           name="studio_id"

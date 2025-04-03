@@ -5,102 +5,152 @@
   font-family: Arial, sans-serif;
 }
 
+/* Styles de base */
 header {
   background: #222;
   padding: 15px 50px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-/* Flexbox pour aligner logo, menu et bouton */
 nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-nav a img {
-  width: 120px; 
+/* Logo */
+.logo-img {
+  width: 120px;
+  height: auto;
+  transition: transform 0.3s ease;
 }
 
-nav ul {
-  list-style: none;
+.logo-img:hover {
+  transform: scale(1.05);
+}
+
+/* Menu principal */
+.main-nav {
   display: flex;
+  list-style: none;
   gap: 30px;
+  margin: 0;
+  padding: 0;
 }
 
-nav ul li {
+.main-nav > li {
   position: relative;
 }
 
-nav ul li a {
-  text-decoration: none;
+.main-nav a {
   color: white;
   font-weight: bold;
-  padding: 10px 15px;
-  display: block;
-  transition: 0.3s ease-in-out;
+  text-decoration: none;
+  padding: 10px 0;
+  position: relative;
+  transition: color 0.3s ease;
 }
 
-/* Animation hover sur les liens */
-nav ul li a:hover {
+.main-nav a:hover {
   color: #ff5733;
-  transform: scale(1.1);
 }
 
-.submenu {
-  display: none; 
-  position: absolute; 
+/* Animation soulignement */
+.main-nav a::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: #ff5733;
+  transition: width 0.3s ease;
+}
+
+.main-nav a:hover::after {
+  width: 100%;
+}
+
+/* Sous-menu Studio */
+.studio-menu-item {
+  cursor: pointer;
+}
+
+.studio-trigger {
+  color: white;
+  font-weight: bold;
+  padding: 10px 0;
+  display: block;
+}
+
+.studio-submenu {
+  position: absolute;
   top: 100%;
   left: 0;
-  background-color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-  border-radius: 12px;
-  z-index: 10;
-  color: black;
-  opacity: 0; /* Commence invisible */
-  transition: opacity 0.3s ease; /* Transition de l'opacité */
+  background: white;
+  min-width: 240px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 100;
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
-/* Style des liens du sous-menu */
-.submenu li {
-  display: block;
-}
-
-.submenu li a {
-  color: black;
-  padding: 10px;
-  display: block;
-  transition: 0.3s ease-in-out;
-}
-
-.submenu li a:hover {
-  background: #ff5733;
-  color: white;
-  border-radius: 5px;
-}
-
-/* Affichage du sous-menu au survol */
-nav ul li:hover .submenu {
-  display: block;
+.studio-menu-item:hover .studio-submenu {
   opacity: 1;
+  visibility: visible;
   transform: translateY(0);
 }
 
-/* Style du bouton "S’enregistrer" */
+.studio-submenu li {
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.studio-submenu li:last-child {
+  border-bottom: none;
+}
+
+.submenu-link {
+  display: block;
+  padding: 12px 16px;
+  color: #333 !important;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.submenu-link:hover {
+  background: #ff5733;
+  color: white !important;
+  padding-left: 20px;
+}
+
+/* Bouton S'enregistrer */
 .register-btn {
   background: #ff5733;
   color: white;
   padding: 10px 20px;
   border-radius: 5px;
-  text-decoration: none;
   font-weight: bold;
-  transition: 0.3s ease-in-out;
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .register-btn:hover {
   background: white;
   color: #ff5733;
-  box-shadow: 0 0 10px rgba(255, 87, 51, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 87, 51, 0.3);
 }
 
 h1 {

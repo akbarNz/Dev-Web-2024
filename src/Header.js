@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const Header = ({ setShowProfileForm }) => {
+const Header = ({ setShowProfileForm, setShowHistorique }) => {
   const [menuItems, setMenuItems] = useState([]);
 
   useEffect(() => {
@@ -33,6 +33,7 @@ const Header = ({ setShowProfileForm }) => {
           <li><a href="#">Contact</a></li>
         </ul>
         {/* <a href="#" className="register-btn">S'enregistrer</a> */}
+        <button className="register-btn" onClick={() => setShowHistorique(true)}>Historique des réservations</button>
         <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
       </nav>
     </header>

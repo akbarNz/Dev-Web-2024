@@ -4,6 +4,7 @@ import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
 import ModifProfil from "./ModifProfil";
+import Historique from "./Historique"
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -23,13 +24,37 @@ const App = () => {
   });
 
   const [showProfileForm, setShowProfileForm] = useState(false);
+  const [showHistorique, setShowHistorique] = useState(false);
+
+  const handleShowProfile = () => {
+    setShowProfileForm(true);
+    setShowHistorique(false);
+  };
+
+  const handleShowHistorique = () => {
+    setShowHistorique(true);
+    setShowProfileForm(false);
+  };
 
   return (
     <div> 
-      <Header setShowProfileForm={setShowProfileForm} />
-      {showProfileForm ? (
+      <Header 
+        setShowProfileForm={handleShowProfile}
+        setShowHistorique={handleShowHistorique} 
+      />
+      
+      {showHistorique && (
+        <Historique 
+          onBack={() => setShowHistorique(false)}
+          artisteId={4}
+        />
+      )}
+      
+      {showProfileForm && (
         <ModifProfil onBack={() => setShowProfileForm(false)} />
-      ) : (
+      )}
+      
+      {!showProfileForm && !showHistorique && (
         <>
           <Wrapper />
           <div className="form-container">
@@ -41,7 +66,7 @@ const App = () => {
               prixMax={filters.prixMax}
               noteMin={filters.noteMin}
               selectedEquipements={filters.selectedEquipements}
-    />
+            />
           </div>
         </>
       )}

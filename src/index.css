@@ -440,3 +440,18 @@ button:hover {
   margin-left: 5%;
   background-color: rgb(0, 82, 175);
 }
+
+.cardHistorique {
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  display: inline-block;
+}
+
+.siu {
+  text-align: center;
+}
+
+.photo-historique {
+  width: 700px;
+}

@@ -38,7 +38,8 @@ app.get("/reserv", async (req, res) => {
       SELECT S.id AS id_stud, 
             S.nom AS nom_stud, 
             S.prix_par_heure,
-            A.moyenne_note
+            A.moyenne_note,
+            S.photo_url
       FROM studios AS S
       JOIN (
           SELECT studio_id, AVG(note) AS moyenne_note
@@ -179,6 +180,22 @@ app.post('/saveUserInfo', async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+app.get('/historique', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      select r.studio_id, r.date_reservation as date, r.nbr_personne, r.heure_debut, r.heure_fin, r.statut, r.prix_total, s.nom, s.adresse, s.photo_url 
+      from reservations as r
+      join studios as s on r.artiste_id = s.id
+      where artiste_id = 4
+      order by date DESC;
+      `);
+    res.json(result.rows);
+  } catch(err){
+    console.error(err);
+    res.status(500).send('Erreur serveur');
   }
 });
 

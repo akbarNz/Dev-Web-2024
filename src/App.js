@@ -4,6 +4,7 @@ import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
 import ModifProfil from "./ModifProfil";
+import Historique from "./Historique"
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -23,13 +24,16 @@ const App = () => {
   });
 
   const [showProfileForm, setShowProfileForm] = useState(false);
+  const [showHistorique, setShowHistorique] = useState(false);
 
   return (
     <div> 
-      <Header setShowProfileForm={setShowProfileForm} />
+      <Header setShowProfileForm={setShowProfileForm} setShowHistorique={setShowHistorique} />
       {showProfileForm ? (
-        <ModifProfil onBack={() => setShowProfileForm(false)} />
-      ) : (
+      <ModifProfil onBack={() => setShowProfileForm(false)} />
+    ) : showHistorique ? (
+      <Historique onBack={() => setShowHistorique(false)} />
+    ) : (
         <>
           <Wrapper />
           <div className="form-container">

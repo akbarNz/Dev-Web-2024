@@ -5,8 +5,6 @@ import Header from "./Header";
 import Wrapper from "./Wrapper";
 import ModifProfil from "./ModifProfil";
 import Historique from "./Historique"
-//import Cloudinary from "./Cloudinary";
-//import Enregi from "./FormulaireEnregiStudio"; 
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -40,39 +38,39 @@ const App = () => {
 
   return (
     <div> 
-    <Header 
-      setShowProfileForm={handleShowProfile}
-      setShowHistorique={handleShowHistorique} 
-    />
-    
-    {showHistorique && (
-      <Historique 
-        onBack={() => setShowHistorique(false)}
-        artisteId={4}
+      <Header 
+        setShowProfileForm={handleShowProfile}
+        setShowHistorique={handleShowHistorique} 
       />
-    )}
-    
-    {showProfileForm && (
-      <ModifProfil onBack={() => setShowProfileForm(false)} />
-    )}
-    
-    {!showProfileForm && !showHistorique && (
-      <>
-        <Wrapper />
-        <div className="form-container">
-          <FilterForm filters={filters} setFilters={setFilters} />
-          <ReservationForm
-            reservation={reservation}
-            setReservation={setReservation}
-            prixMin={filters.prixMin} 
-            prixMax={filters.prixMax}
-            noteMin={filters.noteMin}
-            selectedEquipements={filters.selectedEquipements}
-          />
-        </div>
-      </>
-    )}
-  </div>
+      
+      {showHistorique && (
+        <Historique 
+          onBack={() => setShowHistorique(false)}
+          artisteId={4}
+        />
+      )}
+      
+      {showProfileForm && (
+        <ModifProfil onBack={() => setShowProfileForm(false)} />
+      )}
+      
+      {!showProfileForm && !showHistorique && (
+        <>
+          <Wrapper />
+          <div className="form-container">
+            <FilterForm filters={filters} setFilters={setFilters} />
+            <ReservationForm
+              reservation={reservation}
+              setReservation={setReservation}
+              prixMin={filters.prixMin} 
+              prixMax={filters.prixMax}
+              noteMin={filters.noteMin}
+              selectedEquipements={filters.selectedEquipements}
+            />
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

@@ -112,30 +112,6 @@ nav {
   transform: translateY(0);
 }
 
-.studio-submenu li {
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.studio-submenu li:last-child {
-  border-bottom: none;
-}
-
-.submenu-link {
-  display: block;
-  padding: 12px 16px;
-  color: #333 !important;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.submenu-link:hover {
-  background: #ff5733;
-  color: white !important;
-  padding-left: 20px;
-}
-
-/* Bouton S'enregistrer */
 .register-btn {
   width: auto;
   padding: 10px 20px; 
@@ -144,8 +120,9 @@ nav {
   padding: 10px 20px;
   border-radius: 5px;
   font-weight: bold;
-  text-decoration: none;
-  transition: all 0.3s ease;
+  transition: 0.3s ease-in-out;
+  border: none;
+  cursor: pointer;
 }
 
 .register-btn:hover {
@@ -438,3 +415,69 @@ button:hover {
   text-align: center;
 }
 
+/*Page Profil*/
+
+/*Formulaire de modification*/
+
+.form-wrapper-profil {
+  max-width: 60%; /* Ajuste selon ton besoin */
+  margin: 10% auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.form-wrapper-profil form {
+  background-color: #fff; /* Optionnel : fond blanc */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
+  width: 100%; /* Largeur fixe */
+  text-align: center;
+}
+
+.form-wrapper-profil h2 {
+  text-align: center;
+}
+
+.form-wrapper-profil .left_label {
+  text-align: left;
+}
+
+.form-wrapper-profil h2 {
+  text-align: center;
+}
+
+.profil-photo {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.form-wrapper-profil button {
+  margin: 0 10%;
+}
+
+.profil-container #backbutton {
+  margin-left: 5%;
+  background-color: rgb(0, 82, 175);
+}
+
+.cardHistorique {
+  padding: 20px;
+  margin: 10px;
+  text-align: center;
+  display: inline-block;
+}
+
+.siu {
+  text-align: center;
+}
+
+.photo-historique {
+  width: 700px;
+}

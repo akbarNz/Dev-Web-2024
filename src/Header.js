@@ -1,12 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const Header = () => {
-  const [isStudioSubmenuOpen, setIsStudioSubmenuOpen] = useState(false);
+const Header = ({ setShowProfileForm, setShowHistorique }) => {
+  const [menuItems, setMenuItems] = useState([]);
 
-  const studioSubmenuItems = [
-    { label: "Formulaire Réservation", link: "formulaire-reservation.html" },
-    { label: "Formulaire Enregistrement", link: "formulaire-enregistrement-studio.html" }
-  ];
+  useEffect(() => {
+    const fetchMenuItems = async () => {
+      const response = await fetch("/api/menu-items");
+      const data = await response.json();
+      setMenuItems(data);
+    };
+
+    fetchMenuItems();
+  }, []);
 
   return (
     <header>
@@ -45,8 +50,9 @@ const Header = () => {
           <li><a href="about.html">A propos</a></li>
           <li><a href="contact.html">Contact</a></li>
         </ul>
-
-        <a href="register.html" className="register-btn">S'enregistrer</a>
+        {/* <a href="#" className="register-btn">S'enregistrer</a> */}
+        <button className="register-btn" onClick={() => setShowHistorique(true)}>Historique des réservations</button>
+        <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
       </nav>
     </header>
   );

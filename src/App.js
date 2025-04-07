@@ -4,7 +4,8 @@ import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
 import ModifProfil from "./ModifProfil";
-import Historique from "./Historique"
+import Historique from "./Historique";
+import EnregistrementForm from "./FormulaireEnregiStudio";
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -23,24 +24,43 @@ const App = () => {
     heure_fin: "",
   });
 
+  const [enregistrement, setEnregistrement] = useState({ // Nouvel état
+    artiste_id: "",
+    nom_studio: "",
+    adresse: "",
+    prix_par_heure: "",
+    equipement: "",
+    photo_url: ""
+  });
+
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showHistorique, setShowHistorique] = useState(false);
+  const [showEnregistrementForm, setShowEnregistrementForm] = useState(false); // Nouvel état
 
   const handleShowProfile = () => {
     setShowProfileForm(true);
     setShowHistorique(false);
+    setShowEnregistrementForm(false);
   };
 
   const handleShowHistorique = () => {
     setShowHistorique(true);
     setShowProfileForm(false);
+    setShowEnregistrementForm(false);
+  };
+
+  const handleShowEnregistrement = () => { // Nouvelle fonction
+    setShowEnregistrementForm(true);
+    setShowProfileForm(false);
+    setShowHistorique(false);
   };
 
   return (
     <div> 
       <Header 
         setShowProfileForm={handleShowProfile}
-        setShowHistorique={handleShowHistorique} 
+        setShowHistorique={handleShowHistorique}
+        setShowEnregistrementForm={handleShowEnregistrement} // Nouvelle prop
       />
       
       {showHistorique && (
@@ -53,8 +73,16 @@ const App = () => {
       {showProfileForm && (
         <ModifProfil onBack={() => setShowProfileForm(false)} />
       )}
+
+      {showEnregistrementForm && ( // Nouveau formulaire
+        <EnregistrementForm 
+          enregistrement={enregistrement}
+          setEnregistrement={setEnregistrement}
+          onBack={() => setShowEnregistrementForm(false)}
+        />
+      )}
       
-      {!showProfileForm && !showHistorique && (
+      {!showProfileForm && !showHistorique && !showEnregistrementForm && (
         <>
           <Wrapper />
           <div className="form-container">

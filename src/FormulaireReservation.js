@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem } from "@mui/material";
+import { db } from "./firebase"; // Assurez-vous que ce chemin est correct
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const ReservationForm = ({
   reservation,
@@ -13,10 +15,10 @@ const ReservationForm = ({
   const [users, setUsers] = useState([]);
   const [timeDifference, setTimeDifference] = useState(0);
   const [prixTotal, setPrixTotal] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    // Récupération des studios avec des valeurs par défaut pour prixMin et prixMax
-    console.log(selectedEquipements);
+    // Récupération des studios
     const validNoteMin = noteMin ?? 0;
     fetch(
       `http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${validNoteMin}&selectedEquipements=${encodeURIComponent(
@@ -24,19 +26,13 @@ const ReservationForm = ({
       )}`
     )
       .then((res) => res.json())
-      .then((data) => {
-        setStudios(data);
-        console.log("Studios chargés:", data);
-      })
+      .then((data) => setStudios(data))
       .catch((err) => console.error("Erreur chargement studios:", err));
 
     // Récupération des utilisateurs
     fetch("http://localhost:5001/artiste")
       .then((res) => res.json())
-      .then((data) => {
-        setUsers(data);
-        console.log("Utilisateurs chargés:", data);
-      })
+      .then((data) => setUsers(data))
       .catch((err) => console.error("Erreur chargement utilisateurs:", err));
   }, [prixMin, prixMax, noteMin, selectedEquipements]);
 
@@ -44,13 +40,7 @@ const ReservationForm = ({
     if (startTime && endTime) {
       const start = new Date(`2023-01-01T${startTime}`);
       const end = new Date(`2023-01-01T${endTime}`);
-
-      // Calculer la différence en heures
       const diffMinutes = (end - start) / (1000 * 60);
-      const hours = Math.floor(diffMinutes / 60);
-      const minutes = diffMinutes % 60;
-
-      console.log(`Différence de temps : ${hours} heures ${minutes} minutes`);
       return diffMinutes / 60;
     }
     return 0;
@@ -63,34 +53,25 @@ const ReservationForm = ({
     if (selectedStudio) {
       const total = timeDiff * selectedStudio.prix_par_heure;
       setPrixTotal(total);
-
-      // Mettre à jour le prix total dans l'objet reservation
       setReservation((prev) => ({
         ...prev,
         prix_total: total,
       }));
-
-      console.log("Prix total calculé :", total);
     }
   };
 
   const handleReservationChange = (e) => {
     const { name, value } = e.target;
-
     setReservation({ ...reservation, [name]: value });
 
-    // Si les champs sont heure_debut ou heure_fin, calculer la différence
     if (name === "heure_debut" || name === "heure_fin") {
-      const startTime =
-        name === "heure_debut" ? value : reservation.heure_debut;
+      const startTime = name === "heure_debut" ? value : reservation.heure_debut;
       const endTime = name === "heure_fin" ? value : reservation.heure_fin;
-
       const diff = calculateTimeDifference(startTime, endTime);
       setTimeDifference(diff);
       calculatePrixTotal(reservation.studio_id, diff);
     }
 
-    // Si le studio change, recalculer le prix total
     if (name === "studio_id") {
       calculatePrixTotal(value, timeDifference);
     }
@@ -98,30 +79,43 @@ const ReservationForm = ({
 
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
+    setIsSubmitting(true);
+
+    const reservationData = {
+      artiste_id: parseInt(reservation.artiste_id),
+      studio_id: parseInt(reservation.studio_id),
+      date_reservation: reservation.date_reservation,
+      nbr_personne: parseInt(reservation.nbr_personne),
+      heure_debut: reservation.heure_debut,
+      heure_fin: reservation.heure_fin,
+      prix_total: prixTotal,
+      equipements: selectedEquipements,
+      created_at: new Date().toISOString()
+    };
+
     try {
-      // Préparer les données selon le format attendu par l'API
-      const reservationData = {
-        artiste_id: parseInt(reservation.artiste_id),
-        studio_id: parseInt(reservation.studio_id),
-        date_reservation: reservation.date_reservation,
-        nbr_personne: parseInt(reservation.nbr_personne),
-        heure_debut: reservation.heure_debut,
-        heure_fin: reservation.heure_fin,
-        prix_total: prixTotal, // Utiliser prixTotal ici
-      };
+      // Envoi à Firebase
+      await addDoc(collection(db, "reservations"), {
+        nbr_personne: reservationData.nbr_personne, // Seulement ce champ
+        firebase_created_at: serverTimestamp()
+      });
 
-      console.log("Données envoyées:", reservationData);
-
-      // Utiliser la route /reserve au lieu de /reserv
+      // Envoi à votre backend
       const response = await fetch("http://localhost:5001/reserve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservationData),
       });
+
+      if (!response.ok) throw new Error("Erreur backend");
+      
       const result = await response.json();
-      alert(result.message);
+      alert("Réservation enregistrée avec succès !");
     } catch (error) {
-      console.error("Erreur lors de la réservation :", error);
+      console.error("Erreur:", error);
+      alert(`Erreur lors de l'enregistrement: ${error.message}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,10 +125,7 @@ const ReservationForm = ({
       <form onSubmit={handleReservationSubmit}>
         <InputLabel id="artiste-select-label">Votre nom</InputLabel>
         <Select
-          sx={{
-            width: '100%',
-            height: '45px',
-          }}
+          sx={{ width: '100%', height: '45px' }}
           labelId="artiste-select-label"
           id="artiste-select"
           name="artiste_id"
@@ -142,9 +133,7 @@ const ReservationForm = ({
           onChange={handleReservationChange}
           required
         >
-          <MenuItem value="">
-            <em>Sélectionnez votre nom</em>
-          </MenuItem>
+          <MenuItem value=""><em>Sélectionnez votre nom</em></MenuItem>
           {users.map((user) => (
             <MenuItem key={user.id} value={user.id}>
               {user.nom}
@@ -154,10 +143,7 @@ const ReservationForm = ({
 
         <InputLabel id="studio-select-label">Choisir un studio</InputLabel>
         <Select
-          sx={{
-            width: '100%',
-            height: '45px',
-          }}
+          sx={{ width: '100%', height: '45px' }}
           labelId="studio-select-label"
           id="studio-select"
           name="studio_id"
@@ -165,12 +151,10 @@ const ReservationForm = ({
           onChange={handleReservationChange}
           required
         >
-          <MenuItem value="">
-            <em>Sélectionnez un studio</em>
-          </MenuItem>
+          <MenuItem value=""><em>Sélectionnez un studio</em></MenuItem>
           {studios.map((studio) => (
             <MenuItem key={studio.id_stud} value={studio.id_stud}>
-              {studio.nom_stud} - Prix : {studio.prix_par_heure}
+              {studio.nom_stud} - {studio.prix_par_heure}€/h
             </MenuItem>
           ))}
         </Select>
@@ -203,9 +187,7 @@ const ReservationForm = ({
           required
         />
 
-        <label>
-          <strong>Heure de fin</strong>
-        </label>
+        <label>Heure de fin</label>
         <input
           type="time"
           name="heure_fin"
@@ -217,7 +199,9 @@ const ReservationForm = ({
         <label>Prix total :</label>
         <span id="prixTotal">{prixTotal.toFixed(2)}€</span>
 
-        <button type="submit">Réserver</button>
+        <button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? "Enregistrement..." : "Réserver"}
+        </button>
       </form>
     </div>
   );

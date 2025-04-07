@@ -16,6 +16,7 @@
         "cors": "^2.8.5",
         "dotenv": "^16.4.7",
         "express": "^4.21.2",
+        "firebase": "^11.6.0",
         "multi-range-slider-react": "^2.0.7",
         "pg": "^8.14.1",
         "react": "^19.1.0",

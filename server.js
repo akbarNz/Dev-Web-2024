@@ -199,6 +199,27 @@ app.get('/historique', async (req, res) => {
   }
 });
 
+//Route pour envoyer les données des studios 
+app.post('/enregi', async(req, res) => {
+  const { nom_stud, adresse, code_postal, prix_par_heure, equipement, photo_url } = req.body;
+
+  try {
+    const query = `
+      INSERT INTO studios (nom, adresse, code_postal, prix_par_heure, equipements, photo_url)
+      VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
+      
+    const values = [nom_stud, adresse, code_postal, prix_par_heure, equipement, photo_url];
+    const result = await pool.query(query, values);
+    
+    // N'oubliez pas d'envoyer une réponse au client
+    res.status(201).json(result.rows[0]);
+  }
+  catch(err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});
+
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

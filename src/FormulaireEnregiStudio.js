@@ -27,7 +27,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", files[0]);
-    formData.append("upload_preset", "rnvyghre"); // Votre upload preset
+    formData.append("upload_preset", "rnvyghre");
 
     try {
       const response = await Axios.post(
@@ -59,6 +59,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
         artiste_id: parseInt(enregistrement.artiste_id),
         nom_stud: enregistrement.nom_studio,
         adresse: enregistrement.adresse,
+        code_postal: enregistrement.code_postal,
         prix_par_heure: parseFloat(enregistrement.prix_par_heure),
         equipement: enregistrement.equipement,
         photo_url: enregistrement.photo_url || "" // Ajout du champ photo
@@ -131,6 +132,16 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
           value={enregistrement.adresse} 
           onChange={handleEnregistrementChange} 
           required 
+        />
+
+        <label>Code Postal</label>
+        <input
+          type="number"
+          name="code_postal"
+          value={enregistrement.code_postal}
+          onChange={handleEnregistrementChange}
+          placeholder="Entrer le code postal"
+          required
         />
 
         <label>Prix par heure (€)</label>

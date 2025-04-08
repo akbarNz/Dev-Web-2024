@@ -222,8 +222,18 @@ app.post('/enregi', async(req, res) => {
   }
   catch(err) {
     console.error("Erreur détaillée:", err);
-    // Toujours renvoyer du JSON, même en cas d'erreur
     res.status(500).json({ error: 'Erreur serveur', details: err.message });
+  }
+});
+
+app.get('/ville', async(req, res)=> {
+  try{
+    const query = `Select * from villes`
+    res.json(query.rows)
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).send('Erreur serveur');
   }
 });
 

@@ -55,26 +55,39 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
   const handleEnregistrementSubmit = async (e) => {
     e.preventDefault();
     try {
+      const equipementsArray = enregistrement.equipement
+        .split(',')
+        .map(item => item.trim())
+        .filter(item => item !== ''); // Filtre les éléments vides
+      
       const enregistrementData = {
-        artiste_id: parseInt(enregistrement.artiste_id),
-        nom_stud: enregistrement.nom_studio,
+        nom: enregistrement.nom_studio,
         adresse: enregistrement.adresse,
         code_postal: enregistrement.code_postal,
         prix_par_heure: parseFloat(enregistrement.prix_par_heure),
-        equipement: enregistrement.equipement,
-        photo_url: enregistrement.photo_url || "" // Ajout du champ photo
+        equipements: equipementsArray,
+        photo_url: enregistrement.photo_url || ""
       };
-
+  
+      console.log("Données envoyées au serveur:", enregistrementData);
+  
       const response = await fetch("http://localhost:5001/enregi", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(enregistrementData)
       });
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur serveur: ${errorText}`);
+      }
+      
       const result = await response.json();
-      alert(result.message);
+      console.log(result)
+      alert("Studio enregistré avec succès!");
     } catch (error) {
       console.error("Erreur lors de l'enregistrement :", error);
+      alert(`Erreur: ${error.message}`);
     }
   };
 

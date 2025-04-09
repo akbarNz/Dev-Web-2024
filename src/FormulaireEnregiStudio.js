@@ -32,21 +32,23 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
   const uploadImage = async (files) => {
     if (!files || files.length === 0) return;
-
+    
     setIsUploading(true);
     const formData = new FormData();
     formData.append("file", files[0]);
     formData.append("upload_preset", "rnvyghre");
-
+  
     try {
       const response = await Axios.post(
         "https://api.cloudinary.com/v1_1/dpszia6xf/image/upload",
         formData
       );
       setPublicId(response.data.public_id);
+      
+      // Utiliser public_id au lieu de secure_url
       setEnregistrement((prev) => ({
         ...prev,
-        photo_url: response.data.secure_url,
+        photo_url: response.data.public_id,
       }));
     } catch (error) {
       console.error("Erreur lors de l'upload :", error);
@@ -71,6 +73,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
       const enregistrementData = {
         nom: enregistrement.nom_studio,
+        description: enregistrement.descritpion,
         adresse: enregistrement.adresse,
         code_postal: enregistrement.code_postal,
         prix_par_heure: parseFloat(enregistrement.prix_par_heure),
@@ -104,7 +107,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
     <div className="enregi_form">
       <h1>Enregistrer un studio</h1>
       <form onSubmit={handleEnregistrementSubmit}>
-        {/* Nouveau champ pour l'upload d'image */}
+        {}
         <label>
           Photo du studio
           <input
@@ -146,6 +149,16 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
           value={enregistrement.nom_studio}
           onChange={handleEnregistrementChange}
           placeholder="Entrer le nom de votre studio"
+          required
+        />
+
+        <label>Description du studio</label>
+          <input
+          type="text"
+          name="description"
+          value={enregistrement.description}
+          onChange={handleEnregistrementChange}
+          placeholder="Entrer la description de votre studio"
           required
         />
 

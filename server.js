@@ -201,7 +201,7 @@ app.get('/historique', async (req, res) => {
 
 //Route pour enregistrer un studio :
 app.post('/enregi', async(req, res) => {
-  const { nom, adresse, code_postal, prix_par_heure, equipements, photo_url } = req.body;
+  const { nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url } = req.body;
 
   if (!Array.isArray(equipements)) {
     return res.status(400).json({ error: "Le champ 'equipements' doit être un tableau" });
@@ -209,10 +209,10 @@ app.post('/enregi', async(req, res) => {
 
   try {
     const query = `
-      INSERT INTO studios (nom, adresse, code_postal, prix_par_heure, equipements, photo_url)
-      VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
+      INSERT INTO studios (nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url)
+      VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
       
-    const values = [nom, adresse, code_postal, prix_par_heure, JSON.stringify(equipements), photo_url];
+    const values = [nom, description, adresse, code_postal, prix_par_heure, JSON.stringify(equipements), photo_url];
     const result = await pool.query(query, values);
     
     res.status(201).json({ 
@@ -226,12 +226,11 @@ app.post('/enregi', async(req, res) => {
   }
 });
 
-app.get('/ville', async(req, res)=> {
-  try{
-    const query = `Select * from villes`
-    res.json(query.rows)
-  }
-  catch(err){
+app.get('/ville', async(req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM villes');
+    res.json(result.rows);
+  } catch(err) {
     console.error(err);
     res.status(500).send('Erreur serveur');
   }

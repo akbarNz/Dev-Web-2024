@@ -10,7 +10,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5001/artiste")
+    fetch("http://localhost:5001/proprietaire")
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);
@@ -127,7 +127,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
           )}
         </label>
 
-        <label>Artiste ?</label>
+        <label>Propriétaire ?</label>
         <select
           name="artiste_id"
           value={enregistrement.artiste_id}
@@ -153,7 +153,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
         />
 
         <label>Description du studio</label>
-          <input
+          <textarea
           type="text"
           name="description"
           value={enregistrement.description}

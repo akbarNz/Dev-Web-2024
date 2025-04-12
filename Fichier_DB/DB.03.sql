@@ -97,24 +97,6 @@ CREATE TABLE IF NOT EXISTS public.villes
     CONSTRAINT villes_pkey PRIMARY KEY (code_postal)
 );
 
-CREATE TABLE IF NOT EXISTS public.newtable1
-(
-    id serial NOT NULL,
-    artiste_id integer,
-    studio_id integer,
-    date_ajout timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT favoris_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE IF NOT EXISTS public.newtable2
-(
-    id serial NOT NULL,
-    artiste_id integer,
-    studio_id integer,
-    date_ajout timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT favoris_pkey PRIMARY KEY (id)
-);
-
 ALTER TABLE IF EXISTS public.avis
     ADD CONSTRAINT avis_artiste_id_fkey FOREIGN KEY (artiste_id)
     REFERENCES public.utilisateurs (id) MATCH SIMPLE

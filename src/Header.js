@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const Header = ({ setShowProfileForm, setShowHistorique }) => {
+const Header = ({ setShowProfileForm, setShowHistorique, setShowFavoris }) => {
   const [menuItems, setMenuItems] = useState([]);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ const Header = ({ setShowProfileForm, setShowHistorique }) => {
     <header>
       <nav>
         <a href="logo">
-          <img src="#" alt="Logo" />
+          <img src="#" alt="Logo"/>
         </a>
         <ul>
           <li><a href="#">Home</a></li>
@@ -25,7 +25,7 @@ const Header = ({ setShowProfileForm, setShowHistorique }) => {
             <a href="#">Studio ▼</a>
             <ul className="submenu">
               {menuItems.map((item, index) => (
-                <li key={index}><a href={item.link}>{item.label}</a></li>
+                  <li key={index}><a href={item.link}>{item.label}</a></li>
               ))}
             </ul>
           </li>
@@ -34,7 +34,10 @@ const Header = ({ setShowProfileForm, setShowHistorique }) => {
         </ul>
         {/* <a href="#" className="register-btn">S'enregistrer</a> */}
         <button className="register-btn" onClick={() => setShowHistorique(true)}>Historique des réservations</button>
-        <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon profil</button>
+        <button className="register-btn" onClick={() => setShowFavoris(true)}>Favoris</button>
+        <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>Modifier mon
+          profil
+        </button>
       </nav>
     </header>
   );

@@ -5,6 +5,8 @@ import Header from "./Header";
 import Wrapper from "./Wrapper";
 import ModifProfil from "./ModifProfil";
 import Historique from "./Historique"
+import Favoris from "./Favoris";
+
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -25,28 +27,55 @@ const App = () => {
 
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showHistorique, setShowHistorique] = useState(false);
+  const [showFavoris, setShowFavoris] = useState(false);
+
 
   const handleShowProfile = () => {
     setShowProfileForm(true);
     setShowHistorique(false);
+    setShowFavoris(false);
   };
 
   const handleShowHistorique = () => {
     setShowHistorique(true);
     setShowProfileForm(false);
+    setShowFavoris(false);
   };
+
+  const handleShowFavoris = () => {
+    setShowFavoris(true);
+    setShowHistorique(false);
+    setShowProfileForm(false);
+  };
+
+
+  const ajouterAuFavoris = (studio) => {
+    console.log("Studio à ajouter :", studio);
+  // Plus tard, tu feras un fetch vers l’API ici
+  };
+
+
 
   return (
     <div> 
       <Header 
         setShowProfileForm={handleShowProfile}
-        setShowHistorique={handleShowHistorique} 
+        setShowHistorique={handleShowHistorique}
+        setShowFavoris={handleShowFavoris}
       />
       
       {showHistorique && (
-        <Historique 
-          onBack={() => setShowHistorique(false)}
-          artisteId={4}
+        <Historique
+        onBack={() => setShowHistorique(false)}
+        artisteId={4}
+        ajouterAuFavoris={ajouterAuFavoris}
+        />
+      )}
+
+      {showFavoris && (
+        <Favoris
+        onBack={() => setShowFavoris(false)}
+        favorisList={[]} // ici, on mettra plus tard la vraie liste
         />
       )}
       
@@ -54,7 +83,7 @@ const App = () => {
         <ModifProfil onBack={() => setShowProfileForm(false)} />
       )}
       
-      {!showProfileForm && !showHistorique && (
+      {!showProfileForm && !showHistorique && !showFavoris &&(
         <>
           <Wrapper />
           <div className="form-container">

@@ -75,7 +75,6 @@ const App = () => {
       {showFavoris && (
         <Favoris
         onBack={() => setShowFavoris(false)}
-        favorisList={[]} // ici, on mettra plus tard la vraie liste
         />
       )}
       

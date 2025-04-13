@@ -6,7 +6,7 @@ const Favoris = ({ onBack }) => {
   useEffect(() => {
     const fetchFavoris = async () => {
       try {
-        const response = await fetch("http://localhost:5001/favoris?artiste=4"); // artiste_id = 4
+        const response = await fetch("http://localhost:5001/getFav?artiste=4"); // artiste_id = 4
         const data = await response.json();
         console.log("Favoris récupérés :", data);
         setFavorisList(data);
@@ -44,16 +44,21 @@ const Favoris = ({ onBack }) => {
                 <td style={tdStyle}>{studio.adresse}</td>
                 <td style={tdStyle}>
                   <button
-                    style={{
-                      padding: "6px 12px",
-                      backgroundColor: "#e53935",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {retirerDesFavoris(4, studio.studio_id);// 4 à changer pour artiste
-                    }}
+                      style={{
+                        padding: "6px 12px",
+                        backgroundColor: "#e53935",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                      }}
+                      onClick={() =>
+                          retirerFavori(studio.artiste_id || 4, studio.studio_id, () => {
+                            setFavorisList((prev) =>
+                                prev.filter((s) => s.studio_id !== studio.studio_id)
+                            );
+                          })
+                      }
                   >
                     Retirer
                   </button>
@@ -63,21 +68,21 @@ const Favoris = ({ onBack }) => {
           </tbody>
         </table>
       ) : (
-        <p>Aucun favori pour l'instant.</p>
+          <p>Aucun favori pour l'instant.</p>
       )}
 
       <button
-        id="backbutton"
-        type="button"
-        className="register-btn"
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#ff5722",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
+          id="backbutton"
+          type="button"
+          className="register-btn"
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "#ff5722",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
         }}
         onClick={onBack}
       >
@@ -86,9 +91,10 @@ const Favoris = ({ onBack }) => {
     </div>
   );
 };
+
 export async function ajouterAuxFavoris(artisteId, studioId) {
   try {
-    const response = await fetch("http://localhost:5001/favoris", {
+    const response = await fetch("http://localhost:5001/postFav", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -98,6 +104,9 @@ export async function ajouterAuxFavoris(artisteId, studioId) {
         studio_id: studioId
       })
     });
+
+    const text = await response.text();
+
     if (response.status === 409) {
       console.warn("Le favori existe déjà.");
       return;
@@ -105,36 +114,41 @@ export async function ajouterAuxFavoris(artisteId, studioId) {
 
     if (!response.ok) throw new Error("Erreur API");
 
-    const data = await response.json();
-    console.log("Favoris ajouté :", data);
-    return data;
+    console.log("Favori ajouté :", JSON.parse(text));
+
+    alert("Favori ajouté !");
+
   } catch (err) {
     console.error("Erreur lors de l'ajout aux favoris :", err);
     throw err;
   }
 }
 
-async function retirerDesFavoris(artisteId, studioId) {
+export async function retirerFavori(artisteId, studioId, onSuccess) {
   try {
-    const response = await fetch("http://localhost:5001/favoris", {
+    const response = await fetch("http://localhost:5001/deleteFav", {
       method: "DELETE",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ artiste_id: artisteId, studio_id: studioId }),
+      body: JSON.stringify({
+        artiste_id: artisteId,
+        studio_id: studioId
+      })
     });
 
-    console.log("Statut de la réponse DELETE:", response.status); // 🧪 Ajoute ceci
+    if (!response.ok) throw new Error("Erreur API");
 
-    if (!response.ok) {
-      throw new Error("Échec de la suppression");
-    }
+    console.log("Favori retiré");
+    alert("Favori retiré !");
+    if (onSuccess) onSuccess();
 
-    console.log("Favori supprimé avec succès");
   } catch (err) {
     console.error("Erreur lors du retrait des favoris :", err);
+    alert("Erreur lors du retrait du favori");
   }
 }
+
 
 
 

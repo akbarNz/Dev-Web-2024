@@ -288,6 +288,19 @@ app.delete("/deleteFav", async (req, res) => {
   }
 });
 
+//Route pour récupérer les propriétaires : 
+app.get("/proprietaire", async (req, res) => {
+  try {
+    console.log("Requête reçue sur /proprietaire");
+    const result = await pool.query(`SELECT * FROM utilisateurs WHERE role = 'propriétaire'`);
+    console.log("Artistes récupérés :", result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erreur lors de la récupération des artistes :", err);
+    res.status(500).send('Erreur Serveur !');
+  }
+});
+
 
 
 // Démarrer le serveur

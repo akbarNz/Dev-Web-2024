@@ -38,6 +38,7 @@ const App = () => {
   const [showHistorique, setShowHistorique] = useState(false);
   const [showFavoris, setShowFavoris] = useState(false);
 
+
   const handleShowProfile = () => {
     setShowProfileForm(true);
     setShowHistorique(false);

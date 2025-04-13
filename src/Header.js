@@ -2,16 +2,26 @@ import React, { useState, useEffect } from "react";
 
 const Header = ({ setShowProfileForm, setShowHistorique, setShowFavoris }) => {
   const [menuItems, setMenuItems] = useState([]);
-
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+  
   useEffect(() => {
     const fetchMenuItems = async () => {
-      const response = await fetch("/api/menu-items");
-      const data = await response.json();
-      setMenuItems(data);
+      try {
+        const response = await fetch("/api/menu-items");
+        const data = await response.json();
+        setMenuItems(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des éléments du menu:", error);
+        setMenuItems([]);
+      }
     };
-
+    
     fetchMenuItems();
   }, []);
+  
+  const toggleSubmenu = () => {
+    setIsSubmenuOpen(!isSubmenuOpen);
+  };
 
   return (
     <header>

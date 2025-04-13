@@ -25,6 +25,15 @@ const App = () => {
     heure_fin: "",
   });
 
+  const [enregistrement, setEnregistrement] = useState({
+    artiste_id: "",
+    nom_studio: "",
+    adresse: "",
+    prix_par_heure: "",
+    equipement: "",
+    photo_url: ""
+  });
+
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showHistorique, setShowHistorique] = useState(false);
   const [showFavoris, setShowFavoris] = useState(false);
@@ -80,6 +89,14 @@ const App = () => {
       
       {showProfileForm && (
         <ModifProfil onBack={() => setShowProfileForm(false)} />
+      )}
+
+      {showEnregistrementForm && (
+        <EnregistrementForm 
+          enregistrement={enregistrement}
+          setEnregistrement={setEnregistrement}
+          onBack={() => setShowEnregistrementForm(false)}
+        />
       )}
       
       {!showProfileForm && !showHistorique && !showFavoris &&(

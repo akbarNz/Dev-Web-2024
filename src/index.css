@@ -455,3 +455,153 @@ button:hover {
 .photo-historique {
   width: 700px;
 }
+
+/* Style global pour le formulaire d'enregistrement */
+.enregi_form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif;
+}
+
+.enregi_form h1 {
+  color: #2c3e50;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.enregi_form h1:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(to right, #3498db, #2c3e50);
+  border-radius: 2px;
+}
+
+.enregi_form form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.enregi_form label {
+  font-weight: 500;
+  color: #34495e;
+  margin-bottom: 0.3rem;
+  display: block;
+}
+
+.enregi_form input,
+.enregi_form select,
+.enregi_form textarea {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: white;
+}
+
+.enregi_form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.enregi_form input:focus,
+.enregi_form select:focus,
+.enregi_form textarea:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.enregi_form input[type="file"] {
+  background-color: #e9ecef;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.enregi_form button {
+  background: linear-gradient(to right, #3498db, #2980b9);
+  color: white;
+  border: none;
+  padding: 14px 20px;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.enregi_form button:hover {
+  background: linear-gradient(to right, #2980b9, #2c3e50);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.enregi_form button:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+#backbutton {
+  background: linear-gradient(to right, #95a5a6, #7f8c8d);
+  margin-top: 1.5rem;
+}
+
+#backbutton:hover {
+  background: linear-gradient(to right, #7f8c8d, #34495e);
+}
+
+.enregi_form .advanced-image-container {
+  margin-top: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  overflow: hidden;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f1f1f1;
+}
+
+.enregi_form p {
+  color: #3498db;
+  margin: 0.5rem 0;
+  font-style: italic;
+}
+
+.enregi_form small {
+  color: #7f8c8d;
+  font-size: 0.8rem;
+  margin-top: -0.8rem;
+}
+
+/* Style responsive */
+@media (max-width: 768px) {
+  .enregi_form {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .enregi_form button {
+    padding: 12px 16px;
+  }
+}

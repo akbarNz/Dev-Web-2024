@@ -59,7 +59,7 @@ app.get("/reserv", async (req, res) => {
       ) = $5`;
       values.push(equipementsArray);
       values.push(equipementsArray.length);
-    }    
+    }
 
     console.log("Final query:", query);
     console.log("Query values:", values);
@@ -147,7 +147,7 @@ app.get('/getUserInfo', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
-  
+
   res.json(result.rows[0]);
 } catch (error) {
     console.log(error);
@@ -216,11 +216,11 @@ app.get('/historique', async (req, res) => {
   }
 });
 
-app.post("/favoris", async (req, res) => {
+app.post("/postFav", async (req, res) => {
   const { artiste_id, studio_id } = req.body;
 
   try {
-    await db.query(`
+    await pool.query(`
       INSERT INTO favoris (artiste_id, studio_id, date_ajout)
       VALUES ($1, $2, NOW())
     `, [artiste_id, studio_id]);
@@ -237,7 +237,7 @@ app.post("/favoris", async (req, res) => {
 });
 
 
-app.get("/favoris", async (req, res) => {
+app.get("/getFav", async (req, res) => {
   const { artiste } = req.query;
 
   if (!artiste) {
@@ -264,29 +264,31 @@ app.get("/favoris", async (req, res) => {
   }
 });
 
-app.delete("/favoris", async (req, res) => {
+app.delete("/deleteFav", async (req, res) => {
   const { artiste_id, studio_id } = req.body;
 
   if (!artiste_id || !studio_id) {
-    return res.status(400).json({ message: "Champs manquants" });
+    return res.status(400).json({ error: "Paramètres manquants" });
   }
 
   try {
-    const result = await db.query(
-      "DELETE FROM favoris WHERE artiste_id = $1 AND studio_id = $2",
+    const result = await pool.query(
+      `DELETE FROM favoris WHERE artiste_id = $1 AND studio_id = $2`,
       [artiste_id, studio_id]
     );
 
     if (result.rowCount === 0) {
-      return res.status(404).json({ message: "Aucune entrée supprimée" });
+      return res.status(404).json({ message: "Favori non trouvé" });
     }
 
-    res.status(200).json({ message: "Favori supprimé" });
-  } catch (err) {
-    console.error("Erreur serveur :", err);
-    res.status(500).json({ message: "Erreur serveur" });
+    res.json({ message: "Favori retiré avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression du favori :", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
+
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;

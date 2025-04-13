@@ -8,7 +8,6 @@ import Historique from "./Historique"
 import Favoris from "./Favoris";
 import EnregistrementForm from "./FormulaireEnregiStudio";
 
-
 const App = () => {
   const [filters, setFilters] = useState({
     prixMin: "",
@@ -56,6 +55,7 @@ const App = () => {
     setShowFavoris(true);
     setShowHistorique(false);
     setShowProfileForm(false);
+<<<<<<< Enregi_stud
   };
 
 
@@ -65,6 +65,17 @@ const App = () => {
   };
 
 
+=======
+  };
+
+
+  const ajouterAuFavoris = (studio) => {
+    console.log("Studio à ajouter :", studio);
+  // Plus tard, tu feras un fetch vers l’API ici
+  };
+
+
+>>>>>>> main
 
   return (
     <div> 

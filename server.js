@@ -288,55 +288,7 @@ app.delete("/deleteFav", async (req, res) => {
   }
 });
 
-//Route pour enregistrer un studio :
-app.post('/enregi', async(req, res) => {
-  const { nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url } = req.body;
 
-  if (!Array.isArray(equipements)) {
-    return res.status(400).json({ error: "Le champ 'equipements' doit être un tableau" });
-  }
-
-  try {
-    const query = `
-      INSERT INTO studios (nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url)
-      VALUES($1, $2, $3, $4, $5, $6, $7) RETURNING *`;
-      
-    const values = [nom, description, adresse, code_postal, prix_par_heure, JSON.stringify(equipements), photo_url];
-    const result = await pool.query(query, values);
-    
-    res.status(201).json({ 
-      message: 'Studio enregistré avec succès!',
-      studio: result.rows[0]
-    });
-  }
-  catch(err) {
-    console.error("Erreur détaillée:", err);
-    res.status(500).json({ error: 'Erreur serveur', details: err.message });
-  }
-});
-
-app.get('/ville', async(req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM villes');
-    res.json(result.rows);
-  } catch(err) {
-    console.error(err);
-    res.status(500).send('Erreur serveur');
-  }
-});
-
-//Route pour récupérer les propriétaires : 
-app.get("/proprietaire", async (req, res) => {
-  try {
-    console.log("Requête reçue sur /proprietaire");
-    const result = await pool.query(`SELECT * FROM utilisateurs WHERE role = 'propriétaire'`);
-    console.log("Artistes récupérés :", result.rows);
-    res.json(result.rows);
-  } catch (err) {
-    console.error("Erreur lors de la récupération des artistes :", err);
-    res.status(500).send('Erreur Serveur !');
-  }
-});
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;

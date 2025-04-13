@@ -4,9 +4,9 @@ import ReservationForm from "./FormulaireReservation";
 import Header from "./Header";
 import Wrapper from "./Wrapper";
 import ModifProfil from "./ModifProfil";
-import Historique from "./Historique";
+import Historique from "./Historique"
 import Favoris from "./Favoris";
-import EnregistrementForm from "./EnregistrementForm"; // Assurez-vous que ce composant existe
+
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -37,40 +37,32 @@ const App = () => {
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showHistorique, setShowHistorique] = useState(false);
   const [showFavoris, setShowFavoris] = useState(false);
-  const [showEnregistrementForm, setShowEnregistrementForm] = useState(false); // État manquant
 
   const handleShowProfile = () => {
     setShowProfileForm(true);
     setShowHistorique(false);
     setShowFavoris(false);
-    setShowEnregistrementForm(false);
   };
 
   const handleShowHistorique = () => {
     setShowHistorique(true);
     setShowProfileForm(false);
     setShowFavoris(false);
-    setShowEnregistrementForm(false);
   };
 
   const handleShowFavoris = () => {
     setShowFavoris(true);
     setShowHistorique(false);
     setShowProfileForm(false);
-    setShowEnregistrementForm(false);
   };
 
-  const handleShowEnregistrement = () => { // Ajout d'une fonction pour afficher le formulaire d'enregistrement
-    setShowEnregistrementForm(true);
-    setShowFavoris(false);
-    setShowHistorique(false);
-    setShowProfileForm(false);
-  };
 
   const ajouterAuFavoris = (studio) => {
     console.log("Studio à ajouter :", studio);
-    // Plus tard, tu feras un fetch vers l'API ici
+  // Plus tard, tu feras un fetch vers l’API ici
   };
+
+
 
   return (
     <div> 
@@ -78,20 +70,19 @@ const App = () => {
         setShowProfileForm={handleShowProfile}
         setShowHistorique={handleShowHistorique}
         setShowFavoris={handleShowFavoris}
-        setShowEnregistrementForm={handleShowEnregistrement} // Ajoutez ce prop si nécessaire
       />
       
       {showHistorique && (
         <Historique
-          onBack={() => setShowHistorique(false)}
-          artisteId={4}
-          ajouterAuFavoris={ajouterAuFavoris}
+        onBack={() => setShowHistorique(false)}
+        artisteId={4}
+        ajouterAuFavoris={ajouterAuFavoris}
         />
       )}
 
       {showFavoris && (
         <Favoris
-          onBack={() => setShowFavoris(false)}
+        onBack={() => setShowFavoris(false)}
         />
       )}
       
@@ -107,7 +98,7 @@ const App = () => {
         />
       )}
       
-      {!showProfileForm && !showHistorique && !showFavoris && !showEnregistrementForm && (
+      {!showProfileForm && !showHistorique && !showFavoris &&(
         <>
           <Wrapper />
           <div className="form-container">

@@ -59,7 +59,7 @@ app.get("/reserv", async (req, res) => {
       ) = $5`;
       values.push(equipementsArray);
       values.push(equipementsArray.length);
-    }    
+    }
 
     console.log("Final query:", query);
     console.log("Query values:", values);
@@ -147,7 +147,7 @@ app.get('/getUserInfo', async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
-  
+
   res.json(result.rows[0]);
 } catch (error) {
     console.log(error);
@@ -184,18 +184,107 @@ app.post('/saveUserInfo', async (req, res) => {
 });
 
 app.get('/historique', async (req, res) => {
+  const { artiste } = req.query;
+
+  if (!artiste) {
+    return res.status(400).json({ error: "Paramètre artiste manquant" });
+  }
+
   try {
     const result = await pool.query(`
-      select r.studio_id, r.date_reservation as date, r.nbr_personne, r.heure_debut, r.heure_fin, r.statut, r.prix_total, s.nom, s.adresse, s.photo_url 
-      from reservations as r
-      join studios as s on r.artiste_id = s.id
-      where artiste_id = 4
-      order by date DESC;
-      `);
+      SELECT 
+        r.studio_id, 
+        r.date_reservation AS date, 
+        r.nbr_personne, 
+        r.heure_debut, 
+        r.heure_fin, 
+        r.statut, 
+        r.prix_total, 
+        s.nom, 
+        s.adresse, 
+        s.photo_url 
+      FROM reservations AS r
+      JOIN studios AS s ON r.studio_id = s.id
+      WHERE r.artiste_id = $1
+      ORDER BY date DESC;
+    `, [artiste]);
+
     res.json(result.rows);
-  } catch(err){
-    console.error(err);
+  } catch (err) {
+    console.error("Erreur dans /historique :", err);
     res.status(500).send('Erreur serveur');
+  }
+});
+
+app.post("/postFav", async (req, res) => {
+  const { artiste_id, studio_id } = req.body;
+
+  try {
+    await pool.query(`
+      INSERT INTO favoris (artiste_id, studio_id, date_ajout)
+      VALUES ($1, $2, NOW())
+    `, [artiste_id, studio_id]);
+
+    res.status(201).json({ message: "Favori ajouté" });
+
+  } catch (error) {
+    if (error.code === '23505') { // violation contrainte UNIQUE PostgreSQL
+      return res.status(409).json({ message: "Déjà en favoris" });
+    }
+    console.error("Erreur ajout favoris :", error);
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+});
+
+
+app.get("/getFav", async (req, res) => {
+  const { artiste } = req.query;
+
+  if (!artiste) {
+    return res.status(400).json({ error: "Paramètre artiste manquant" });
+  }
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        f.studio_id,
+        s.nom,
+        s.adresse,
+        s.photo_url,
+        s.prix_par_heure
+      FROM favoris f
+      JOIN studios s ON f.studio_id = s.id
+      WHERE f.artiste_id = $1
+    `, [artiste]);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error("Erreur dans /favoris :", err);
+    res.status(500).send("Erreur serveur");
+  }
+});
+
+app.delete("/deleteFav", async (req, res) => {
+  const { artiste_id, studio_id } = req.body;
+
+  if (!artiste_id || !studio_id) {
+    return res.status(400).json({ error: "Paramètres manquants" });
+  }
+
+  try {
+    const result = await pool.query(
+      `DELETE FROM favoris WHERE artiste_id = $1 AND studio_id = $2`,
+      [artiste_id, studio_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Favori non trouvé" });
+    }
+
+    res.json({ message: "Favori retiré avec succès" });
+  } catch (error) {
+    console.error("Erreur lors de la suppression du favori :", error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 });
 

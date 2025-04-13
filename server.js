@@ -301,7 +301,16 @@ app.get("/proprietaire", async (req, res) => {
   }
 });
 
-
+app.get('/ville', async(req, res)=> {
+  try{
+    const query = `Select * from villes`
+    res.json(query.rows)
+  }
+  catch(err){
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});
 
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;

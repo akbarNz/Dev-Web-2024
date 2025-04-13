@@ -63,13 +63,6 @@ const App = () => {
   };
 
 
-  };
-
-
-  const ajouterAuFavoris = (studio) => {
-    console.log("Studio à ajouter :", studio);
-  // Plus tard, tu feras un fetch vers l’API ici
-  };
 
   return (
     <div> 

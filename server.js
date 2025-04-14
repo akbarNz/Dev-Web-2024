@@ -311,6 +311,37 @@ app.get('/ville', async(req, res) => {
   }
 });
 
+//Route d'enregistrement 
+app.post('/enregi', async(req, res) => {
+  const { nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url, proprietaire_id } = req.body;
+
+  if (!Array.isArray(equipements)) {
+    return res.status(400).json({ error: "Le champ 'equipements' doit être un tableau" });
+  }
+
+  if (!proprietaire_id) {
+    return res.status(400).json({ error: "L'ID du propriétaire est requis" });
+  }
+
+  try {
+    const query = `
+      INSERT INTO studios (nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url, proprietaire_id)
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
+      
+    const values = [nom, description, adresse, code_postal, prix_par_heure, JSON.stringify(equipements), photo_url, proprietaire_id];
+    const result = await pool.query(query, values);
+    
+    res.status(201).json({ 
+      message: 'Studio enregistré avec succès!',
+      studio: result.rows[0]
+    });
+  }
+  catch(err) {
+    console.error("Erreur détaillée:", err);
+    res.status(500).json({ error: 'Erreur serveur', details: err.message });
+  }
+});
+
 // Démarrer le serveur
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

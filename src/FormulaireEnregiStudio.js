@@ -73,12 +73,13 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
       const enregistrementData = {
         nom: enregistrement.nom_studio,
-        description: enregistrement.descritpion,
+        description: enregistrement.description,
         adresse: enregistrement.adresse,
         code_postal: enregistrement.code_postal,
         prix_par_heure: parseFloat(enregistrement.prix_par_heure),
         equipements: equipementsArray,
         photo_url: enregistrement.photo_url || "",
+        proprietaire_id: enregistrement.artiste_id
       };
 
       console.log("Données envoyées au serveur:", enregistrementData);

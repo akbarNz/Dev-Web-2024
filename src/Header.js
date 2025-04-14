@@ -52,10 +52,6 @@ const Header = ({
                   e.preventDefault();
                   setShowEnregistrement(true);
                 }}>Enregistrer un studio</a></li>
-                <li><a href="#" onClick={(e) => {
-                  e.preventDefault();
-                  setShowReservationForm(true);
-                }}>Réserver un studio</a></li>
               </ul>
             )}
           </li>

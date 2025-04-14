@@ -301,12 +301,11 @@ app.get("/proprietaire", async (req, res) => {
   }
 });
 
-app.get('/ville', async(req, res)=> {
-  try{
-    const query = `Select * from villes`
-    res.json(query.rows)
-  }
-  catch(err){
+app.get('/ville', async(req, res) => {
+  try {
+    const result = await pool.query(`SELECT * FROM villes`);
+    res.json(result.rows);
+  } catch(err) {
     console.error(err);
     res.status(500).send('Erreur serveur');
   }

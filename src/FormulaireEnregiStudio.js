@@ -20,7 +20,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
     fetch("http://localhost:5001/ville")
       .then((res) => res.json())
       .then((data) => {
-        console.log("Données reçues pour villes:", data); // Ajoutez ce log
+        console.log("Données reçues pour villes:", data);
         setVille(data);
       })
       .catch((err) => console.error("Erreur chargement villes:", err));

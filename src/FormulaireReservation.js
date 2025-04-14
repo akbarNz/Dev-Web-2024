@@ -96,7 +96,7 @@ const ReservationForm = ({
     try {
       // Envoi à Firebase
       await addDoc(collection(db, "reservations"), {
-        nbr_personne: reservationData.nbr_personne, // Seulement ce champ
+        nbr_personne: reservationData.nbr_personne,
         firebase_created_at: serverTimestamp()
       });
 

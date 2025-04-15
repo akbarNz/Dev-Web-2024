@@ -1,0 +1,88 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #1E1E1E;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.logo a {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #FF5722;
+  text-decoration: none;
+  font-family: 'Righteous', sans-serif;
+  transition: color 0.3s ease;
+}
+
+.logo a:hover {
+  color: #FF7043;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.langSelect {
+  padding: 0.5rem;
+  border: 1px solid #FF5722;
+  border-radius: 4px;
+  background-color: transparent;
+  color: #FFFFFF;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.langSelect option {
+  background-color: #1E1E1E;
+  color: #FFFFFF;
+}
+
+.authLinks {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.link {
+  text-decoration: none;
+  color: #FFFFFF;
+  padding: 0.5rem 1.2rem;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.link:hover {
+  background-color: #FF5722;
+  color: #FFFFFF;
+}
+
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+  }
+
+  .nav {
+    gap: 1rem;
+  }
+
+  .logo a {
+    font-size: 1.5rem;
+  }
+
+  .authLinks {
+    gap: 0.8rem;
+  }
+
+  .link {
+    padding: 0.4rem 0.8rem;
+  }
+}

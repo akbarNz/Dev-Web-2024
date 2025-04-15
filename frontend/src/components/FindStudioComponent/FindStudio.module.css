@@ -1,0 +1,81 @@
+.findStudioContainer {
+    padding: 2rem;
+    background-image: url('../../../assets/images/pexels-tima-miroshnichenko-4988131.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f5f5f5; /* Fallback color */
+}
+
+.title {
+    color: #333;
+    margin-bottom: 2rem;
+    text-align: center;
+    font-size: 2rem;
+}
+
+.searchContainer {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+}
+
+.searchWrapper {
+    display: flex;
+    align-items: center;
+    background: white;
+    border-radius: 25px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.searchInput {
+    flex: 1;
+    padding: 1rem 1.5rem;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+}
+
+.filterButton {
+    background: none;
+    border: none;
+    padding: 1rem;
+    cursor: pointer;
+    font-size: 1.2rem;
+}
+
+.filterDropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-top: 0.5rem;
+    width: 200px;
+    z-index: 1000;
+}
+
+.filterDropdown button {
+    width: 100%;
+    padding: 0.8rem 1rem;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.filterDropdown button:hover {
+    background-color: #f5f5f5;
+}
+
+.filterDropdown button.active {
+    background-color: #e0e0e0;
+    font-weight: bold;
+}

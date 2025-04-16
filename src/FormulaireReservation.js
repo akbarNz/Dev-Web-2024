@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem } from "@mui/material";
-import { db } from "./firebase"; // Assurez-vous que ce chemin est correct
+import { db } from "./firebase"; 
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const ReservationForm = ({

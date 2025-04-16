@@ -1,3 +1,4 @@
+/* Reset style */
 * {
   margin: 0;
   padding: 0;
@@ -5,107 +6,236 @@
   font-family: Arial, sans-serif;
 }
 
+/* Header Styles */
 header {
-  background: #222;
-  padding: 15px 50px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 0.8rem 2rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Flexbox pour aligner logo, menu et bouton */
 nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
-nav a img {
-  width: 120px; 
-}
-
-nav ul {
-  list-style: none;
+/* Logo Style */
+nav > a {
   display: flex;
-  gap: 30px;
+  align-items: center;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+nav > a:hover {
+  transform: scale(1.05);
+}
+
+nav img {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Main Navigation */
+nav ul {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1.2rem;
 }
 
 nav ul li {
   position: relative;
 }
 
-nav ul li a {
+nav ul li > a {
+  color: #f0f0f0;
   text-decoration: none;
-  color: white;
-  font-weight: bold;
-  padding: 10px 15px;
-  display: block;
-  transition: 0.3s ease-in-out;
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  position: relative;
+  transition: all 0.3s ease;
 }
 
-/* Animation hover sur les liens */
-nav ul li a:hover {
+nav ul li > a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #ff5733;
+  transition: width 0.3s ease;
+}
+
+nav ul li > a:hover::after {
+  width: 100%;
+}
+
+nav ul li > a:hover {
   color: #ff5733;
-  transform: scale(1.1);
 }
 
+/* Dropdown Menu */
 .submenu {
-  display: none; 
-  position: absolute; 
+  position: absolute;
   top: 100%;
   left: 0;
-  background-color: white;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); 
-  border-radius: 12px;
-  z-index: 10;
-  color: black;
-  opacity: 0; /* Commence invisible */
-  transition: opacity 0.3s ease; /* Transition de l'opacité */
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  min-width: 220px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(15px);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 100;
+  padding: 0.5rem 0;
 }
 
-/* Style des liens du sous-menu */
+nav ul li:hover .submenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(5px);
+}
+
 .submenu li {
   display: block;
 }
 
 .submenu li a {
-  color: black;
-  padding: 10px;
+  color: #333 !important;
+  padding: 0.7rem 1.5rem;
   display: block;
-  transition: 0.3s ease-in-out;
+  transition: all 0.2s ease;
+  font-size: 1rem;
 }
 
 .submenu li a:hover {
-  background: #ff5733;
-  color: white;
-  border-radius: 5px;
+  background: linear-gradient(to right, #ff5733, #ff8c42);
+  color: white !important;
+  padding-left: 1.8rem;
 }
 
-/* Affichage du sous-menu au survol */
-nav ul li:hover .submenu {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
+/* Action Buttons */
+.nav-actions {
+  display: flex;
+  gap: 0.3rem; 
+  align-items: center;
 }
 
 .register-btn {
-  width: auto;
-  padding: 10px 20px; 
-  background: #ff5733;
+  background: linear-gradient(135deg, #ff5733 0%, #ff8c42 100%);
   color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: 0.3s ease-in-out;
   border: none;
+  padding: 0.5rem 1.2rem; 
+  border-radius: 30px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 8px rgba(255, 87, 51, 0.3);
+  font-size: 0.9rem;
+  min-width: 90px;
+  width: 175px; 
+  text-align: center;
+  white-space: nowrap; 
 }
 
 .register-btn:hover {
-  background: white;
-  color: #ff5733;
-  box-shadow: 0 0 10px rgba(255, 87, 51, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 87, 51, 0.4);
+  background: linear-gradient(135deg, #ff8c42 0%, #ff5733 100%);
 }
 
+#profil_button {
+  background: linear-gradient(135deg, #4a6bff 0%, #6a8aff 100%);
+  box-shadow: 0 4px 8px rgba(74, 107, 255, 0.3);
+  min-width: 80px; 
+}
+
+#profil_button:hover {
+  background: linear-gradient(135deg, #6a8aff 0%, #4a6bff 100%);
+  box-shadow: 0 6px 12px rgba(74, 107, 255, 0.4);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  nav {
+    padding: 0.8rem 1.5rem;
+  }
+  
+  nav ul {
+    gap: 1.5rem;
+  }
+  
+  .nav-actions {
+    gap: 0.8rem;
+  }
+  
+  .register-btn {
+    padding: 0.5rem 1rem;
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 0.6rem 1rem;
+  }
+  
+  nav {
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  
+  nav > a {
+    order: 1;
+  }
+  
+  nav ul {
+    order: 3;
+    width: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  
+  .nav-actions {
+    order: 2;
+    margin-left: auto;
+  }
+  
+  .register-btn {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  nav ul {
+    gap: 1rem;
+  }
+  
+  .nav-actions {
+    gap: 0.5rem;
+  }
+  
+  .register-btn {
+    min-width: 70px;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8rem;
+  }
+}
 
 h1 {
   animation: slideIn 2s ease-out forwards;
@@ -130,68 +260,68 @@ h1 {
 /*Wrapper pour les différents studios*/
 
 .wrapper {
-  width: 90%;
-  max-width: 1536px;
-  margin-inline: auto;
+  width: 100%;
+  margin: 2rem auto;
   position: relative;
-  height: 300px; 
-  margin-top: 5rem;
+  height: 300px;
   overflow: hidden;
   mask-image: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0),
-      rgba(0, 0, 0, 1) 20%,
-      rgba(0, 0, 0, 1) 80%,
-      rgba(0, 0, 0, 0)
+    to right,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 1) 10%,
+    rgba(0, 0, 0, 1) 90%,
+    rgba(0, 0, 0, 0)
   );
-  margin: 20px;
 }
 
-/* Animation de défilement */
-@keyframes scrollLeft {
-  to {
-      left: -200px;
+/* Container pour les items */
+.scroll-container {
+  display: flex;
+  position: absolute;
+  gap: 2rem;
+  height: 100%;
+  align-items: center;
+  animation: scrollAnimation linear infinite;
+}
+
+@keyframes scrollAnimation {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(calc(-100% - 2rem)); /* espace entre les items */
   }
 }
 
 /* Style des items */
 .item {
-  width: 300px;
+  flex: 0 0 300px; /* Largeur fixe mais flexibilité */
   height: 250px;
-  background-color: #ffffff;
+  background: #ffffff;
   border-radius: 12px;
-  position: absolute;
-  left: max(calc(150px * 8), 100%);
-  animation-name: scrollLeft;
-  animation-duration: 20s; /* Animation plus rapide */
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
   display: flex;
-  flex-direction: column; /* Affichage en colonne */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Ombre portée */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
 }
 
-/* Style des logos */
-.item img {
-  height: 200px;
-  width: 300px;
-  margin-bottom: 10px; /* Marge pour espacer l'image et le texte */
-  border-radius: 12px;
-}
-
-/* Style du texte h5 */
-.item h5 {
-  text-align: center; /* Centrer le texte */
-  margin: 0; /* Supprimer les marges par défaut */
-}
-
-/* Effet de survol sur les items */
 .item:hover {
-  transform: scale(1.1); /* Agrandissement au survol */
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3); /* Ombre plus prononcée */
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.item img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+}
+
+.item h5 {
+  margin: 0.5rem;
+  text-align: center;
 }
 
 /* Effet de survol sur les logos

@@ -524,7 +524,7 @@ button:hover {
 /*Formulaire de modification*/
 
 .form-wrapper-profil {
-  max-width: 60%; /* Ajuste selon ton besoin */
+  max-width: 60%; 
   margin: 10% auto;
   padding: 20px;
   background-color: #f9f9f9;
@@ -534,16 +534,17 @@ button:hover {
 
 
 .form-wrapper-profil form {
-  background-color: #fff; /* Optionnel : fond blanc */
+  background-color: #fff; 
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
-  width: 100%; /* Largeur fixe */
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+  width: 100%; 
   text-align: center;
 }
 
 .form-wrapper-profil h2 {
   text-align: center;
+  padding-bottom: 2%;
 }
 
 .form-wrapper-profil .left_label {
@@ -560,6 +561,16 @@ button:hover {
   border-radius: 50%;
   object-fit: cover;
   margin-bottom: 10px;
+}
+
+#file-upload {
+  display: none;
+}
+
+.form-wrapper-profil #profil_button {
+  display: block;
+  margin: 1rem auto;
+  text-align: center;
 }
 
 .form-wrapper-profil button {

@@ -5,7 +5,6 @@ import Axios from "axios";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 
-
 const ModifProfil = ({ onBack }) => {
   const [profil, setProfil] = useState({
     photo_profil_url: "",
@@ -16,15 +15,16 @@ const ModifProfil = ({ onBack }) => {
   });
 
   const [publicId, setPublicId] = useState("");
+  const [localImage, setLocalImage] = useState(null); // photo locale
+  const [fileToUpload, setFileToUpload] = useState(null); // Fichier sélectionné
 
   useEffect(() => {
     const fetchProfil = async () => {
       try {
-        const response = await fetch("http://localhost:5001/getUserInfo?id=4"); 
+        const response = await fetch("http://localhost:5001/getUserInfo?id=4");
         const data = await response.json();
-
         setProfil({ ...data, numero_telephone: `+${data.numero_telephone}` });
-        setPublicId(data.photo_profil_url); // Charger l'image
+        setPublicId(data.photo_profil_url);
       } catch (error) {
         console.error("Erreur lors de la récupération du profil :", error);
       }
@@ -33,26 +33,36 @@ const ModifProfil = ({ onBack }) => {
     fetchProfil();
   }, []);
 
-  const uploadImage = async (files) => {
-    const formData = new FormData();
-    formData.append("file", files[0]);
-    formData.append("upload_preset", "rnvyghre");
-
-    try {
-      const response = await Axios.post("https://api.cloudinary.com/v1_1/dpszia6xf/image/upload", formData);
-      setPublicId(response.data.public_id);
-
-      // Met à jour le profil direct
-      setProfil((prev) => ({ ...prev, photo_profil_url: response.data.public_id }));
-    } catch (error) {
-      console.error("Erreur lors de l'upload :", error);
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFileToUpload(file);
+      setLocalImage(URL.createObjectURL(file)); // Aperçu immédiat
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    let finalPublicId = publicId;
+
+    // Si l'utilisateur a sélectionné une nouvelle image
+    if (fileToUpload) {
+      const formData = new FormData();
+      formData.append("file", fileToUpload);
+      formData.append("upload_preset", "rnvyghre");
+
+      try {
+        const response = await Axios.post("https://api.cloudinary.com/v1_1/dpszia6xf/image/upload", formData);
+        finalPublicId = response.data.public_id;
+      } catch (error) {
+        console.error("Erreur lors de l'upload :", error);
+        return;
+      }
+    }
+
     const formattedPhone = profil.numero_telephone.replace(/[\s+]/g, '');
-    const updatedProfil = { ...profil, numero_telephone: formattedPhone };
+    const updatedProfil = { ...profil, numero_telephone: formattedPhone, photo_profil_url: finalPublicId };
 
     try {
       const response = await fetch("http://localhost:5001/saveUserInfo", {
@@ -63,6 +73,9 @@ const ModifProfil = ({ onBack }) => {
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
       alert("Profil mis à jour avec succès !");
+      setPublicId(finalPublicId); // Mise à jour affichage après sauvegarde
+      setLocalImage(null); // Nettoyer l'aperçu
+      setFileToUpload(null);
     } catch (error) {
       console.error(error);
     }
@@ -78,14 +91,16 @@ const ModifProfil = ({ onBack }) => {
         <form onSubmit={handleSubmit}>
           <label>
             <div>
-              {publicId ? (
+              {localImage ? (
+                <img src={localImage} alt="Aperçu" className="profil-photo" />
+              ) : publicId ? (
                 <AdvancedImage cldImg={img} className="profil-photo" />
               ) : (
                 <img src="logo512.png" alt="Photo de profil" className="profil-photo" />
               )}
             </div>
-            <label className="left_label">Changer de photo</label>
-            <input type="file" accept="image/*" onChange={(e) => uploadImage(e.target.files)} />
+            <label id= "profil_button" for="file-upload" class="register-btn">Changer de photo</label>
+            <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
           </label>
 
           <label className="left_label">

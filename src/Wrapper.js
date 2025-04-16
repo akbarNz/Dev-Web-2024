@@ -20,21 +20,30 @@ const StudioSection = () => {
     fetchStudios();
   }, []);
 
+  // Duplique les studios pour créer un effet de boucle continu
+  const duplicatedStudios = [...studios, ...studios];
+
   return (
     <section>
       <div className="wrapper">
-        {studios.map((studio, index) => {
-          const img = cld.image(studio.photo_url);
-          return (
-            <div key={studio.id_stud || index} className={`item item${index + 1}`}>
-              <AdvancedImage cldImg={img} className="profil-photo" />
-              <h5 id={`studio-name-${index + 1}`}>{studio.nom_stud}</h5>
-              <h5>
-                Prix : <span id={`studio-price-${index + 1}`}>{studio.prix_par_heure}</span>
-              </h5>
-            </div>
-          );
-        })}
+        <div 
+          className="scroll-container" 
+          style={{ 
+            animationDuration: `${studios.length * 5}s`,
+            width: `calc(${studios.length * 320}px + ${studios.length * 2}rem)`
+          }}
+        >
+          {duplicatedStudios.map((studio, index) => {
+            const img = cld.image(studio.photo_url);
+            return (
+              <div key={`${studio.id_stud}-${index}`} className="item">
+                <AdvancedImage cldImg={img} className="studio-photo" />
+                <h5>{studio.nom_stud}</h5>
+                <h5>Prix : {studio.prix_par_heure}€/h</h5>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

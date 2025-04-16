@@ -33,11 +33,9 @@ const Header = ({
     <header>
       <nav>
         <a href="logo">
-          <img src="#" alt="Logo" />
-          <h1>StudioElec</h1>
+          <img src="zikfreak_logo.png" alt="Logo" />
         </a>
         <ul>
-          <li><a href="#">Home</a></li>
           <li>
             <a href="#" onClick={(e) => {
               e.preventDefault();
@@ -55,17 +53,15 @@ const Header = ({
               </ul>
             )}
           </li>
-          <li><a href="#">A propos</a></li>
-          <li><a href="#">Contact</a></li>
         </ul>
         <button className="register-btn" onClick={() => setShowHistorique(true)}>
-          Historique des réservations
+          Historique
         </button>
         <button className="register-btn" onClick={() => setShowFavoris(true)}>
           Favoris
         </button>
         <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>
-          Modifier mon profil
+          Profil
         </button>
       </nav>
     </header>

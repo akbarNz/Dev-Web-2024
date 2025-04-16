@@ -15,7 +15,7 @@ const ModifProfil = ({ onBack }) => {
   });
 
   const [publicId, setPublicId] = useState("");
-  const [localImage, setLocalImage] = useState(null); // Pour l'aperçu local
+  const [localImage, setLocalImage] = useState(null); // photo locale
   const [fileToUpload, setFileToUpload] = useState(null); // Fichier sélectionné
 
   useEffect(() => {
@@ -99,8 +99,8 @@ const ModifProfil = ({ onBack }) => {
                 <img src="logo512.png" alt="Photo de profil" className="profil-photo" />
               )}
             </div>
-            <label className="left_label">Changer de photo</label>
-            <input type="file" accept="image/*" onChange={handleFileChange} />
+            <label id= "profil_button" for="file-upload" class="register-btn">Changer de photo</label>
+            <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
           </label>
 
           <label className="left_label">

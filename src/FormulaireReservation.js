@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { InputLabel, Select, MenuItem } from "@mui/material";
+import { InputLabel, Select, MenuItem, CircularProgress, Box } from "@mui/material";
 import { db } from "./firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -16,11 +16,11 @@ const ReservationForm = ({
   const [timeDifference, setTimeDifference] = useState(0);
   const [prixTotal, setPrixTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // S'assurer que les champs ne sont jamais undefined
+  // Initialisation des champs de réservation
   useEffect(() => {
     setReservation(prev => ({
-      ...prev,
       artiste_id: prev.artiste_id || "",
       studio_id: prev.studio_id || "",
       date_reservation: prev.date_reservation || "",
@@ -31,31 +31,56 @@ const ReservationForm = ({
     }));
   }, [setReservation]);
 
+  // Chargement initial de tous les studios et des utilisateurs
   useEffect(() => {
-    // Récupération des studios
-    const validNoteMin = noteMin ?? 0;
-    fetch(
-      `http://localhost:5001/reserv?prixMin=${prixMin}&prixMax=${prixMax}&noteMin=${validNoteMin}&selectedEquipements=${encodeURIComponent(
-        JSON.stringify(selectedEquipements)
-      )}`
-    )
-      .then((res) => res.json())
-      .then((data) => setStudios(data))
-      .catch((err) => console.error("Erreur chargement studios:", err));
+    const fetchInitialData = async () => {
+      try {
+        const [studioRes, userRes] = await Promise.all([
+          fetch("http://localhost:5001/studios"),
+          fetch("http://localhost:5001/artiste"),
+        ]);
+        const [studioData, userData] = await Promise.all([
+          studioRes.json(),
+          userRes.json(),
+        ]);
+        setStudios(studioData);
+        setUsers(userData);
+      } catch (err) {
+        console.error("Erreur chargement initial:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchInitialData();
+  }, []);
 
-    // Récupération des utilisateurs
-    fetch("http://localhost:5001/artiste")
-      .then((res) => res.json())
-      .then((data) => setUsers(data))
-      .catch((err) => console.error("Erreur chargement utilisateurs:", err));
+  useEffect(() => {
+    // Ne fait rien si aucun filtre n'est défini
+    if (prixMin === null && prixMax === null && noteMin === null && !selectedEquipements?.length) {
+      return;
+    }
+  
+    const fetchFilteredStudios = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5001/reserv?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
+            JSON.stringify(selectedEquipements || [])
+          )}`
+        );
+        const data = await response.json();
+        setStudios(data);
+      } catch (err) {
+        console.error("Erreur filtre studios:", err);
+      }
+    };
+    fetchFilteredStudios();
   }, [prixMin, prixMax, noteMin, selectedEquipements]);
 
   const calculateTimeDifference = (startTime, endTime) => {
     if (startTime && endTime) {
       const start = new Date(`2023-01-01T${startTime}`);
       const end = new Date(`2023-01-01T${endTime}`);
-      const diffMinutes = (end - start) / (1000 * 60);
-      return diffMinutes / 60;
+      return (end - start) / (1000 * 60 * 60); // différence en heures
     }
     return 0;
   };
@@ -76,7 +101,7 @@ const ReservationForm = ({
 
   const handleReservationChange = (e) => {
     const { name, value } = e.target;
-    setReservation({ ...reservation, [name]: value });
+    setReservation(prev => ({ ...prev, [name]: value }));
 
     if (name === "heure_debut" || name === "heure_fin") {
       const startTime = name === "heure_debut" ? value : reservation.heure_debut;
@@ -108,13 +133,11 @@ const ReservationForm = ({
     };
 
     try {
-      // Envoi à Firebase
       await addDoc(collection(db, "reservations"), {
         nbr_personne: reservationData.nbr_personne,
         firebase_created_at: serverTimestamp()
       });
 
-      // Envoi à votre backend
       const response = await fetch("http://localhost:5001/reserve", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -122,8 +145,7 @@ const ReservationForm = ({
       });
 
       if (!response.ok) throw new Error("Erreur backend");
-      
-      const result = await response.json();
+
       alert("Réservation enregistrée avec succès !");
     } catch (error) {
       console.error("Erreur:", error);
@@ -133,13 +155,21 @@ const ReservationForm = ({
     }
   };
 
+  if (isLoading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <div className="reservation-form">
       <h1>Réserver un studio</h1>
       <form onSubmit={handleReservationSubmit}>
         <InputLabel id="artiste-select-label">Votre nom</InputLabel>
         <Select
-          sx={{ width: '100%', height: '45px' }}
+          sx={{ width: '100%', height: '45px', mb: 2 }}
           labelId="artiste-select-label"
           id="artiste-select"
           name="artiste_id"
@@ -149,7 +179,7 @@ const ReservationForm = ({
         >
           <MenuItem value=""><em>Sélectionnez votre nom</em></MenuItem>
           {users.map((user) => (
-            <MenuItem key={user.id} value={user.id}>
+            <MenuItem key={user.id} value={user.id.toString()}>
               {user.nom}
             </MenuItem>
           ))}
@@ -157,7 +187,7 @@ const ReservationForm = ({
 
         <InputLabel id="studio-select-label">Choisir un studio</InputLabel>
         <Select
-          sx={{ width: '100%', height: '45px' }}
+          sx={{ width: '100%', height: '45px', mb: 2 }}
           labelId="studio-select-label"
           id="studio-select"
           name="studio_id"
@@ -167,53 +197,78 @@ const ReservationForm = ({
         >
           <MenuItem value=""><em>Sélectionnez un studio</em></MenuItem>
           {studios.map((studio) => (
-            <MenuItem key={studio.id_stud} value={studio.id_stud}>
+            <MenuItem key={studio.id_stud} value={studio.id_stud.toString()}>
               {studio.nom_stud} - {studio.prix_par_heure}€/h
             </MenuItem>
           ))}
         </Select>
 
-        <label>Date de réservation</label>
+        <InputLabel htmlFor="date_reservation">Date de réservation</InputLabel>
         <input
           type="date"
+          id="date_reservation"
           name="date_reservation"
-          value={reservation.date_reservation || ""}
+          value={reservation.date_reservation}
           onChange={handleReservationChange}
           required
+          style={{ width: '100%', padding: '8px', marginBottom: '16px' }}
         />
 
-        <label>Nombre de personnes</label>
+        <InputLabel htmlFor="nbr_personne">Nombre de personnes</InputLabel>
         <input
           type="number"
+          id="nbr_personne"
           name="nbr_personne"
-          value={reservation.nbr_personne || 1}
+          value={reservation.nbr_personne}
           onChange={handleReservationChange}
           required
           min="1"
+          style={{ width: '100%', padding: '8px', marginBottom: '16px' }}
         />
 
-        <label>Heure de début</label>
+        <InputLabel htmlFor="heure_debut">Heure de début</InputLabel>
         <input
           type="time"
+          id="heure_debut"
           name="heure_debut"
-          value={reservation.heure_debut || ""}
+          value={reservation.heure_debut}
           onChange={handleReservationChange}
           required
+          style={{ width: '100%', padding: '8px', marginBottom: '16px' }}
         />
 
-        <label>Heure de fin</label>
+        <InputLabel htmlFor="heure_fin">Heure de fin</InputLabel>
         <input
           type="time"
+          id="heure_fin"
           name="heure_fin"
-          value={reservation.heure_fin || ""}
+          value={reservation.heure_fin}
           onChange={handleReservationChange}
           required
+          style={{ width: '100%', padding: '8px', marginBottom: '16px' }}
         />
 
-        <label>Prix total :</label>
-        <span id="prixTotal">{prixTotal.toFixed(2)}€</span>
+        <Box sx={{ mb: 2 }}>
+          <InputLabel>Prix total :</InputLabel>
+          <span id="prixTotal" style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+            {prixTotal.toFixed(2)}€
+          </span>
+        </Box>
 
-        <button type="submit" disabled={isSubmitting}>
+        <button 
+          type="submit" 
+          disabled={isSubmitting}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: isSubmitting ? '#cccccc' : '#1976d2',
+            color: 'white',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer',
+            fontSize: '1rem'
+          }}
+        >
           {isSubmitting ? "Enregistrement..." : "Réserver"}
         </button>
       </form>

@@ -20,7 +20,7 @@ const pool = new Pool({
     port: 5432,
 });
 
-// Route pour récupérer les studios
+//Route pour les studios filtrés
 app.get("/reserv", async (req, res) => {
   try {
     const { prixMin, prixMax, noteMin, selectedEquipements } = req.query;
@@ -38,28 +38,44 @@ app.get("/reserv", async (req, res) => {
       SELECT S.id AS id_stud, 
             S.nom AS nom_stud, 
             S.prix_par_heure,
-            A.moyenne_note,
+            COALESCE(A.moyenne_note, 0) AS moyenne_note,
             S.photo_url
       FROM studios AS S
-      JOIN (
+      LEFT JOIN (
           SELECT studio_id, AVG(note) AS moyenne_note
           FROM avis
           GROUP BY studio_id
-          HAVING AVG(note) >= $3
       ) AS A ON S.id = A.studio_id
-      WHERE S.prix_par_heure BETWEEN $1 AND $2
+      WHERE 1=1
     `;
 
-    let values = [prixMin || 0, prixMax || 1000, noteMin || 0];
+    let values = [];
+    let paramIndex = 1;
+
+    if (prixMin || prixMax) {
+      query += ` AND S.prix_par_heure BETWEEN $${paramIndex} AND $${paramIndex + 1}`;
+      values.push(prixMin || 0);
+      values.push(prixMax || 1000);
+      paramIndex += 2;
+    }
+
+    if (noteMin) {
+      query += ` AND COALESCE(A.moyenne_note, 0) >= $${paramIndex}`;
+      values.push(noteMin);
+      paramIndex += 1;
+    }
 
     if (equipementsArray.length > 0) {
       query += ` AND (
         SELECT COUNT(*) FROM json_array_elements_text(S.equipements) AS elem
-        WHERE elem = ANY($4)
-      ) = $5`;
+        WHERE elem = ANY($${paramIndex})
+      ) = $${paramIndex + 1}`;
       values.push(equipementsArray);
       values.push(equipementsArray.length);
     }
+
+    // Ajout du tri par prix croissant
+    query += ` ORDER BY S.prix_par_heure ASC`;
 
     console.log("Final query:", query);
     console.log("Query values:", values);
@@ -69,6 +85,22 @@ app.get("/reserv", async (req, res) => {
   } catch (err) {
     console.error("Erreur détaillée:", err);
     res.status(500).json({ error: 'Erreur serveur', details: err.message });
+  }
+});
+
+//Route pour récupérer les studios sans filtre : 
+app.get("/studios", async(req, res) => {
+  try{
+    const result = await pool.query(`
+      SELECT * 
+      FROM studios 
+      ORDER BY prix_par_heure ASC
+    `);
+    res.json(result.rows)
+  }
+  catch (err) {
+    console.error("Erreur lors de la récupération des artistes :", err);
+    res.status(500).send('Erreur Serveur !');
   }
 });
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem } from "@mui/material";
-import { db } from "./firebase"; // Assurez-vous que ce chemin est correct
+import { db } from "./firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const ReservationForm = ({
@@ -16,6 +16,20 @@ const ReservationForm = ({
   const [timeDifference, setTimeDifference] = useState(0);
   const [prixTotal, setPrixTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // S'assurer que les champs ne sont jamais undefined
+  useEffect(() => {
+    setReservation(prev => ({
+      ...prev,
+      artiste_id: prev.artiste_id || "",
+      studio_id: prev.studio_id || "",
+      date_reservation: prev.date_reservation || "",
+      nbr_personne: prev.nbr_personne || 1,
+      heure_debut: prev.heure_debut || "",
+      heure_fin: prev.heure_fin || "",
+      prix_total: prev.prix_total || 0
+    }));
+  }, [setReservation]);
 
   useEffect(() => {
     // Récupération des studios
@@ -129,7 +143,7 @@ const ReservationForm = ({
           labelId="artiste-select-label"
           id="artiste-select"
           name="artiste_id"
-          value={reservation.artiste_id}
+          value={reservation.artiste_id || ""}
           onChange={handleReservationChange}
           required
         >
@@ -147,7 +161,7 @@ const ReservationForm = ({
           labelId="studio-select-label"
           id="studio-select"
           name="studio_id"
-          value={reservation.studio_id}
+          value={reservation.studio_id || ""}
           onChange={handleReservationChange}
           required
         >
@@ -163,7 +177,7 @@ const ReservationForm = ({
         <input
           type="date"
           name="date_reservation"
-          value={reservation.date_reservation}
+          value={reservation.date_reservation || ""}
           onChange={handleReservationChange}
           required
         />
@@ -172,7 +186,7 @@ const ReservationForm = ({
         <input
           type="number"
           name="nbr_personne"
-          value={reservation.nbr_personne}
+          value={reservation.nbr_personne || 1}
           onChange={handleReservationChange}
           required
           min="1"
@@ -182,7 +196,7 @@ const ReservationForm = ({
         <input
           type="time"
           name="heure_debut"
-          value={reservation.heure_debut}
+          value={reservation.heure_debut || ""}
           onChange={handleReservationChange}
           required
         />
@@ -191,7 +205,7 @@ const ReservationForm = ({
         <input
           type="time"
           name="heure_fin"
-          value={reservation.heure_fin}
+          value={reservation.heure_fin || ""}
           onChange={handleReservationChange}
           required
         />

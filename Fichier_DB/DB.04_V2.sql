@@ -132,15 +132,15 @@ INSERT INTO Studio (nom, description, adresse, latitude, longitude, prix_par_heu
     
     ('Gand Electronic Lab', 'Studio équipé pour musique électronique', '7 Korenmarkt', 51.0543, 3.7174, 50.00, '["synthétiseurs modulaires", "boîtes à rythmes", "DAW Ableton", "contrôleurs MIDI"]', 'gand_studio.jpg', 4, 'validé', 9000);
 
-INSERT INTO Avis (client_id, studio_id, note, commentaire) VALUES
-    (2, 1, 5, 'Excellente acoustique et équipement de qualité. Parfait pour mes sessions vocales.'),
-    (3, 1, 4, 'Très bon studio mais un peu cher pour les longues sessions.'),
-    (4, 2, 5, 'Vue magnifique et ambiance parfaite pour la créativité. Je recommande!'),
-    (5, 3, 3, 'Bon studio mais quelques problèmes techniques avec la console.'),
-    (2, 4, 5, 'L''équipement vintage donne une chaleur incroyable aux enregistrements!'),
-    (3, 5, 4, 'Très bon rapport qualité-prix et propriétaire très serviable.'),
-    (5, 7, 5, 'Le piano à queue est exceptionnel, parfait pour mes compositions classiques.'),
-    (4, 8, 4, 'Idéal pour la production électronique, bon équipement MIDI.');
+INSERT INTO Avis (client_id, studio_id, note) VALUES
+    (2, 1, 5),
+    (3, 1, 4),
+    (4, 2, 5),
+    (5, 3, 3),
+    (2, 4, 5),
+    (3, 5, 4),
+    (5, 7, 5),
+    (4, 8, 4);
 
 INSERT INTO Reservation (client_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, statut, prix_total) VALUES
     (2, 1, '2024-04-20', 2, '14:00', '18:00', 'confirmée', 240.00),

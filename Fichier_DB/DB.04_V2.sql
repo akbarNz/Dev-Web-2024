@@ -56,7 +56,6 @@ CREATE TABLE Avis (
     client_id INT NOT NULL,
     studio_id INT NOT NULL,
     note INT CHECK (note >= 1 AND note <= 5),
-    commentaire TEXT,
     date_creation TIMESTAMP DEFAULT NOW(),
     CONSTRAINT fk_client FOREIGN KEY (client_id) 
         REFERENCES Client(id) ON DELETE CASCADE,

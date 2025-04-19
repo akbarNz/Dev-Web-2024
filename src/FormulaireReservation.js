@@ -21,7 +21,7 @@ const ReservationForm = ({
   // Initialisation des champs de réservation
   useEffect(() => {
     setReservation(prev => ({
-      artiste_id: prev.artiste_id || "",
+      client_id: prev.client_id || "",
       studio_id: prev.studio_id || "",
       date_reservation: prev.date_reservation || "",
       nbr_personne: prev.nbr_personne || 1,
@@ -121,7 +121,7 @@ const ReservationForm = ({
     setIsSubmitting(true);
 
     const reservationData = {
-      artiste_id: parseInt(reservation.artiste_id),
+      client_id: parseInt(reservation.client_id),
       studio_id: parseInt(reservation.studio_id),
       date_reservation: reservation.date_reservation,
       nbr_personne: parseInt(reservation.nbr_personne),
@@ -172,8 +172,8 @@ const ReservationForm = ({
           sx={{ width: '100%', height: '45px', mb: 2 }}
           labelId="artiste-select-label"
           id="artiste-select"
-          name="artiste_id"
-          value={reservation.artiste_id || ""}
+          name="client_id"
+          value={reservation.client_id || ""}
           onChange={handleReservationChange}
           required
         >

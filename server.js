@@ -15,7 +15,7 @@ app.use(express.static("public"));
 const pool = new Pool({
     user: "postgres",
     host: "localhost",
-    database: "Projet_v2",
+    database: "dev_projet",
     password: "dev_projet",
     port: 5432,
 });
@@ -40,7 +40,7 @@ app.get("/reserv", async (req, res) => {
             S.prix_par_heure,
             COALESCE(A.moyenne_note, 0) AS moyenne_note,
             S.photo_url
-      FROM studios AS S
+      FROM studio AS S
       LEFT JOIN (
           SELECT studio_id, AVG(note) AS moyenne_note
           FROM avis
@@ -93,7 +93,7 @@ app.get("/studios", async(req, res) => {
   try{
     const result = await pool.query(`
       SELECT * 
-      FROM studios 
+      FROM studio
       ORDER BY prix_par_heure ASC
     `);
     res.json(result.rows)
@@ -111,7 +111,7 @@ app.get("/equipements", async (req, res) => {
 
     const result = await pool.query(`
       SELECT DISTINCT eq AS equipements
-      FROM studios, json_array_elements_text(studios.equipements) AS eq;
+      FROM studio, json_array_elements_text(studios.equipements) AS eq;
       `, []);
     res.json(result.rows);
   } catch(err){
@@ -124,7 +124,7 @@ app.get("/equipements", async (req, res) => {
 app.get("/artiste", async (req, res) => {
   try {
     console.log("Requête reçue sur /artiste");
-    const result = await pool.query(`SELECT * FROM utilisateurs WHERE role = 'artiste'`);
+    const result = await pool.query(`SELECT * FROM client WHERE role = 'artiste'`);
     console.log("Artistes récupérés :", result.rows);
     res.json(result.rows);
   } catch (err) {
@@ -137,7 +137,7 @@ app.get("/prixMinMax", async (req, res) => {
   try {
       const result = await pool.query(`
           SELECT MIN(prix_par_heure) AS prix_min, MAX(prix_par_heure) AS prix_max
-          FROM studios;
+          FROM studio;
       `);
       res.json(result.rows[0]);
   } catch (err) {
@@ -149,15 +149,15 @@ app.get("/prixMinMax", async (req, res) => {
 
 // Route pour enregistrer une réservation
 app.post('/reserve', async (req, res) => {
-  const { artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total } = req.body;
+  const { client_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total } = req.body;
 
   try {
     const query = `
-      INSERT INTO reservations (artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total) 
+      INSERT INTO reservation (client_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total) 
       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;
     `;
 
-    const values = [artiste_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total];
+    const values = [client_id, studio_id, date_reservation, nbr_personne, heure_debut, heure_fin, prix_total];
     const result = await pool.query(query, values);
 
     res.status(201).json({ message: 'Réservation enregistrée !', reservation: result.rows[0] });
@@ -324,7 +324,7 @@ app.delete("/deleteFav", async (req, res) => {
 app.get("/proprietaire", async (req, res) => {
   try {
     console.log("Requête reçue sur /proprietaire");
-    const result = await pool.query(`SELECT * FROM utilisateurs WHERE role = 'propriétaire'`);
+    const result = await pool.query(`SELECT * FROM proprio WHERE role = 'propriétaire'`);
     console.log("Artistes récupérés :", result.rows);
     res.json(result.rows);
   } catch (err) {
@@ -357,7 +357,7 @@ app.post('/enregi', async(req, res) => {
 
   try {
     const query = `
-      INSERT INTO studios (nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url, proprietaire_id)
+      INSERT INTO studio (nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url, proprietaire_id)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
       
     const values = [nom, description, adresse, code_postal, prix_par_heure, JSON.stringify(equipements), photo_url, proprietaire_id];

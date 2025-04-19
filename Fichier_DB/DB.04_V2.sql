@@ -1,7 +1,6 @@
 CREATE TYPE role_utilisateurs AS ENUM ('admin', 'propriétaire', 'artiste');
 CREATE TYPE statut_studio AS ENUM ('en attente', 'validé', 'refusé');
 CREATE TYPE statut_réservation AS ENUM ('confirmée', 'annulée', 'modifiée');
-CREATE TYPE type_notif AS ENUM ('reservation', 'paiement', 'avis', 'administratif');
 
 CREATE TABLE Villes (
     code_postal INTEGER PRIMARY KEY,
@@ -13,7 +12,7 @@ CREATE TABLE Client (
     nom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     numero_telephone TEXT UNIQUE NOT NULL,
-    photo_profil_url VARCHAR(500),
+    photo_url VARCHAR(500),
     role role_utilisateurs NOT NULL DEFAULT 'artiste',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
@@ -25,7 +24,7 @@ CREATE TABLE Proprio (
     nom TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     numero_telephone TEXT UNIQUE NOT NULL,
-    photo_profil_url VARCHAR(500),
+    photo_url VARCHAR(500),
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
     deux_facteur_active BOOLEAN DEFAULT FALSE

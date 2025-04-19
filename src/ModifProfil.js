@@ -7,11 +7,10 @@ import { AdvancedImage } from '@cloudinary/react';
 
 const ModifProfil = ({ onBack }) => {
   const [profil, setProfil] = useState({
-    photo_profil_url: "",
+    photo_url: "",
     nom: "",
     email: "",
     numero_telephone: "",
-    role: "",
   });
 
   const [publicId, setPublicId] = useState("");
@@ -24,7 +23,7 @@ const ModifProfil = ({ onBack }) => {
         const response = await fetch("http://localhost:5001/getUserInfo?id=4");
         const data = await response.json();
         setProfil({ ...data, numero_telephone: `+${data.numero_telephone}` });
-        setPublicId(data.photo_profil_url);
+        setPublicId(data.photo_url);
       } catch (error) {
         console.error("Erreur lors de la récupération du profil :", error);
       }
@@ -62,7 +61,7 @@ const ModifProfil = ({ onBack }) => {
     }
 
     const formattedPhone = profil.numero_telephone.replace(/[\s+]/g, '');
-    const updatedProfil = { ...profil, numero_telephone: formattedPhone, photo_profil_url: finalPublicId };
+    const updatedProfil = { ...profil, numero_telephone: formattedPhone, photo_url: finalPublicId };
 
     try {
       const response = await fetch("http://localhost:5001/saveUserInfo", {
@@ -116,14 +115,6 @@ const ModifProfil = ({ onBack }) => {
           <label className="left_label">
             Numéro de téléphone :
             <PhoneInput defaultCountry="BE" value={profil.numero_telephone} onChange={(value) => setProfil({ ...profil, numero_telephone: value })} />
-          </label>
-
-          <label className="left_label">
-            Rôle :
-            <select name="role" value={profil.role} onChange={(e) => setProfil({ ...profil, role: e.target.value })} required>
-              <option value="propriétaire">Propriétaire</option>
-              <option value="artiste">Artiste</option>
-            </select>
           </label>
 
           <button type="submit" className="register-btn">Enregistrer</button>

@@ -174,7 +174,7 @@ app.get('/getUserInfo', async (req, res) => {
     if (!userId) {
       return res.status(400).json({ error: "ID utilisateur manquant" });
     }
-    const result = await pool.query('SELECT * FROM utilisateurs WHERE id = $1', [userId]);
+    const result = await pool.query('SELECT * FROM Client WHERE id = $1', [userId]);
 
     if (result.rows.length === 0) {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
@@ -190,16 +190,16 @@ app.get('/getUserInfo', async (req, res) => {
 app.post('/saveUserInfo', async (req, res) => {
   try {
     console.log("Données reçues :", req.body);
-    const { id, photo_profil_url, nom, email, numero_telephone, role } = req.body;
+    const { id, photo_profil_url, nom, email, numero_telephone} = req.body;
 
     const query = `
-      UPDATE utilisateurs
-      SET photo_profil_url = $1, nom = $2, email = $3, numero_telephone = $4, role = $5
-      WHERE id = $6
+      UPDATE Client
+      SET photo_url = $1, nom = $2, email = $3, numero_telephone = $4
+      WHERE id = $5
       RETURNING *;
     `;
 
-    const values = [photo_profil_url, nom, email, numero_telephone, role, id];
+    const values = [photo_profil_url, nom, email, numero_telephone, id];
 
     const result = await pool.query(query, values);
 

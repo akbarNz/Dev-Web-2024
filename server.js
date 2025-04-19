@@ -190,7 +190,7 @@ app.get('/getUserInfo', async (req, res) => {
 app.post('/saveUserInfo', async (req, res) => {
   try {
     console.log("Données reçues :", req.body);
-    const { id, photo_profil_url, nom, email, numero_telephone} = req.body;
+    const { id, photo_url, nom, email, numero_telephone} = req.body;
 
     const query = `
       UPDATE Client
@@ -199,7 +199,7 @@ app.post('/saveUserInfo', async (req, res) => {
       RETURNING *;
     `;
 
-    const values = [photo_profil_url, nom, email, numero_telephone, id];
+    const values = [photo_url, nom, email, numero_telephone, id];
 
     const result = await pool.query(query, values);
 

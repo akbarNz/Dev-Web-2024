@@ -25,6 +25,7 @@ CREATE TABLE Proprio (
     email TEXT UNIQUE NOT NULL,
     numero_telephone TEXT UNIQUE NOT NULL,
     photo_url VARCHAR(500),
+     role role_utilisateurs NOT NULL DEFAULT 'propriétaire',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
     deux_facteur_active BOOLEAN DEFAULT FALSE

@@ -197,7 +197,7 @@ const ReservationForm = ({
         >
           <MenuItem value=""><em>Sélectionnez un studio</em></MenuItem>
           {studios.map((studio) => (
-            <MenuItem key={studio.id_stud} value={studio.id_stud.toString()}>
+            <MenuItem key={studio.id_stud} value={studio.id_stud}>
               {studio.nom_stud} - {studio.prix_par_heure}€/h
             </MenuItem>
           ))}

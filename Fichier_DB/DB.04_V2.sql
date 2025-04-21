@@ -116,21 +116,21 @@ INSERT INTO Client (nom, email, numero_telephone, role, verifie) VALUES
     ('Nicolas Claes', 'nicolas.claes@gmail.com', '32423456789', 'artiste', FALSE);
 
 INSERT INTO Studio (nom, description, adresse, latitude, longitude, prix_par_heure, equipements, photo_url, proprietaire_id, statut, code_postal) VALUES
-    ('Studio Bruxelles Central', 'Studio professionnel au centre de Bruxelles', '25 Rue de la Loi', 50.8466, 4.3528, 60.00, '["microphones Neumann", "console SSL", "acoustique traitée", "instruments"]', 'studio_bruxelles.jpg', 1, 'validé', 1000),
+    ('Studio Bruxelles Central', 'Studio professionnel au centre de Bruxelles', '25 Rue de la Loi', 50.8466, 4.3528, 60.00, '["microphones Neumann", "console SSL", "acoustique traitée", "instruments"]', 'slkelm9y9ooushsaowro', 1, 'validé', 1000),
     
-    ('Anvers Sound Lab', 'Studio moderne avec vue sur l''Escaut', '10 Meir', 51.2194, 4.4025, 45.00, '["batterie Pearl", "amplis guitare Mesa", "synthétiseurs", "micros Shure"]', 'anvers_studio.jpg', 2, 'validé', 2000),
+    ('Anvers Sound Lab', 'Studio moderne avec vue sur l''Escaut', '10 Meir', 51.2194, 4.4025, 45.00, '["batterie Pearl", "amplis guitare Mesa", "synthétiseurs", "micros Shure"]', 'gddjqtzra3ijqbovrzpn', 2, 'validé', 2000),
     
-    ('Louvain Music Factory', 'Espace créatif pour musiciens indépendants', '15 Bondgenotenlaan', 50.8798, 4.7005, 35.00, '["piano Yamaha", "DAW Pro Tools", "isolation phonique", "monitoring Genelec"]', 'louvain_studio.jpg', 1, 'validé', 3000),
+    ('Louvain Music Factory', 'Espace créatif pour musiciens indépendants', '15 Bondgenotenlaan', 50.8798, 4.7005, 35.00, '["piano Yamaha", "DAW Pro Tools", "isolation phonique", "monitoring Genelec"]', 'ttgsjjy7uazxob9kf2g8', 1, 'validé', 3000),
     
-    ('Liège Recording', 'Studio chaleureux avec équipement vintage', '8 Rue Hors-Château', 50.6410, 5.5796, 50.00, '["préamplis à lampes", "mixeur analogique", "instruments vintage", "cabine vocale"]', 'liege_studio.jpg', 3, 'validé', 4000),
+    ('Liège Recording', 'Studio chaleureux avec équipement vintage', '8 Rue Hors-Château', 50.6410, 5.5796, 50.00, '["préamplis à lampes", "mixeur analogique", "instruments vintage", "cabine vocale"]', 'dj0p4ravbn3erntclzu1', 3, 'validé', 4000),
     
-    ('Namur Sessions', 'Studio avec ambiance cosy près de la Citadelle', '22 Rue de Fer', 50.4669, 4.8719, 40.00, '["interface UAD", "micros Audio-Technica", "clavier MIDI", "acoustique traitée"]', 'namur_studio.jpg', 4, 'validé', 5000),
+    ('Namur Sessions', 'Studio avec ambiance cosy près de la Citadelle', '22 Rue de Fer', 50.4669, 4.8719, 40.00, '["interface UAD", "micros Audio-Technica", "clavier MIDI", "acoustique traitée"]', 'ppnt59terglxhqvflg42', 4, 'validé', 5000),
     
-    ('Charleroi Urban Studio', 'Espace moderne pour productions urbaines', '5 Boulevard Tirou', 50.4108, 4.4444, 35.00, '["station de production", "boîtes à rythmes", "platines vinyle", "micros rap"]', 'charleroi_studio.jpg', 2, 'en attente', 6000),
+    ('Charleroi Urban Studio', 'Espace moderne pour productions urbaines', '5 Boulevard Tirou', 50.4108, 4.4444, 35.00, '["station de production", "boîtes à rythmes", "platines vinyle", "micros rap"]', 'lvya3ftnsjba8je6v8sq', 2, 'en attente', 6000),
     
-    ('Bruges Acoustic Room', 'Studio spécialisé en musique acoustique', '12 Steenstraat', 51.2093, 3.2247, 55.00, '["piano à queue", "guitares acoustiques", "micros ribbon", "traitement acoustique premium"]', 'bruges_studio.jpg', 3, 'validé', 8000),
+    ('Bruges Acoustic Room', 'Studio spécialisé en musique acoustique', '12 Steenstraat', 51.2093, 3.2247, 55.00, '["piano à queue", "guitares acoustiques", "micros ribbon", "traitement acoustique premium"]', 'cgedhgdbi9tgaihlolxw', 3, 'validé', 8000),
     
-    ('Gand Electronic Lab', 'Studio équipé pour musique électronique', '7 Korenmarkt', 51.0543, 3.7174, 50.00, '["synthétiseurs modulaires", "boîtes à rythmes", "DAW Ableton", "contrôleurs MIDI"]', 'gand_studio.jpg', 4, 'validé', 9000);
+    ('Gand Electronic Lab', 'Studio équipé pour musique électronique', '7 Korenmarkt', 51.0543, 3.7174, 50.00, '["synthétiseurs modulaires", "boîtes à rythmes", "DAW Ableton", "contrôleurs MIDI"]', 'r7fyxfrrtdndrcuz2i3u', 4, 'validé', 9000);
 
 INSERT INTO Avis (client_id, studio_id, note) VALUES
     (2, 1, 5),

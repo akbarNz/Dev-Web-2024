@@ -9,6 +9,60 @@ const Header = ({
 }) => {
   const [menuItems, setMenuItems] = useState([]);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+  const [users, setUsers] = useState({
+    artistes: [],
+    proprietaires: []
+  });
+  const [selectedUser, setSelectedUser] = useState(null);
+  
+  // Fonction pour récupérer la liste des utilisateurs
+  const fetchUsers = async () => {
+    try {
+      // Fetch artistes
+      const artistesResponse = await fetch("http://localhost:5001/artiste");
+      const artistesData = await artistesResponse.json();
+      
+      // Fetch propriétaires
+      const proprietairesResponse = await fetch("http://localhost:5001/proprietaire");
+      const proprietairesData = await proprietairesResponse.json();
+      
+      setUsers({
+        artistes: artistesData,
+        proprietaires: proprietairesData
+      });
+      
+      // user par défaut
+      if (!selectedUser && artistesData.length > 0) {
+        const defaultUser = {
+          id: artistesData[0].id,
+          nom: artistesData[0].nom,
+          type: 'artiste'
+        };
+        setSelectedUser(defaultUser);
+        localStorage.setItem('currentUser', JSON.stringify(defaultUser));
+      }
+      
+      // Si un utilisateur est déjà sélectionné, mettre à jour ses informations
+      if (selectedUser) {
+        const userType = selectedUser.type;
+        const userId = selectedUser.id;
+        const userList = userType === 'artiste' ? artistesData : proprietairesData;
+        const updatedUser = userList.find(user => user.id === userId);
+        
+        if (updatedUser) {
+          const refreshedUser = {
+            id: updatedUser.id,
+            nom: updatedUser.nom,
+            type: userType
+          };
+          setSelectedUser(refreshedUser);
+          localStorage.setItem('currentUser', JSON.stringify(refreshedUser));
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des utilisateurs:", error);
+    }
+  };
   
   useEffect(() => {
     const fetchMenuItems = async () => {
@@ -23,10 +77,40 @@ const Header = ({
     };
     
     fetchMenuItems();
+    fetchUsers();
+    
+    // user dans localStorage ? 
+    const storedUser = localStorage.getItem('currentUser');
+    if (storedUser) {
+      setSelectedUser(JSON.parse(storedUser));
+    }
+    
+    window.addEventListener('userUpdated', fetchUsers);
+    
+    // Update la liste
+    return () => {
+      window.removeEventListener('userUpdated', fetchUsers);
+    };
   }, []);
   
   const toggleSubmenu = () => {
     setIsSubmenuOpen(!isSubmenuOpen);
+  };
+  
+  const handleUserChange = (e) => {
+    const [id, nom, type] = e.target.value.split('|');
+    const newUser = {
+      id: parseInt(id),
+      nom,
+      type
+    };
+    
+    setSelectedUser(newUser);
+    localStorage.setItem('currentUser', JSON.stringify(newUser));
+    
+    // évenement pour prévenir user a changé
+    const event = new CustomEvent('userChanged', { detail: newUser });
+    window.dispatchEvent(event);
   };
 
   return (
@@ -63,6 +147,28 @@ const Header = ({
         <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>
           Profil
         </button>
+        <div className="user-select-container">
+          <select 
+            className="user-select" 
+            value={selectedUser ? `${selectedUser.id}|${selectedUser.nom}|${selectedUser.type}` : ''}
+            onChange={handleUserChange}
+          >
+            <optgroup label="Artistes">
+              {users.artistes.map(artiste => (
+                <option key={`artiste-${artiste.id}`} value={`${artiste.id}|${artiste.nom}|artiste`}>
+                  {artiste.nom}
+                </option>
+              ))}
+            </optgroup>
+            <optgroup label="Propriétaires">
+              {users.proprietaires.map(proprio => (
+                <option key={`proprio-${proprio.id}`} value={`${proprio.id}|${proprio.nom}|proprietaire`}>
+                  {proprio.nom}
+                </option>
+              ))}
+            </optgroup>
+          </select>
+        </div>
       </nav>
     </header>
   );

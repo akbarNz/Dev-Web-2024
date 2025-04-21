@@ -127,7 +127,44 @@ nav ul li:hover .submenu {
   color: white !important;
   padding-left: 1.8rem;
 }
+.user-select-container {
+  margin: 0 15px;
+}
 
+.user-select {
+  margin: 2%;
+  padding: 8px 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  font-size: 14px;
+  min-width: 150px;
+  cursor: pointer;
+}
+
+.user-select:focus {
+  outline: none;
+  border-color: #666;
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+.user-select optgroup {
+  font-weight: bold;
+}
+
+.user-select option {
+  padding: 5px;
+}
+
+@media (max-width: 768px) {
+  .user-select-container {
+    margin: 10px 0;
+  }
+  
+  .user-select {
+    width: 100%;
+  }
+}
 /* Action Buttons */
 .nav-actions {
   display: flex;

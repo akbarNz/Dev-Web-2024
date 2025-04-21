@@ -167,8 +167,7 @@ app.post('/reserve', async (req, res) => {
   }
 });
 
-// Route pour récupérer les données du profil utilisateur
-app.get('/getUserInfo', async (req, res) => {
+app.get('/getClientInfo', async (req, res) => {
   try {
     const userId = req.query.id;
     if (!userId) {
@@ -180,17 +179,36 @@ app.get('/getUserInfo', async (req, res) => {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
 
-  res.json(result.rows[0]);
-} catch (error) {
+    res.json(result.rows[0]);
+  } catch (error) {
     console.log(error);
-    res.status(500).send("Erreur serveur")
+    res.status(500).send("Erreur serveur");
   }
-})
+});
 
-app.post('/saveUserInfo', async (req, res) => {
+app.get('/getProprioInfo', async (req, res) => {
   try {
-    console.log("Données reçues :", req.body);
-    const { id, photo_url, nom, email, numero_telephone} = req.body;
+    const userId = req.query.id;
+    if (!userId) {
+      return res.status(400).json({ error: "ID utilisateur manquant" });
+    }
+    const result = await pool.query('SELECT * FROM Proprio WHERE id = $1', [userId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Propriétaire non trouvé" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Erreur serveur");
+  }
+});
+
+app.post('/saveClientInfo', async (req, res) => {
+  try {
+    console.log("Données reçues pour client:", req.body);
+    const { id, photo_url, nom, email, numero_telephone } = req.body;
 
     const query = `
       UPDATE Client
@@ -207,7 +225,35 @@ app.post('/saveUserInfo', async (req, res) => {
       return res.status(404).json({ error: "Utilisateur non trouvé" });
     }
 
-    res.json({ message: "Profil mis à jour avec succès", user: result.rows[0] });
+    res.json({ message: "Profil client mis à jour avec succès", user: result.rows[0] });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+});
+
+app.post('/saveProprioInfo', async (req, res) => {
+  try {
+    console.log("Données reçues pour propriétaire:", req.body);
+    const { id, photo_url, nom, email, numero_telephone } = req.body;
+
+    const query = `
+      UPDATE Proprio
+      SET photo_url = $1, nom = $2, email = $3, numero_telephone = $4
+      WHERE id = $5
+      RETURNING *;
+    `;
+
+    const values = [photo_url, nom, email, numero_telephone, id];
+
+    const result = await pool.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Propriétaire non trouvé" });
+    }
+
+    res.json({ message: "Profil propriétaire mis à jour avec succès", user: result.rows[0] });
 
   } catch (error) {
     console.error(error);

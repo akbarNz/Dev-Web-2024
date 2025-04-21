@@ -85,11 +85,19 @@ const Header = ({
       setSelectedUser(JSON.parse(storedUser));
     }
     
-    window.addEventListener('userUpdated', fetchUsers);
+    const handleUserUpdate = (event) => {
+      if (event.detail) {
+        // Mettre à jour l'utilisateur sélectionné avec les données de l'événement
+        setSelectedUser(event.detail);
+      }
+      fetchUsers();
+    };
+    
+    window.addEventListener('userUpdated', handleUserUpdate);
     
     // Update la liste
     return () => {
-      window.removeEventListener('userUpdated', fetchUsers);
+      window.removeEventListener('userUpdated', handleUserUpdate);
     };
   }, []);
   

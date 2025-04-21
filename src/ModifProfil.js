@@ -118,21 +118,19 @@ const ModifProfil = ({ onBack }) => {
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
       
       alert("Profil mis à jour avec succès !");
-      setPublicId(finalPublicId); // Mise à jour affichage après sauvegarde
+      setPublicId(finalPublicId); 
       setLocalImage(null); // Nettoyer l'aperçu
       setFileToUpload(null);
       
-      // Mettre à jour les données dans localStorage si le nom a changé
-      if (currentUser && profil.nom !== currentUser.nom) {
-        const updatedUser = {
-          ...currentUser,
-          nom: profil.nom
-        };
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      }
+      // Mettre à jour les données dans localStorage
+      const updatedUser = {
+        ...currentUser,
+        nom: profil.nom
+      };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       
-      // Émettre un événement pour informer Header de la mise à jour
-      const event = new CustomEvent('userUpdated');
+      // Déclencher l'événement avec les données mises à jour
+      const event = new CustomEvent('userUpdated', { detail: updatedUser });
       window.dispatchEvent(event);
       
     } catch (error) {

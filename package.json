@@ -10,6 +10,7 @@
         "@emotion/styled": "^11.14.0",
         "@mui/material": "^6.4.8",
         "@radix-ui/react-collapsible": "^1.1.7",
+        "@radix-ui/react-dialog": "^1.1.10",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/jest-dom": "^6.6.3",
         "@testing-library/react": "^16.2.0",

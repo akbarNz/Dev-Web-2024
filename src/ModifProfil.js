@@ -7,30 +7,69 @@ import { AdvancedImage } from '@cloudinary/react';
 
 const ModifProfil = ({ onBack }) => {
   const [profil, setProfil] = useState({
-    photo_profil_url: "",
+    id: "",
+    photo_url: "",
     nom: "",
     email: "",
     numero_telephone: "",
-    role: "",
+    type: "" 
   });
 
   const [publicId, setPublicId] = useState("");
   const [localImage, setLocalImage] = useState(null); // photo locale
   const [fileToUpload, setFileToUpload] = useState(null); // Fichier sélectionné
+  const [currentUser, setCurrentUser] = useState(null);
+
+  // Fonction pour charger les données de l'utilisateur
+  const fetchUserData = async (user) => {
+    if (!user) return;
+    
+    try {
+      // Fetch les données selon le type d'utilisateur
+      const url = user.type === 'artiste' 
+        ? `http://localhost:5001/getClientInfo?id=${user.id}`
+        : `http://localhost:5001/getProprioInfo?id=${user.id}`;
+      
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      setProfil({ 
+        ...data, 
+        numero_telephone: `+${data.numero_telephone}`,
+        type: user.type
+      });
+      setPublicId(data.photo_url);
+      setCurrentUser(user);
+      
+      // Réinitialiser l'image locale et le fichier à télécharger
+      setLocalImage(null);
+      setFileToUpload(null);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du profil :", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProfil = async () => {
-      try {
-        const response = await fetch("http://localhost:5001/getUserInfo?id=4");
-        const data = await response.json();
-        setProfil({ ...data, numero_telephone: `+${data.numero_telephone}` });
-        setPublicId(data.photo_profil_url);
-      } catch (error) {
-        console.error("Erreur lors de la récupération du profil :", error);
-      }
+    // Récupération de l'utilisateur courant depuis localStorage
+    const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+    if (userFromStorage) {
+      setCurrentUser(userFromStorage);
+      fetchUserData(userFromStorage);
+    }
+    
+    // Écouter les changements d'utilisateur
+    const handleUserChange = (event) => {
+      const newUser = event.detail;
+      setCurrentUser(newUser);
+      fetchUserData(newUser);
     };
-
-    fetchProfil();
+    
+    window.addEventListener('userChanged', handleUserChange);
+    
+    // Nettoyage
+    return () => {
+      window.removeEventListener('userChanged', handleUserChange);
+    };
   }, []);
 
   const handleFileChange = (e) => {
@@ -62,20 +101,38 @@ const ModifProfil = ({ onBack }) => {
     }
 
     const formattedPhone = profil.numero_telephone.replace(/[\s+]/g, '');
-    const updatedProfil = { ...profil, numero_telephone: formattedPhone, photo_profil_url: finalPublicId };
+    const updatedProfil = { ...profil, numero_telephone: formattedPhone, photo_url: finalPublicId };
 
     try {
-      const response = await fetch("http://localhost:5001/saveUserInfo", {
+      // Utiliser la route appropriée selon le type d'utilisateur
+      const url = profil.type === 'artiste' 
+        ? "http://localhost:5001/saveClientInfo"
+        : "http://localhost:5001/saveProprioInfo";
+      
+      const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedProfil),
       });
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
+      
       alert("Profil mis à jour avec succès !");
-      setPublicId(finalPublicId); // Mise à jour affichage après sauvegarde
+      setPublicId(finalPublicId); 
       setLocalImage(null); // Nettoyer l'aperçu
       setFileToUpload(null);
+      
+      // Mettre à jour les données dans localStorage
+      const updatedUser = {
+        ...currentUser,
+        nom: profil.nom
+      };
+      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+      
+      // Déclencher l'événement avec les données mises à jour
+      const event = new CustomEvent('userUpdated', { detail: updatedUser });
+      window.dispatchEvent(event);
+      
     } catch (error) {
       console.error(error);
     }
@@ -87,7 +144,7 @@ const ModifProfil = ({ onBack }) => {
   return (
     <div className="profil-container">
       <div className="form-wrapper-profil">
-        <h2>Modifier mon profil</h2>
+        <h2>Modifier mon profil {profil.type === 'proprietaire' ? '(Propriétaire)' : '(Artiste)'}</h2>
         <form onSubmit={handleSubmit}>
           <label>
             <div>
@@ -99,7 +156,7 @@ const ModifProfil = ({ onBack }) => {
                 <img src="logo512.png" alt="Photo de profil" className="profil-photo" />
               )}
             </div>
-            <label id= "profil_button" for="file-upload" class="register-btn">Changer de photo</label>
+            <label id="profil_button" htmlFor="file-upload" className="register-btn">Changer de photo</label>
             <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
           </label>
 
@@ -116,14 +173,6 @@ const ModifProfil = ({ onBack }) => {
           <label className="left_label">
             Numéro de téléphone :
             <PhoneInput defaultCountry="BE" value={profil.numero_telephone} onChange={(value) => setProfil({ ...profil, numero_telephone: value })} />
-          </label>
-
-          <label className="left_label">
-            Rôle :
-            <select name="role" value={profil.role} onChange={(e) => setProfil({ ...profil, role: e.target.value })} required>
-              <option value="propriétaire">Propriétaire</option>
-              <option value="artiste">Artiste</option>
-            </select>
           </label>
 
           <button type="submit" className="register-btn">Enregistrer</button>

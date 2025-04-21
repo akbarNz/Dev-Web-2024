@@ -4,6 +4,7 @@ import Rating from '@mui/material/Rating';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import { Dialog } from '@base-ui-components/react/dialog';
 
 const FilterForm = ({ filters, setFilters}) => {
   const [minValue, set_minValue] = useState(null);
@@ -109,20 +110,37 @@ const FilterForm = ({ filters, setFilters}) => {
       </div>
 
       <h3>Choisissez vos équipements</h3>
-      <FormGroup>
-        {equipements.map((item, index) => (
-          <FormControlLabel
-            key={index}
-            control={
-              <Checkbox
-                checked={selectedEquipements.includes(item.equipements)}
-                onChange={() => handleCheckboxChange(item.equipements)}
-              />
-            }
-            label={item.equipements}
-          />
-        ))}
-      </FormGroup>
+      <Dialog.Root>
+      <Dialog.Trigger className="Button">Sélectionner les équipements</Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Backdrop className="Backdrop" />
+        <Dialog.Popup className="Popup">
+          <Dialog.Title className="Title">Choisissez les équipements</Dialog.Title>
+          <Dialog.Description className="Description">
+            Cochez les équipements que vous souhaitez ajouter.
+          </Dialog.Description>
+          <div className="Content">
+            <FormGroup className="CheckboxGrid">
+              {equipements.map((item, index) => (
+                <FormControlLabel
+                  key={index}
+                  control={
+                    <Checkbox
+                      checked={selectedEquipements.includes(item.equipements)}
+                      onChange={() => handleCheckboxChange(item.equipements)}
+                    />
+                  }
+                  label={item.equipements}
+                />
+              ))}
+            </FormGroup>
+          </div>
+          <div className="Actions">
+            <Dialog.Close className="Button">Fermer</Dialog.Close>
+          </div>
+        </Dialog.Popup>
+      </Dialog.Portal>
+    </Dialog.Root>
     </aside>
   );
 };

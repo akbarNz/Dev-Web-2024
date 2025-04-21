@@ -16,7 +16,7 @@ const pool = new Pool({
     user: "postgres",
     host: "localhost",
     database: "dev_projet",
-    password: "dev_projet",
+    password: "WICJTYHIFHIF1@",
     port: 5432,
 });
 
@@ -107,18 +107,17 @@ app.get("/studios", async(req, res) => {
 
 app.get("/equipements", async (req, res) => {
   try {
-    const { equipements } = req.query;
-
     const result = await pool.query(`
       SELECT DISTINCT eq AS equipements
-      FROM studio, json_array_elements_text(studios.equipements) AS eq;
-      `, []);
+      FROM Studio, json_array_elements_text(Studio.equipements) AS eq;
+    `);
     res.json(result.rows);
-  } catch(err){
+  } catch (err) {
     console.error(err);
     res.status(500).send('Erreur serveur');
   }
 });
+
 
 //Route pour récupérer les artistes
 app.get("/artiste", async (req, res) => {

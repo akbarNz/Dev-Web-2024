@@ -270,20 +270,21 @@ app.get('/historique', async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT 
-        r.studio_id, 
-        r.date_reservation AS date, 
-        r.nbr_personne, 
-        r.heure_debut, 
-        r.heure_fin, 
-        r.statut, 
-        r.prix_total, 
-        s.nom, 
-        s.adresse, 
-        s.photo_url 
-      FROM reservations AS r
-      JOIN studios AS s ON r.studio_id = s.id
-      WHERE r.artiste_id = $1
-      ORDER BY date DESC;
+        r.id,
+        r.studio_id,
+        r.date_reservation AS date,
+        r.nbr_personne,
+        r.heure_debut,
+        r.heure_fin,
+        r.statut,
+        r.prix_total,
+        s.nom,
+        s.adresse,
+        s.photo_url
+      FROM Reservation AS r
+      JOIN Studio AS s ON r.studio_id = s.id
+      WHERE r.client_id = $1
+      ORDER BY r.date_reservation DESC;
     `, [artiste]);
 
     res.json(result.rows);
@@ -416,6 +417,56 @@ app.post('/enregi', async(req, res) => {
   catch(err) {
     console.error("Erreur détaillée:", err);
     res.status(500).json({ error: 'Erreur serveur', details: err.message });
+  }
+});
+
+app.get('/avis', async (req, res) => {
+  const { client_id } = req.query;
+
+  if (!client_id) {
+    return res.status(400).json({ error: "Paramètre client_id manquant" });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT studio_id, note FROM avis WHERE client_id = $1',
+      [client_id]
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des avis:", error);
+    res.status(500).json({ error: 'Erreur serveur' });
+  }
+});
+
+app.post('/avisP', async (req, res) => {
+  const { client_id, studio_id, note } = req.body;
+
+  try {
+    // Vérifie si un avis existe déjà pour ce client et ce studio
+    const existingAvis = await pool.query(
+      'SELECT * FROM avis WHERE client_id = $1 AND studio_id = $2',
+      [client_id, studio_id]
+    );
+
+    if (existingAvis.rows.length > 0) {
+      // Mise à jour de l'avis existant (on ne modifie pas date_creation)
+      const updateResult = await pool.query(
+        'UPDATE avis SET note = $1, date_creation = NOW() WHERE client_id = $2 AND studio_id = $3 RETURNING *',
+        [note, client_id, studio_id]
+      );
+      res.json({ message: 'Avis mis à jour', avis: updateResult.rows[0] });
+    } else {
+      // Création d'un nouvel avis (date_creation sera automatiquement définie par DEFAULT NOW())
+      const insertResult = await pool.query(
+        'INSERT INTO avis (client_id, studio_id, note, date_creation) VALUES ($1, $2, $3, NOW()) RETURNING *',
+        [client_id, studio_id, note]
+      );
+      res.status(201).json({ message: 'Avis créé', avis: insertResult.rows[0] });
+    }
+  } catch (error) {
+    console.error("Erreur lors de l'ajout/mise à jour de l'avis:", error);
+    res.status(500).json({ error: 'Erreur serveur' });
   }
 });
 

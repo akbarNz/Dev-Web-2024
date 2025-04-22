@@ -37,7 +37,7 @@ const App = () => {
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showHistorique, setShowHistorique] = useState(false);
   const [showFavoris, setShowFavoris] = useState(false);
-  const [showEnregistrementForm, setShowEnregistrementForm] = useState(false); // Ajout de cet état
+  const [showEnregistrementForm, setShowEnregistrementForm] = useState(false);
 
   const handleShowProfile = () => {
     setShowProfileForm(true);
@@ -69,7 +69,6 @@ const App = () => {
 
   const ajouterAuFavoris = (studio) => {
     console.log("Studio à ajouter :", studio);
-    // Plus tard, tu feras un fetch vers l'API ici
   };
 
   return (
@@ -78,7 +77,7 @@ const App = () => {
         setShowProfileForm={handleShowProfile}
         setShowHistorique={handleShowHistorique}
         setShowFavoris={handleShowFavoris}
-        setShowEnregistrement={handleShowEnregistrement} // Ajout de cette prop
+        setShowEnregistrement={handleShowEnregistrement}
       />
       
       {showHistorique && (
@@ -100,7 +99,7 @@ const App = () => {
       )}
 
       {showEnregistrementForm && (
-        <Enregistrement  // Changé de EnregistrementForm à Enregistrement
+        <Enregistrement 
           enregistrement={enregistrement}
           setEnregistrement={setEnregistrement}
           onBack={() => setShowEnregistrementForm(false)}

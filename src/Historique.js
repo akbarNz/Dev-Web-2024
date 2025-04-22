@@ -7,17 +7,19 @@ import Typography from '@mui/material/Typography';
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { ajouterAuxFavoris } from "./Favoris";
+import Rating from '@mui/material/Rating';
 
 
 
 const Historique = ({ onBack, artisteId }) => {
   const [historique, sethistorique] = useState([]);
+  const [notes, setNotes] = useState({});
   const cld = new Cloudinary({cloud: {cloudName: "dpszia6xf"}});
 
   useEffect(() => {
     const historic = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/historique?artiste=${artisteId}`);
+        const response = await fetch(`http://localhost:5001/historique?artiste=${Number(artisteId)}`);
         const data = await response.json();
         sethistorique(data);
       } catch (error) {
@@ -28,6 +30,25 @@ const Historique = ({ onBack, artisteId }) => {
     historic();
   }, [artisteId]);
 
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const response = await fetch(`http://localhost:5001/avis?client_id=${artisteId}`);
+        const data = await response.json();
+        
+        const notesMap = data.reduce((acc, avis) => {
+          acc[avis.studio_id] = avis.note;
+          return acc;
+        }, {});
+        
+        setNotes(notesMap);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des notes:", error);
+      }
+    };
+  
+    fetchNotes();
+  }, [artisteId]);
 
   // Fonction pour formater la date
   const formatDate = (dateString) => {
@@ -35,8 +56,37 @@ const Historique = ({ onBack, artisteId }) => {
     return new Date(dateString).toLocaleDateString('fr-FR', options);
   };
 
+  const handleRatingChange = async (newValue, studioId) => {
+    const oldValue = notes[studioId] || 0;
+    
+    setNotes(prev => ({ ...prev, [studioId]: newValue }));
+    
+    try {
+      const response = await fetch('http://localhost:5001/avisP', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          client_id: artisteId,
+          studio_id: studioId,
+          note: newValue
+        }),
+      });
+  
+      if (!response.ok) throw new Error('Erreur serveur');
+      
+      const data = await response.json();
+      console.log('Avis enregistré:', data);
+      
+    } catch (error) {
+      console.error("Erreur:", error);
+      setNotes(prev => ({ ...prev, [studioId]: oldValue }));
+      
+      alert("La note n'a pas pu être sauvegardée. Veuillez réessayer.");
+    }
+  };
+
   return (
-      <div className="siu">
+      <div className="siu" style={{ textAlign: "center" }}>
         {historique.map((reservation, index) => {
           const img = cld.image(reservation.photo_url);
           return (
@@ -71,10 +121,17 @@ const Historique = ({ onBack, artisteId }) => {
                     </div>
                   </CardContent>
                   <CardActions>
+                  <div className="ratingStar">
+                  <Rating 
+                    name={`rating-${reservation.studio_id}`}
+                    size="large" 
+                    onChange={(event, newValue) => handleRatingChange(newValue, reservation.studio_id)}
+                    value={notes[reservation.studio_id] || 0}
+                    precision={0.5} 
+                  />
+                  </div>
                     <Button size="small"
                             style={{
-                              marginTop: "20px",
-                              padding: "10px 20px",
                               backgroundColor: "#ff5722",
                               color: "#fff",
                               border: "none",
@@ -84,7 +141,6 @@ const Historique = ({ onBack, artisteId }) => {
                             onClick={() => ajouterAuxFavoris(artisteId, reservation.studio_id)}>
                       Ajouter aux favoris
                     </Button>
-
                   </CardActions>
                 </Card>
               </div>

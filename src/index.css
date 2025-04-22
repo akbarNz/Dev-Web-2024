@@ -859,3 +859,9 @@ button:hover {
   overflow-y: auto;
   padding: 0.5rem 0;
 }
+
+.siu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}

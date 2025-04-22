@@ -79,3 +79,22 @@
     background-color: #e0e0e0;
     font-weight: bold;
 }
+
+.searchButton {
+    padding: 0.8rem 1.5rem;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 0 25px 25px 0;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.searchButton:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.searchButton:hover:not(:disabled) {
+    background-color: #45a049;
+}

@@ -16,9 +16,9 @@ const FindStudio = ({ onSearch, disabled }) => {
     };
 
     const handleSearch = (e) => {
-        e.preventDefault();
-        if (!disabled) {
-            onSearch({ criteria: searchCriteria, value: searchValue });
+        e.preventDefault(); // Prevent form submission
+        if (!disabled && searchValue.trim()) {
+            onSearch({ criteria: searchCriteria, value: searchValue.trim() });
         }
     };
 
@@ -43,6 +43,13 @@ const FindStudio = ({ onSearch, disabled }) => {
                         disabled={disabled}
                     >
                         🔍
+                    </button>
+                    <button 
+                        type="submit"
+                        className={styles.searchButton}
+                        disabled={disabled || !searchValue.trim()}
+                    >
+                        Search
                     </button>
                 </div>
                 

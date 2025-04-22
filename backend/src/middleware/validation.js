@@ -1,13 +1,29 @@
 const { validationResult, check } = require('express-validator');
 
 const validateStudioSearch = [
-    check('lat').isFloat({ min: -90, max: 90 })
+    check('criteria')
+        .isIn(['radius', 'studio', 'city'])
+        .withMessage('Invalid search criteria'),
+    check('lat')
+        .if((value, { req }) => ['radius', 'studio'].includes(req.query.criteria))
+        .isFloat({ min: -90, max: 90 })
         .withMessage('Latitude must be between -90 and 90'),
-    check('lng').isFloat({ min: -180, max: 180 })
+    check('lng')
+        .if((value, { req }) => ['radius', 'studio'].includes(req.query.criteria))
+        .isFloat({ min: -180, max: 180 })
         .withMessage('Longitude must be between -180 and 180'),
-    check('radius').optional()
+    check('radius')
+        .if((value, { req }) => req.query.criteria === 'radius')
         .isFloat({ min: 0, max: 50 })
         .withMessage('Radius must be between 0 and 50 km'),
+    check('name')
+        .if((value, { req }) => req.query.criteria === 'studio')
+        .notEmpty()
+        .withMessage('Studio name is required for name search'),
+    check('city')
+        .if((value, { req }) => req.query.criteria === 'city')
+        .notEmpty()
+        .withMessage('City is required for city search'),
 ];
 
 const validateStudioCreation = [

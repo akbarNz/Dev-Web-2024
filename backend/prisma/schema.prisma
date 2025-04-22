@@ -22,19 +22,26 @@ enum StatutStudio {
 }
 
 model Studio {
-  id              Int         @id @default(autoincrement())
-  nom             String      @db.VarChar(255)
-  description     String?     @db.Text
-  adresse         String      @db.VarChar(255)
-  latitude        Float       @db.DoublePrecision
-  longitude       Float       @db.DoublePrecision
-  prix_par_heure  Decimal     @db.Decimal(10,2)
-  equipements     Json?       
-  photo_url       String?     @db.VarChar(500)
-  proprietaire_id Int
-  statut          StatutStudio @default(en_attente)
-  date_creation   DateTime    @default(now()) @db.Timestamp()
-  code_postal     Int
+    id              Int         @id @default(autoincrement())
+    nom             String      @db.VarChar(255)
+    description     String?     @db.Text
+    adresse         String      @db.VarChar(255)
+    latitude        Float       @db.DoublePrecision
+    longitude       Float       @db.DoublePrecision
+    prix_par_heure  Decimal     @db.Decimal(10,2)
+    equipements     Json?       
+    photo_url       String?     @db.VarChar(500)
+    proprietaire_id Int
+    statut          StatutStudio @default(en_attente)
+    date_creation   DateTime    @default(now()) @db.Timestamp()
+    code_postal     Int
 
-  @@map("studios")
+    @@map("studios")
+}
+
+model Ville {
+    code_postal     Int      @id
+    ville           String
+
+    @@map("villes")
 }

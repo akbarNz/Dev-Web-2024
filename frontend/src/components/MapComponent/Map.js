@@ -1,27 +1,45 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import { findNearbyStudios } from '../../services/studioService';
 import { GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_ID, defaultMapConfig } from '../config/maps';
 
+// Move these outside component to prevent recreating on each render
 const containerStyle = {
     width: '100%',
     height: '400px'
 };
 
+// Define libraries as a static array outside component
+const libraries = ['marker'];
+
 const Map = ({ center, searchParams, onStudiosFound }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [markers, setMarkers] = useState([]);
-
+    
+    // Memoize search parameters to prevent unnecessary re-renders
+    const searchKey = useMemo(() => 
+        `${searchParams?.criteria}-${searchParams?.value}-${center?.lat}-${center?.lng}`,
+        [searchParams, center]
+    );
+    
     useEffect(() => {
+        let isMounted = true;
+
         const fetchStudios = async () => {
+            if (!center || !searchParams) return;
+            
             try {
+                setLoading(true);
                 const studios = await findNearbyStudios(
                     searchParams.criteria,
                     searchParams.value,
                     center
                 );
-                setMarkers([
+                
+                if (!isMounted) return;
+                
+                const newMarkers = [
                     {
                         position: center,
                         icon: '/user-location.png',
@@ -34,23 +52,32 @@ const Map = ({ center, searchParams, onStudiosFound }) => {
                         },
                         title: studio.name
                     }))
-                ]);
+                ];
+                
+                setMarkers(newMarkers);
                 onStudiosFound(studios);
             } catch (err) {
-                setError('Failed to fetch studios');
+                if (isMounted) {
+                    setError('Failed to fetch studios');
+                    console.error('Error fetching studios:', err);
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
-        if (center && searchParams) {
-            fetchStudios();
-        }
-    }, [center, searchParams, onStudiosFound]);
+        fetchStudios();
 
-    const onLoad = (map) => {
+        return () => {
+            isMounted = false;
+        };
+    }, [searchKey]); // Only re-run when searchKey changes
+
+    const onLoad = useCallback((map) => {
         const { google } = window;
-        if (google) {
+        if (google && markers.length > 0) {
             markers.forEach(marker => {
                 new google.maps.marker.AdvancedMarkerElement({
                     position: marker.position,
@@ -62,7 +89,7 @@ const Map = ({ center, searchParams, onStudiosFound }) => {
                 });
             });
         }
-    };
+    }, [markers]);
 
     const createMarkerContent = (iconUrl) => {
         const element = document.createElement('div');
@@ -77,7 +104,7 @@ const Map = ({ center, searchParams, onStudiosFound }) => {
     return (
         <LoadScript 
             googleMapsApiKey={GOOGLE_MAPS_API_KEY}
-            libraries={['marker']}
+            libraries={libraries}
         >
             <GoogleMap
                 mapContainerStyle={containerStyle}
@@ -94,4 +121,5 @@ const Map = ({ center, searchParams, onStudiosFound }) => {
     );
 };
 
-export default Map;
+// Wrap with memo to prevent unnecessary re-renders
+export default React.memo(Map);

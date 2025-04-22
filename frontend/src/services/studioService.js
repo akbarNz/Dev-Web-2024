@@ -6,21 +6,29 @@ if (!API_URL) {
 
 export const findNearbyStudios = async (criteria, searchValue, location) => {
     try {
-        let url;
+        let url = new URL(`${API_URL}/studios/search`);
+        const params = new URLSearchParams();
+        params.append('criteria', criteria);
+
         switch (criteria) {
             case 'radius':
-                url = `${API_URL}/studios/nearby?lat=${location.lat}&lng=${location.lng}&radius=${searchValue}`;
+                params.append('lat', location.lat);
+                params.append('lng', location.lng);
+                params.append('radius', searchValue);
                 break;
             case 'studio':
-                url = `${API_URL}/studios/search?name=${searchValue}&lat=${location.lat}&lng=${location.lng}`;
+                params.append('lat', location.lat);
+                params.append('lng', location.lng);
+                params.append('name', searchValue);
                 break;
             case 'city':
-                url = `${API_URL}/studios/city?city=${searchValue}`;
+                params.append('city', searchValue);
                 break;
             default:
                 throw new Error('Invalid search criteria');
         }
 
+        url.search = params.toString();
         const response = await fetch(url);
         const data = await response.json();
 

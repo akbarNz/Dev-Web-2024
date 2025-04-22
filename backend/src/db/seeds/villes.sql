@@ -1,0 +1,18 @@
+INSERT INTO villes (code_postal, ville) VALUES
+    (1000, 'Bruxelles'),
+    (1020, 'Laeken'),
+    (1030, 'Schaerbeek'),
+    (1040, 'Etterbeek'),
+    (1050, 'Ixelles'),
+    (1060, 'Saint-Gilles'),
+    (1070, 'Anderlecht'),
+    (1080, 'Molenbeek-Saint-Jean'),
+    (1090, 'Jette'),
+    (1140, 'Evere'),
+    (1150, 'Woluwe-Saint-Pierre'),
+    (1160, 'Auderghem'),
+    (1170, 'Watermael-Boitsfort'),
+    (1180, 'Uccle'),
+    (1190, 'Forest'),
+    (1200, 'Woluwe-Saint-Lambert'),
+    (1210, 'Saint-Josse-ten-Noode');

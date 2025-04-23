@@ -1,105 +1,101 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import { findNearbyStudios } from '../../services/studioService';
-import { GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_ID, defaultMapConfig } from '../config/maps';
+import { GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_ID } from '../config/maps';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import MusicNoteIcon from '@mui/icons-material/MusicNote';
 
-// Move these outside component to prevent recreating on each render
 const containerStyle = {
     width: '100%',
     height: '400px'
 };
 
-// Define libraries as a static array outside component
 const libraries = ['marker'];
 
-const Map = ({ center, searchParams, onStudiosFound }) => {
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const createMarkerContent = (IconComponent, color) => {
+    // Get the path from the icon component
+    const path = IconComponent?.mui?.icon?.path || IconComponent?.default?.path;
+    if (!path) return null;
+
+    const svg = `
+        <svg viewBox="0 0 24 24" width="30" height="30">
+            <path d="${path}" fill="${color}"/>
+        </svg>
+    `;
+    const blob = new Blob([svg], { type: 'image/svg+xml' });
+    const url = URL.createObjectURL(blob);
+    const img = document.createElement('img');
+    img.style.width = '30px';
+    img.style.height = '30px';
+    img.src = url;
+
+    // Clean up the blob URL when the image loads
+    img.onload = () => URL.revokeObjectURL(url);
+    
+    return img;
+};
+
+const Map = ({ center, searchParams, studios }) => {
+    const [selectedStudio, setSelectedStudio] = useState(null);
+    const [mapInstance, setMapInstance] = useState(null);
     const [markers, setMarkers] = useState([]);
-    
-    // Memoize search parameters to prevent unnecessary re-renders
-    const searchKey = useMemo(() => 
-        `${searchParams?.criteria}-${searchParams?.value}-${center?.lat}-${center?.lng}`,
-        [searchParams, center]
-    );
-    
-    useEffect(() => {
-        let isMounted = true;
 
-        const fetchStudios = async () => {
-            if (!center || !searchParams) return;
-            
-            try {
-                setLoading(true);
-                const studios = await findNearbyStudios(
-                    searchParams.criteria,
-                    searchParams.value,
-                    center
-                );
-                
-                if (!isMounted) return;
-                
-                const newMarkers = [
-                    {
-                        position: center,
-                        icon: '/user-location.png',
-                        title: 'Your location'
-                    },
-                    ...studios.map(studio => ({
-                        position: { 
-                            lat: studio.latitude, 
-                            lng: studio.longitude 
-                        },
-                        title: studio.name
-                    }))
-                ];
-                
-                setMarkers(newMarkers);
-                onStudiosFound(studios);
-            } catch (err) {
-                if (isMounted) {
-                    setError('Failed to fetch studios');
-                    console.error('Error fetching studios:', err);
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false);
-                }
-            }
-        };
+    const handleMapLoad = useCallback((map) => {
+        setMapInstance(map);
+    }, []);
 
-        fetchStudios();
+    const createAdvancedMarker = useCallback((position, content, title, onClick) => {
+        if (!window.google?.maps?.marker) return null;
 
-        return () => {
-            isMounted = false;
-        };
-    }, [searchKey]); // Only re-run when searchKey changes
+        const marker = new window.google.maps.marker.AdvancedMarkerElement({
+            position,
+            content,
+            title,
+            map: mapInstance
+        });
 
-    const onLoad = useCallback((map) => {
-        const { google } = window;
-        if (google && markers.length > 0) {
-            markers.forEach(marker => {
-                new google.maps.marker.AdvancedMarkerElement({
-                    position: marker.position,
-                    map: map,
-                    title: marker.title,
-                    ...(marker.icon && {
-                        content: createMarkerContent(marker.icon)
-                    })
-                });
-            });
+        if (onClick) {
+            marker?.addListener('gmp-click', onClick);
         }
-    }, [markers]);
 
-    const createMarkerContent = (iconUrl) => {
-        const element = document.createElement('div');
-        element.className = 'custom-marker';
-        element.style.backgroundImage = `url(${iconUrl})`;
-        element.style.width = '40px';
-        element.style.height = '40px';
-        element.style.backgroundSize = 'contain';
-        return element;
-    };
+        return marker;
+    }, [mapInstance]);
+
+    useEffect(() => {
+        if (!mapInstance || !window.google?.maps?.marker) return;
+
+        // Clear existing markers
+        markers.forEach(marker => marker.setMap(null));
+
+        // Create user location marker
+        const userMarker = createAdvancedMarker(
+            center,
+            createMarkerContent(LocationOnIcon, '#2196F3'),
+            'Your location'
+        );
+
+        // Create studio markers
+        const studioMarkers = studios?.map(studio => {
+            const marker = createAdvancedMarker(
+                {
+                    lat: Number(studio.latitude),
+                    lng: Number(studio.longitude)
+                },
+                createMarkerContent(MusicNoteIcon, '#FF4081'),
+                studio.nom,
+                () => setSelectedStudio(studio)  // Pass the click handler here
+            );
+
+            return marker;
+        });
+
+        const newMarkers = [userMarker, ...(studioMarkers || [])].filter(Boolean);
+        setMarkers(newMarkers);
+
+        // Cleanup function
+        return () => {
+            newMarkers.forEach(marker => marker?.setMap(null));
+        };
+    }, [mapInstance, studios, center, createAdvancedMarker]);
 
     return (
         <LoadScript 
@@ -108,18 +104,42 @@ const Map = ({ center, searchParams, onStudiosFound }) => {
         >
             <GoogleMap
                 mapContainerStyle={containerStyle}
-                center={center || defaultMapConfig.center}
-                zoom={defaultMapConfig.zoom}
-                onLoad={onLoad}
-                mapId={GOOGLE_MAPS_ID}
+                center={center}
+                zoom={13}
                 options={{
-                    mapId: GOOGLE_MAPS_ID
+                    mapId: GOOGLE_MAPS_ID, // Ensure Map ID is passed here
+                    disableDefaultUI: false
                 }}
+                onLoad={handleMapLoad}
             >
+                {selectedStudio && (
+                    <div
+                        style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -100%)',
+                            backgroundColor: 'white',
+                            padding: '12px',
+                            borderRadius: '8px',
+                            boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
+                            zIndex: 1000
+                        }}
+                    >
+                        <h3>{selectedStudio.nom}</h3>
+                        <p>{selectedStudio.adresse}</p>
+                        <p>€{selectedStudio.prix_par_heure}/hour</p>
+                        <button 
+                            onClick={() => setSelectedStudio(null)}
+                            style={{ float: 'right' }}
+                        >
+                            Close
+                        </button>
+                    </div>
+                )}
             </GoogleMap>
         </LoadScript>
     );
 };
 
-// Wrap with memo to prevent unnecessary re-renders
 export default React.memo(Map);

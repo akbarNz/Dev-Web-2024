@@ -107,13 +107,13 @@ INSERT INTO Proprio (nom, email, numero_telephone, verifie) VALUES
     ('Thomas Peeters', 'thomas.peeters@skynet.be', '32456789012', TRUE),
     ('Sophie Dubois', 'sophie.dubois@telenet.be', '32412345678', TRUE);
 
-INSERT INTO Client (nom, email, numero_telephone, role, verifie) VALUES
-    ('Admin Système', 'admin@studiobe.be', '32487654321', 'admin', TRUE),
-    ('Luc Janssens', 'luc.janssens@gmail.com', '32465432109', 'artiste', TRUE),
-    ('Emma Vervoort', 'emma.vervoort@hotmail.com', '32476543210', 'artiste', TRUE),
-    ('Maxime Leroy', 'maxime.leroy@gmail.com', '32432109876', 'artiste', TRUE),
-    ('Julie Maes', 'julie.maes@outlook.be', '32454321098', 'artiste', TRUE),
-    ('Nicolas Claes', 'nicolas.claes@gmail.com', '32423456789', 'artiste', FALSE);
+INSERT INTO Client (nom, email, numero_telephone, role, verifie, photo_url) VALUES
+    ('Admin Système', 'admin@studiobe.be', '32487654321', 'admin', TRUE, 'iaubuxzig7kkf1m9lhyh'),
+    ('Luc Janssens', 'luc.janssens@gmail.com', '32465432109', 'artiste', TRUE, 'iaubuxzig7kkf1m9lhyh'),
+    ('Emma Vervoort', 'emma.vervoort@hotmail.com', '32476543210', 'artiste', TRUE, 'orfhdqdzq639yzk0vbgm'),
+    ('Maxime Leroy', 'maxime.leroy@gmail.com', '32432109876', 'artiste', TRUE, 'bmi53mcp07h67fhsmzqg'),
+    ('Julie Maes', 'julie.maes@outlook.be', '32454321098', 'artiste', TRUE, 'iqffx5bnaoa04nvbllxy'),
+    ('Nicolas Claes', 'nicolas.claes@gmail.com', '32423456789', 'artiste', FALSE, 'h6arc7m9wvhqntmypyvs');
 
 INSERT INTO Studio (nom, description, adresse, latitude, longitude, prix_par_heure, equipements, photo_url, proprietaire_id, statut, code_postal) VALUES
     ('Studio Bruxelles Central', 'Studio professionnel au centre de Bruxelles', '25 Rue de la Loi', 50.8466, 4.3528, 60.00, '["microphones Neumann", "console SSL", "acoustique traitée", "instruments"]', 'slkelm9y9ooushsaowro', 1, 'validé', 1000),

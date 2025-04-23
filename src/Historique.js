@@ -112,9 +112,6 @@ const Historique = ({ onBack, artisteId }) => {
                       <Typography variant="body1" gutterBottom>
                         <strong>Nombre de personnes:</strong> {reservation.nbr_personne}
                       </Typography>
-                      <Typography variant="body1" gutterBottom>
-                        <strong>Statut:</strong> {reservation.statut}
-                      </Typography>
                       <Typography variant="body1">
                         <strong>Prix total:</strong> {reservation.prix_total} €
                       </Typography>

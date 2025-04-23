@@ -19,7 +19,7 @@ const Historique = ({ onBack, artisteId }) => {
   useEffect(() => {
     const historic = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/historique?artiste=${Number(artisteId)}`);
+        const response = await fetch(`http://localhost:5001/api/reservations/historique?artiste=${Number(artisteId)}`);
         const data = await response.json();
         sethistorique(data);
       } catch (error) {
@@ -33,7 +33,7 @@ const Historique = ({ onBack, artisteId }) => {
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/avis?client_id=${artisteId}`);
+        const response = await fetch(`http://localhost:5001/api/avis?client_id=${artisteId}`);
         const data = await response.json();
         
         const notesMap = data.reduce((acc, avis) => {
@@ -62,7 +62,7 @@ const Historique = ({ onBack, artisteId }) => {
     setNotes(prev => ({ ...prev, [studioId]: newValue }));
     
     try {
-      const response = await fetch('http://localhost:5001/avisP', {
+      const response = await fetch('http://localhost:5001/api/avis', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

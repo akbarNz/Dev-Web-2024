@@ -10,7 +10,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    fetch("http://localhost:5001/proprietaire")
+    fetch("http://localhost:5001/api/proprietaires")
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);
@@ -84,7 +84,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
       console.log("Données envoyées au serveur:", enregistrementData);
 
-      const response = await fetch("http://localhost:5001/enregi", {
+      const response = await fetch("http://localhost:5001/api/studio/enregistrer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(enregistrementData),

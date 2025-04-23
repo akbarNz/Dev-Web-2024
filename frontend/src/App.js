@@ -1,12 +1,12 @@
 import { useState } from "react";
-import FilterForm from "./Filtrage";
-import ReservationForm from "./FormulaireReservation";
-import Header from "./Header";
-import Wrapper from "./Wrapper";
-import ModifProfil from "./ModifProfil";
-import Historique from "./Historique";
-import Favoris from "./Favoris";
-import Enregistrement from "./FormulaireEnregiStudio";
+import FilterForm from "./components/Filtrage";
+import ReservationForm from "./components/FormulaireReservation";
+import Header from "./components/Header";
+import Wrapper from "./components/Wrapper";
+import ModifProfil from "./components/ModifProfil";
+import Historique from "./components/Historique";
+import Favoris from "./components/Favoris";
+import Enregistrement from "./components/FormulaireEnregiStudio";
 
 const App = () => {
   const [filters, setFilters] = useState({

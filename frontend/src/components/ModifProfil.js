@@ -27,8 +27,8 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Fetch les données selon le type d'utilisateur
       const url = user.type === 'artiste' 
-        ? `http://localhost:5001/getClientInfo?id=${user.id}`
-        : `http://localhost:5001/getProprioInfo?id=${user.id}`;
+        ? `http://localhost:5001/api/clients/info?id=${user.id}`
+        : `http://localhost:5001/api/proprietaires/info?id=${user.id}`;
       
       const response = await fetch(url);
       const data = await response.json();
@@ -106,8 +106,8 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Utiliser la route appropriée selon le type d'utilisateur
       const url = profil.type === 'artiste' 
-        ? "http://localhost:5001/saveClientInfo"
-        : "http://localhost:5001/saveProprioInfo";
+        ? "http://localhost:5001/api/clients/save"
+        : "http://localhost:5001/api/proprietaires/save";
       
       const response = await fetch(url, {
         method: "POST",

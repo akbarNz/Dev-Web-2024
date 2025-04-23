@@ -9,7 +9,7 @@ const StudioSection = () => {
   useEffect(() => {
     const fetchStudios = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/studio?prixMin=0&prixMax=1000&noteMin=0");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/studio?prixMin=0&prixMax=1000&noteMin=0`);
         const data = await response.json();
         setStudios(data);
       } catch (error) {

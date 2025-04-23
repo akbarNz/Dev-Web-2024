@@ -295,18 +295,17 @@ app.get('/historique', async (req, res) => {
 });
 
 app.post("/postFav", async (req, res) => {
-  const { artiste_id, studio_id } = req.body;
+  const { client_id, studio_id } = req.body;
 
   try {
     await pool.query(`
-      INSERT INTO favoris (artiste_id, studio_id, date_ajout)
+      INSERT INTO Favoris (client_id, studio_id, date_ajout)
       VALUES ($1, $2, NOW())
-    `, [artiste_id, studio_id]);
+    `, [client_id, studio_id]);
 
     res.status(201).json({ message: "Favori ajouté" });
-
   } catch (error) {
-    if (error.code === '23505') { // violation contrainte UNIQUE PostgreSQL
+    if (error.code === '23505') {
       return res.status(409).json({ message: "Déjà en favoris" });
     }
     console.error("Erreur ajout favoris :", error);
@@ -316,10 +315,10 @@ app.post("/postFav", async (req, res) => {
 
 
 app.get("/getFav", async (req, res) => {
-  const { artiste } = req.query;
+  const { client } = req.query;
 
-  if (!artiste) {
-    return res.status(400).json({ error: "Paramètre artiste manquant" });
+  if (!client) {
+    return res.status(400).json({ error: "Paramètre client manquant" });
   }
 
   try {
@@ -330,29 +329,30 @@ app.get("/getFav", async (req, res) => {
         s.adresse,
         s.photo_url,
         s.prix_par_heure
-      FROM favoris f
-      JOIN studios s ON f.studio_id = s.id
-      WHERE f.artiste_id = $1
-    `, [artiste]);
+      FROM Favoris f
+      JOIN Studio s ON f.studio_id = s.id
+      WHERE f.client_id = $1
+    `, [client]);
 
     res.json(result.rows);
   } catch (err) {
-    console.error("Erreur dans /favoris :", err);
+    console.error("Erreur dans /getFav :", err);
     res.status(500).send("Erreur serveur");
   }
 });
 
-app.delete("/deleteFav", async (req, res) => {
-  const { artiste_id, studio_id } = req.body;
 
-  if (!artiste_id || !studio_id) {
+app.delete("/deleteFav", async (req, res) => {
+  const { client_id, studio_id } = req.body;
+
+  if (!client_id || !studio_id) {
     return res.status(400).json({ error: "Paramètres manquants" });
   }
 
   try {
     const result = await pool.query(
-      `DELETE FROM favoris WHERE artiste_id = $1 AND studio_id = $2`,
-      [artiste_id, studio_id]
+      `DELETE FROM Favoris WHERE client_id = $1 AND studio_id = $2`,
+      [client_id, studio_id]
     );
 
     if (result.rowCount === 0) {
@@ -365,6 +365,7 @@ app.delete("/deleteFav", async (req, res) => {
     res.status(500).json({ error: "Erreur serveur" });
   }
 });
+
 
 //Route pour récupérer les propriétaires : 
 app.get("/proprietaire", async (req, res) => {

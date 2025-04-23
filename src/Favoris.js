@@ -6,7 +6,7 @@ const Favoris = ({ onBack }) => {
   useEffect(() => {
     const fetchFavoris = async () => {
       try {
-        const response = await fetch("http://localhost:5001/getFav?artiste=4"); // artiste_id = 4
+        const response = await fetch("http://localhost:5001/getFav?client=4"); // client_id = 4
         const data = await response.json();
         console.log("Favoris récupérés :", data);
         setFavorisList(data);
@@ -53,7 +53,7 @@ const Favoris = ({ onBack }) => {
                         cursor: "pointer",
                       }}
                       onClick={() =>
-                          retirerFavori(studio.artiste_id || 4, studio.studio_id, () => {
+                          retirerFavori(studio.client_id || 4, studio.studio_id, () => {
                             setFavorisList((prev) =>
                                 prev.filter((s) => s.studio_id !== studio.studio_id)
                             );
@@ -92,7 +92,7 @@ const Favoris = ({ onBack }) => {
   );
 };
 
-export async function ajouterAuxFavoris(artisteId, studioId) {
+export async function ajouterAuxFavoris(clientId, studioId) {
   try {
     const response = await fetch("http://localhost:5001/postFav", {
       method: "POST",
@@ -100,7 +100,7 @@ export async function ajouterAuxFavoris(artisteId, studioId) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        artiste_id: artisteId,
+        client_id: clientId,
         studio_id: studioId
       })
     });
@@ -124,7 +124,7 @@ export async function ajouterAuxFavoris(artisteId, studioId) {
   }
 }
 
-export async function retirerFavori(artisteId, studioId, onSuccess) {
+export async function retirerFavori(clientId, studioId, onSuccess) {
   try {
     const response = await fetch("http://localhost:5001/deleteFav", {
       method: "DELETE",
@@ -132,7 +132,7 @@ export async function retirerFavori(artisteId, studioId, onSuccess) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        artiste_id: artisteId,
+        client_id: clientId,
         studio_id: studioId
       })
     });
@@ -148,8 +148,6 @@ export async function retirerFavori(artisteId, studioId, onSuccess) {
     alert("Erreur lors du retrait du favori");
   }
 }
-
-
 
 
 

@@ -9,7 +9,7 @@ const StudioSection = () => {
   useEffect(() => {
     const fetchStudios = async () => {
       try {
-        const response = await fetch("http://localhost:5001/api/studio?prixMin=0&prixMax=1000&noteMin=0");
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/studio?prixMin=0&prixMax=1000&noteMin=0`);
         const data = await response.json();
         setStudios(data);
       } catch (error) {
@@ -38,7 +38,7 @@ const StudioSection = () => {
             return (
               <div key={`${studio.id_stud}-${index}`} className="item">
                 <AdvancedImage cldImg={img} className="studio-photo" />
-                <h5>{studio.nom_stud}</h5>
+                <h5>{studio.nom}</h5>
                 <h5>Prix : {studio.prix_par_heure}€/h</h5>
               </div>
             );

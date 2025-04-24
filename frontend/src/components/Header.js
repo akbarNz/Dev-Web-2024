@@ -19,11 +19,11 @@ const Header = ({
   const fetchUsers = async () => {
     try {
       // Fetch artistes
-      const artistesResponse = await fetch("http://localhost:5001/api/clients/artistes");
+      const artistesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/clients/artistes`);
       const artistesData = await artistesResponse.json();
       
       // Fetch propriétaires
-      const proprietairesResponse = await fetch("http://localhost:5001/api/proprietaires/");
+      const proprietairesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/proprietaires/`);
       const proprietairesData = await proprietairesResponse.json();
       
       setUsers({

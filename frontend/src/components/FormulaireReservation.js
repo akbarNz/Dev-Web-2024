@@ -138,7 +138,7 @@ const ReservationForm = ({
         firebase_created_at: serverTimestamp()
       });
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/reservations`, {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservationData),

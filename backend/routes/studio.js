@@ -6,6 +6,7 @@ router.get('/', studioController.getStudios);
 router.get('/filter', studioController.getFilteredStudios);
 router.get('/equipements', studioController.getEquipements);
 router.get('/prixMinMax', studioController.getPrixMinMax);
+router.get('/ville', studioController.getVille);
 router.post('/enregistrer', studioController.registerStudio);
 
 module.exports = router;

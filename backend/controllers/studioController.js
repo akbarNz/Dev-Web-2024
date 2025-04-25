@@ -123,3 +123,14 @@ exports.registerStudio = async (req, res) => {
     res.status(500).json({ error: 'Erreur serveur', details: err.message });
   }
 };
+
+exports.getVille = async(req, res) => {
+  
+  try {
+    const result = await pool.query(SELECT * FROM villes);
+    res.json(result.rows);
+  } catch(err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+});

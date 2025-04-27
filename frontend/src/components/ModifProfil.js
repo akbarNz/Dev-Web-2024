@@ -27,8 +27,8 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Fetch les données selon le type d'utilisateur
       const url = user.type === 'artiste' 
-        ? `${process.env.REACT_APP_API_URL}/api/clients/info?id=${user.id}`
-        : `${process.env.REACT_APP_API_URL}/api/proprietaires/info?id=${user.id}`;
+        ? `http://localhost:5001/clients/info?id=${user.id}`
+        : `http://localhost:5001/proprietaires/info?id=${user.id}`;
       
       const response = await fetch(url);
       const data = await response.json();
@@ -106,8 +106,8 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Utiliser la route appropriée selon le type d'utilisateur
       const url = profil.type === 'artiste' 
-        ? `${process.env.REACT_APP_API_URL}/api/clients/save`
-        : `${process.env.REACT_APP_API_URL}/api/proprietaires/save`;
+        ? `http://localhost:5001/clients/save`
+        : `http://localhost:5001/proprietaires/save`;
       
       const response = await fetch(url, {
         method: "POST",

@@ -10,14 +10,14 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
   const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/proprietaires`)
+    fetch(`http://localhost:5001/proprietaires`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);
       })
       .catch((err) => console.error("Erreur chargement utilisateurs:", err));
 
-    fetch(`${process.env.REACT_APP_API_URL}/ville`)
+    fetch(`http://localhost:5001/ville`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Données reçues pour villes:", data);
@@ -84,7 +84,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
       console.log("Données envoyées au serveur:", enregistrementData);
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/studio/enregistrer`, {
+      const response = await fetch(`http://localhost:5001/studio/enregistrer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(enregistrementData),

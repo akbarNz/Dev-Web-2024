@@ -19,11 +19,11 @@ const Header = ({
   const fetchUsers = async () => {
     try {
       // Fetch artistes
-      const artistesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/clients/artistes`);
+      const artistesResponse = await fetch(`http://localhost:5001/clients/artistes`);
       const artistesData = await artistesResponse.json();
       
       // Fetch propriétaires
-      const proprietairesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/proprietaires/`);
+      const proprietairesResponse = await fetch(`http://localhost:5001/proprietaires/`);
       const proprietairesData = await proprietairesResponse.json();
       
       setUsers({
@@ -67,9 +67,9 @@ const Header = ({
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch("/api/menu-items");
-        const data = await response.json();
-        setMenuItems(data);
+        //const response = await fetch("/api/menu-items");
+        //const data = await response.json();
+        //setMenuItems(data);
       } catch (error) {
         console.error("Erreur lors de la récupération des éléments du menu:", error);
         setMenuItems([]);

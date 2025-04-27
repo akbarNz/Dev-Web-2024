@@ -36,8 +36,8 @@ const ReservationForm = ({
     const fetchInitialData = async () => {
       try {
         const [studioRes, userRes] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/api/studio`),
-          fetch(`${process.env.REACT_APP_API_URL}/api/clients/artistes`),
+          fetch(`http://localhost:5001/studio`),
+          fetch(`http://localhost:5001/clients/artistes`),
         ]);
         const [studioData, userData] = await Promise.all([
           studioRes.json(),
@@ -63,7 +63,7 @@ const ReservationForm = ({
     const fetchFilteredStudios = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
+          `http://localhost:5001/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
             JSON.stringify(selectedEquipements || [])
           )}`
         );
@@ -138,7 +138,7 @@ const ReservationForm = ({
         firebase_created_at: serverTimestamp()
       });
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations`, {
+      const response = await fetch(`http://localhost:5001/reservations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservationData),

@@ -6,7 +6,7 @@ const Favoris = ({ onBack }) => {
   useEffect(() => {
     const fetchFavoris = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/favoris?client=4`);
+        const response = await fetch(`http://localhost:5001/favoris?client=4`);
         const data = await response.json();
         console.log("Favoris récupérés :", data);
         setFavorisList(data);
@@ -94,7 +94,7 @@ const Favoris = ({ onBack }) => {
 
 export async function ajouterAuxFavoris(clientId, studioId) {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/favoris`, {
+    const response = await fetch(`http://localhost:5001/favoris`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -126,7 +126,7 @@ export async function ajouterAuxFavoris(clientId, studioId) {
 
 export async function retirerFavori(clientId, studioId, onSuccess) {
   try {
-    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/favoris`, {
+    const response = await fetch(`http://localhost:5001/favoris`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json"

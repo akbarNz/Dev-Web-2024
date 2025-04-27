@@ -16,7 +16,7 @@ const FilterForm = ({ filters, setFilters}) => {
 
 
   useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/studio/prixMinMax`)
+    fetch(`http://localhost:5001/studio/prixMinMax`)
       .then((res) => res.json())
       .then((data) => {
         set_minInit(data.prix_min);
@@ -27,7 +27,7 @@ const FilterForm = ({ filters, setFilters}) => {
       })
       .catch((err) => console.error("Erreur au chargement de prix min et max:", err));
   
-    fetch(`${process.env.REACT_APP_API_URL}/api/studio/equipements`)
+    fetch(`http://localhost:5001/studio/equipements`)
       .then((res) => res.json())
       .then((data) => {
         setEquipements(data);

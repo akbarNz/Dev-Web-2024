@@ -127,7 +127,7 @@ exports.registerStudio = async (req, res) => {
 exports.getVille = async(req, res) => {
   
   try {
-    const result = await pool.query(SELECT * FROM villes);
+    const result = await pool.query('SELECT * FROM villes');
     res.json(result.rows);
   } catch(err) {
     console.error(err);

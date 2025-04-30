@@ -86,6 +86,18 @@ exports.getEquipements = async (req, res) => {
   }
 };
 
+exports.getVilles = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT * from villes;
+    `);
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Erreur serveur');
+  }
+};
+
 exports.getPrixMinMax = async (req, res) => {
   try {
     const result = await pool.query(`

@@ -76,10 +76,16 @@ const ReservationForm = ({
     fetchFilteredStudios();
   }, [prixMin, prixMax, noteMin, selectedEquipements]);
 
-  const calculateTimeDifference = (startTime, endTime) => {
+ const calculateTimeDifference = (startTime, endTime) => {
     if (startTime && endTime) {
       const start = new Date(`2023-01-01T${startTime}`);
-      const end = new Date(`2023-01-01T${endTime}`);
+      let end = new Date(`2023-01-01T${endTime}`);
+  
+      // Si fin < début, on considère que la réservation va au lendemain
+      if (end <= start) {
+        end.setDate(end.getDate() + 1);
+      }
+  
       return (end - start) / (1000 * 60 * 60); // différence en heures
     }
     return 0;

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem, CircularProgress, Box } from "@mui/material";
-import { db } from "./firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 
 const ReservationForm = ({
   reservation,
@@ -80,7 +79,7 @@ const ReservationForm = ({
     if (startTime && endTime) {
       const start = new Date(`2023-01-01T${startTime}`);
       let end = new Date(`2023-01-01T${endTime}`);
-      
+
       if (end <= start) {
         end.setDate(end.getDate() + 1);
       }
@@ -138,9 +137,10 @@ const ReservationForm = ({
     };
 
     try {
-      await addDoc(collection(db, "reservations"), {
-        nbr_personne: reservationData.nbr_personne,
-        firebase_created_at: serverTimestamp()
+      await fetch(`/api/firebase`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nbr_personne: reservationData.nbr_personne }),
       });
 
       const response = await fetch(`/api/reservations`, {

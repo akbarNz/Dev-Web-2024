@@ -1,8 +1,7 @@
-import express from "express";
-import { saveReservationToFirebase } from "../controllers/firebaseController.js";
-
+const express = require('express');
 const router = express.Router();
+const firebaseController = require("../controllers/firebaseController");
 
-router.post("/firebase/reservations", saveReservationToFirebase);
+router.post('/', firebaseController.saveReservationToFirebase);
 
-export default router;
+module.exports = router;

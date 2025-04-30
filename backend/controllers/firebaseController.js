@@ -1,7 +1,7 @@
-import { db } from "../firebase.js";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+const db = require("../firebase.js");
+const { collection, addDoc, serverTimestamp } = require("firebase/firestore");
 
-export const saveReservationToFirebase = async (req, res) => {
+exports.saveReservationToFirebase = async (req, res) => {
   try {
     const { nbr_personne } = req.body;
 

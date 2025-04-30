@@ -89,7 +89,7 @@ exports.getEquipements = async (req, res) => {
 exports.getVilles = async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT * from villes;
+      SELECT * from villes
     `);
     res.json(result.rows);
   } catch (err) {

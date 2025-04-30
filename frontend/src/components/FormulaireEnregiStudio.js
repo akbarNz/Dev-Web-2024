@@ -17,7 +17,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
       })
       .catch((err) => console.error("Erreur chargement utilisateurs:", err));
 
-    fetch(`/api/villes`)
+    fetch(`/api/studio/villes`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Données reçues pour villes:", data);

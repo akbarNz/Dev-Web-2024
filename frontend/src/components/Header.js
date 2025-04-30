@@ -67,7 +67,7 @@ const Header = ({
   useEffect(() => {
     const fetchMenuItems = async () => {
       try {
-        const response = await fetch("/api/menu-items");
+        const response = await fetch("/api/menu-item");
         const data = await response.json();
         setMenuItems(data);
       } catch (error) {
@@ -124,8 +124,8 @@ const Header = ({
   return (
     <header>
       <nav>
-        <a href="logo">
-          <img src="zikfreak_logo.png" alt="Logo" />
+        <a href="/">
+          <img src="zikfreek_VF.png" alt="Logo" />
         </a>
         <ul>
           <li>

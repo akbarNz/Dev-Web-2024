@@ -36,8 +36,8 @@ const ReservationForm = ({
     const fetchInitialData = async () => {
       try {
         const [studioRes, userRes] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/api/studio`),
-          fetch(`${process.env.REACT_APP_API_URL}/api/clients/artistes`),
+          fetch(`/api/studio`),
+          fetch(`/api/clients/artistes`),
         ]);
         const [studioData, userData] = await Promise.all([
           studioRes.json(),
@@ -63,7 +63,7 @@ const ReservationForm = ({
     const fetchFilteredStudios = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
+          `/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
             JSON.stringify(selectedEquipements || [])
           )}`
         );
@@ -80,8 +80,7 @@ const ReservationForm = ({
     if (startTime && endTime) {
       const start = new Date(`2023-01-01T${startTime}`);
       let end = new Date(`2023-01-01T${endTime}`);
-  
-      // Si fin < début, on considère que la réservation va au lendemain
+      
       if (end <= start) {
         end.setDate(end.getDate() + 1);
       }
@@ -144,7 +143,7 @@ const ReservationForm = ({
         firebase_created_at: serverTimestamp()
       });
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations`, {
+      const response = await fetch(`/api/reservations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservationData),

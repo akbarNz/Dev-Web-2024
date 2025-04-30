@@ -2,6 +2,7 @@
     "name": "projet-dev",
     "version": "0.1.0",
     "private": true,
+    "proxy":"http://localhost:5001",
     "dependencies": {
         "@base-ui-components/react": "^1.0.0-alpha.8",
         "@cloudinary/react": "^1.14.1",

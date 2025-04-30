@@ -14,6 +14,7 @@ app.use('/api/proprietaires', require('./routes/proprio'));
 app.use('/api/reservations', require('./routes/reservation'));
 app.use('/api/favoris', require('./routes/favoris'));
 app.use('/api/avis', require('./routes/avis'));
+app.use('/api/firebase', require('./routes/firebase'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 

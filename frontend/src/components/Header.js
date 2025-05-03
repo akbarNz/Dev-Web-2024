@@ -125,7 +125,7 @@ const Header = ({
     <header>
       <nav>
         <a href="/">
-          <img src="zikfreek_VF.png" alt="Logo" />
+        <img id="logo" src="zikfreek_VF.png" alt="Logo" />
         </a>
         <ul>
           <li>

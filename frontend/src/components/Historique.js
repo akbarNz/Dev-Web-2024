@@ -8,6 +8,7 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { ajouterAuxFavoris } from "./Favoris";
 import Rating from '@mui/material/Rating';
+import { useSnackbar } from "./SnackBar";
 
 
 
@@ -15,6 +16,7 @@ const Historique = ({ onBack, artisteId }) => {
   const [historique, sethistorique] = useState([]);
   const [notes, setNotes] = useState({});
   const cld = new Cloudinary({cloud: {cloudName: "dpszia6xf"}});
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
     const historic = async () => {
@@ -135,7 +137,7 @@ const Historique = ({ onBack, artisteId }) => {
                               borderRadius: "5px",
                               cursor: "pointer",
                             }}
-                            onClick={() => ajouterAuxFavoris(artisteId, reservation.studio_id)}>
+                            onClick={() => ajouterAuxFavoris(artisteId, reservation.studio_id, showSnackbar)}>
                       Ajouter aux favoris
                     </Button>
                   </CardActions>

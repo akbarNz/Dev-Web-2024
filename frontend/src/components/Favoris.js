@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { useSnackbar } from "./SnackBar";
 
 const Favoris = ({ onBack }) => {
   const [favorisList, setFavorisList] = useState([]);
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
     const fetchFavoris = async () => {
@@ -53,11 +55,16 @@ const Favoris = ({ onBack }) => {
                         cursor: "pointer",
                       }}
                       onClick={() =>
-                          retirerFavori(studio.client_id || 4, studio.studio_id, () => {
+                        retirerFavori(
+                          studio.client_id || 4,
+                          studio.studio_id,
+                          showSnackbar,
+                          () => {
                             setFavorisList((prev) =>
-                                prev.filter((s) => s.studio_id !== studio.studio_id)
+                              prev.filter((s) => s.studio_id !== studio.studio_id)
                             );
-                          })
+                          }
+                        )
                       }
                   >
                     Retirer
@@ -92,39 +99,34 @@ const Favoris = ({ onBack }) => {
   );
 };
 
-export async function ajouterAuxFavoris(clientId, studioId) {
-  try {
-    const response = await fetch(`/api/favoris`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        client_id: clientId,
-        studio_id: studioId
-      })
-    });
+const ajouterAuxFavoris = async (clientId, studioId, showSnackbar) => {
+    try {
+      const response = await fetch(`/api/favoris`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ client_id: clientId, studio_id: studioId })
+      });
 
-    const text = await response.text();
+      const text = await response.text();
 
-    if (response.status === 409) {
-      console.warn("Le favori existe déjà.");
-      return;
+      if (response.status === 409) {
+        showSnackbar("Ce studio est déjà dans vos favoris.", "warning");
+        return;
+      }
+
+      if (!response.ok) throw new Error("Erreur API");
+
+      showSnackbar("Favori ajouté !", "success");
+    } catch (err) {
+      console.error("Erreur lors de l'ajout aux favoris :", err);
+      showSnackbar("Erreur lors de l'ajout du favori.", "error");
     }
+  };
 
-    if (!response.ok) throw new Error("Erreur API");
 
-    console.log("Favori ajouté :", JSON.parse(text));
-
-    alert("Favori ajouté !");
-
-  } catch (err) {
-    console.error("Erreur lors de l'ajout aux favoris :", err);
-    throw err;
-  }
-}
-
-export async function retirerFavori(clientId, studioId, onSuccess) {
+export async function retirerFavori(clientId, studioId, showSnackbar, onSuccess) {
   try {
     const response = await fetch(`/api/favoris`, {
       method: "DELETE",
@@ -139,17 +141,14 @@ export async function retirerFavori(clientId, studioId, onSuccess) {
 
     if (!response.ok) throw new Error("Erreur API");
 
-    console.log("Favori retiré");
-    alert("Favori retiré !");
+    showSnackbar("Favori retiré !", "info");
     if (onSuccess) onSuccess();
 
   } catch (err) {
     console.error("Erreur lors du retrait des favoris :", err);
-    alert("Erreur lors du retrait du favori");
+    showSnackbar("Erreur lors du retrait du favori.", "error");
   }
 }
-
-
 
 const thStyle = {
   border: "1px solid #ddd",
@@ -165,3 +164,4 @@ const tdStyle = {
 };
 
 export default Favoris;
+export { ajouterAuxFavoris };

@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem, CircularProgress, Box } from "@mui/material";
-import { db } from "./firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 const ReservationForm = ({
   reservation,
@@ -36,8 +34,8 @@ const ReservationForm = ({
     const fetchInitialData = async () => {
       try {
         const [studioRes, userRes] = await Promise.all([
-          fetch(`${process.env.REACT_APP_API_URL}/api/studio`),
-          fetch(`${process.env.REACT_APP_API_URL}/api/clients/artistes`),
+          fetch(`/api/studio`),
+          fetch(`/api/clients/artistes`),
         ]);
         const [studioData, userData] = await Promise.all([
           studioRes.json(),
@@ -63,7 +61,7 @@ const ReservationForm = ({
     const fetchFilteredStudios = async () => {
       try {
         const response = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
+          `/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
             JSON.stringify(selectedEquipements || [])
           )}`
         );
@@ -76,17 +74,23 @@ const ReservationForm = ({
     fetchFilteredStudios();
   }, [prixMin, prixMax, noteMin, selectedEquipements]);
 
- const calculateTimeDifference = (startTime, endTime) => {
+  const calculateTimeDifference = (startTime, endTime) => {
     if (startTime && endTime) {
-      const start = new Date(`2023-01-01T${startTime}`);
-      let end = new Date(`2023-01-01T${endTime}`);
-  
-      // Si fin < début, on considère que la réservation va au lendemain
-      if (end <= start) {
-        end.setDate(end.getDate() + 1);
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+      
+      let totalHours = endHours - startHours;
+      let totalMinutes = endMinutes - startMinutes;
+      
+      // Si l'heure de fin est avant l'heure de début, on ajoute 24h
+      if (totalHours < 0 || (totalHours === 0 && totalMinutes < 0)) {
+        totalHours += 24;
       }
-  
-      return (end - start) / (1000 * 60 * 60); // différence en heures
+      
+      // Convertir les minutes en fraction d'heure
+      const timeDiff = totalHours + (totalMinutes / 60);
+      
+      return timeDiff;
     }
     return 0;
   };
@@ -139,12 +143,13 @@ const ReservationForm = ({
     };
 
     try {
-      await addDoc(collection(db, "reservations"), {
-        nbr_personne: reservationData.nbr_personne,
-        firebase_created_at: serverTimestamp()
+      await fetch(`/api/firebase`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nbr_personne: reservationData.nbr_personne }),
       });
 
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/reservations`, {
+      const response = await fetch(`/api/reservations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservationData),

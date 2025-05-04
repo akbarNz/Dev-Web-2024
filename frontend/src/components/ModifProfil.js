@@ -4,6 +4,8 @@ import "react-phone-number-input/style.css";
 import Axios from "axios";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
+import { useSnackbar } from "./SnackBar";
+
 
 const ModifProfil = ({ onBack }) => {
   const [profil, setProfil] = useState({
@@ -19,6 +21,8 @@ const ModifProfil = ({ onBack }) => {
   const [localImage, setLocalImage] = useState(null); // photo locale
   const [fileToUpload, setFileToUpload] = useState(null); // Fichier sélectionné
   const [currentUser, setCurrentUser] = useState(null);
+  const { showSnackbar } = useSnackbar();
+
 
   // Fonction pour charger les données de l'utilisateur
   const fetchUserData = async (user) => {
@@ -117,7 +121,8 @@ const ModifProfil = ({ onBack }) => {
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
       
-      alert("Profil mis à jour avec succès !");
+      showSnackbar("Profil mis à jour avec succès !", "success");
+
       setPublicId(finalPublicId); 
       setLocalImage(null); // Nettoyer l'aperçu
       setFileToUpload(null);

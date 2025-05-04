@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem, CircularProgress, Box } from "@mui/material";
+import { useSnackbar } from "./SnackBar";
 
 const ReservationForm = ({
   reservation,
@@ -15,6 +16,8 @@ const ReservationForm = ({
   const [prixTotal, setPrixTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { showSnackbar } = useSnackbar();
+
 
   // Initialisation des champs de réservation
   useEffect(() => {
@@ -157,10 +160,10 @@ const ReservationForm = ({
 
       if (!response.ok) throw new Error("Erreur backend");
 
-      alert("Réservation enregistrée avec succès !");
+      showSnackbar("Réservation enregistrée avec succès !", "success");
     } catch (error) {
       console.error("Erreur:", error);
-      alert(`Erreur lors de l'enregistrement: ${error.message}`);
+      showSnackbar(`Erreur lors de l'enregistrement: ${error.message}`, "error");
     } finally {
       setIsSubmitting(false);
     }

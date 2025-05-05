@@ -4,21 +4,39 @@ import { useSnackbar } from "./SnackBar";
 const Favoris = ({ onBack }) => {
   const [favorisList, setFavorisList] = useState([]);
   const { showSnackbar } = useSnackbar();
+  const [currentUser, setCurrentUser] = useState(null);
+
 
   useEffect(() => {
-    const fetchFavoris = async () => {
-      try {
-        const response = await fetch(`/api/favoris?client=4`);
-        const data = await response.json();
-        console.log("Favoris récupérés :", data);
-        setFavorisList(data);
-      } catch (err) {
-        console.error("Erreur lors du fetch des favoris :", err);
-      }
-    };
+  const fetchFavoris = async (userId) => {
+    try {
+      const response = await fetch(`/api/favoris?client=${userId}`);
+      const data = await response.json();
+      console.log("Favoris récupérés :", data);
+      setFavorisList(data);
+    } catch (err) {
+      console.error("Erreur lors du fetch des favoris :", err);
+    }
+  };
 
-    fetchFavoris();
-  }, []);
+  const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+  if (userFromStorage) {
+    setCurrentUser(userFromStorage);
+    fetchFavoris(userFromStorage.id);
+  }
+
+  const handleUserChange = (event) => {
+    const newUser = event.detail;
+    setCurrentUser(newUser);
+    fetchFavoris(newUser.id);
+  };
+
+  window.addEventListener('userChanged', handleUserChange);
+
+  return () => {
+    window.removeEventListener('userChanged', handleUserChange);
+  };
+}, []);
 
   return (
     <div style={{ padding: "20px", textAlign: "center" }}>
@@ -56,7 +74,7 @@ const Favoris = ({ onBack }) => {
                       }}
                       onClick={() =>
                         retirerFavori(
-                          studio.client_id || 4,
+                          currentUser?.id,
                           studio.studio_id,
                           showSnackbar,
                           () => {

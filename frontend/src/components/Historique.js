@@ -8,18 +8,41 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { ajouterAuxFavoris } from "./Favoris";
 import Rating from '@mui/material/Rating';
+import { useSnackbar } from "./SnackBar";
 
 
 
-const Historique = ({ onBack, artisteId }) => {
+const Historique = ({ onBack }) => {
   const [historique, sethistorique] = useState([]);
   const [notes, setNotes] = useState({});
   const cld = new Cloudinary({cloud: {cloudName: "dpszia6xf"}});
+  const { showSnackbar } = useSnackbar();
+  const [userId, setUserId] = useState(null);
+
 
   useEffect(() => {
+    const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+    if (userFromStorage) {
+      setUserId(userFromStorage.id);
+    }
+
+    const handleUserChange = (event) => {
+      const newUser = event.detail;
+      setUserId(newUser.id);
+    };
+
+    window.addEventListener('userChanged', handleUserChange);
+
+    return () => {
+      window.removeEventListener('userChanged', handleUserChange);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!userId) return;
     const historic = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/reservations/historique?artiste=${Number(artisteId)}`);
+        const response = await fetch(`/api/reservations/historique?artiste=${userId}`);
         const data = await response.json();
         sethistorique(data);
       } catch (error) {
@@ -28,27 +51,29 @@ const Historique = ({ onBack, artisteId }) => {
     };
 
     historic();
-  }, [artisteId]);
+  }, [userId]);
 
   useEffect(() => {
+    if (!userId) return;
     const fetchNotes = async () => {
       try {
-        const response = await fetch(`http://localhost:5001/api/avis?client_id=${artisteId}`);
+        const response = await fetch(`/api/avis?client_id=${userId}`);
         const data = await response.json();
-        
+
         const notesMap = data.reduce((acc, avis) => {
           acc[avis.studio_id] = avis.note;
           return acc;
         }, {});
-        
+
         setNotes(notesMap);
       } catch (error) {
         console.error("Erreur lors de la récupération des notes:", error);
       }
     };
-  
+
     fetchNotes();
-  }, [artisteId]);
+  }, [userId]);
+
 
   // Fonction pour formater la date
   const formatDate = (dateString) => {
@@ -62,11 +87,11 @@ const Historique = ({ onBack, artisteId }) => {
     setNotes(prev => ({ ...prev, [studioId]: newValue }));
     
     try {
-      const response = await fetch('http://localhost:5001/api/avis', {
+      const response = await fetch(`/api/avis`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          client_id: artisteId,
+          client_id: userId,
           studio_id: studioId,
           note: newValue
         }),
@@ -135,7 +160,7 @@ const Historique = ({ onBack, artisteId }) => {
                               borderRadius: "5px",
                               cursor: "pointer",
                             }}
-                            onClick={() => ajouterAuxFavoris(artisteId, reservation.studio_id)}>
+                            onClick={() => ajouterAuxFavoris(userId, reservation.studio_id, showSnackbar)}>
                       Ajouter aux favoris
                     </Button>
                   </CardActions>

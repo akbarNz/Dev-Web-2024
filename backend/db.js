@@ -1,12 +1,8 @@
 const { Pool } = require('pg');
-require('dotenv').config();
 
+// Utiliser la variable d'environnement DATABASE_URL fournie par Render
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
+  connectionString: process.env.DATABASE_URL,  // Utiliser DATABASE_URL sur Render
 });
 
 module.exports = pool;

@@ -7,6 +7,7 @@ import ModifProfil from "./components/ModifProfil";
 import Historique from "./components/Historique";
 import Favoris from "./components/Favoris";
 import Enregistrement from "./components/FormulaireEnregiStudio";
+import { SnackbarProvider } from "./components/SnackBar";
 
 const App = () => {
   const [filters, setFilters] = useState({
@@ -72,6 +73,7 @@ const App = () => {
   };
 
   return (
+    <SnackbarProvider>
     <div> 
       <Header 
         setShowProfileForm={handleShowProfile}
@@ -123,6 +125,7 @@ const App = () => {
         </>
       )}
     </div>
+    </SnackbarProvider>
   );
 };
 

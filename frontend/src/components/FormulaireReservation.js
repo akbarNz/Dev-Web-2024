@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { InputLabel, Select, MenuItem, CircularProgress, Box } from "@mui/material";
-import { db } from "./firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { useSnackbar } from "./SnackBar";
 
 const ReservationForm = ({
   reservation,
@@ -17,6 +16,8 @@ const ReservationForm = ({
   const [prixTotal, setPrixTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { showSnackbar } = useSnackbar();
+
 
   // Initialisation des champs de réservation
   useEffect(() => {
@@ -36,8 +37,8 @@ const ReservationForm = ({
     const fetchInitialData = async () => {
       try {
         const [studioRes, userRes] = await Promise.all([
-          fetch("http://localhost:5001/api/studio"),
-          fetch("http://localhost:5001/api/clients/artistes"),
+          fetch(`/api/studio`),
+          fetch(`/api/clients/artistes`),
         ]);
         const [studioData, userData] = await Promise.all([
           studioRes.json(),
@@ -63,7 +64,7 @@ const ReservationForm = ({
     const fetchFilteredStudios = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5001/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
+          `/api/studio/filter?prixMin=${prixMin || 0}&prixMax=${prixMax || 1000}&noteMin=${noteMin || 0}&selectedEquipements=${encodeURIComponent(
             JSON.stringify(selectedEquipements || [])
           )}`
         );
@@ -78,9 +79,21 @@ const ReservationForm = ({
 
   const calculateTimeDifference = (startTime, endTime) => {
     if (startTime && endTime) {
-      const start = new Date(`2023-01-01T${startTime}`);
-      const end = new Date(`2023-01-01T${endTime}`);
-      return (end - start) / (1000 * 60 * 60); // différence en heures
+      const [startHours, startMinutes] = startTime.split(':').map(Number);
+      const [endHours, endMinutes] = endTime.split(':').map(Number);
+      
+      let totalHours = endHours - startHours;
+      let totalMinutes = endMinutes - startMinutes;
+      
+      // Si l'heure de fin est avant l'heure de début, on ajoute 24h
+      if (totalHours < 0 || (totalHours === 0 && totalMinutes < 0)) {
+        totalHours += 24;
+      }
+      
+      // Convertir les minutes en fraction d'heure
+      const timeDiff = totalHours + (totalMinutes / 60);
+      
+      return timeDiff;
     }
     return 0;
   };
@@ -133,12 +146,13 @@ const ReservationForm = ({
     };
 
     try {
-      await addDoc(collection(db, "reservations"), {
-        nbr_personne: reservationData.nbr_personne,
-        firebase_created_at: serverTimestamp()
+      await fetch(`/api/firebase`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nbr_personne: reservationData.nbr_personne }),
       });
 
-      const response = await fetch("http://localhost:5001/reservations", {
+      const response = await fetch(`/api/reservations`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservationData),
@@ -146,10 +160,10 @@ const ReservationForm = ({
 
       if (!response.ok) throw new Error("Erreur backend");
 
-      alert("Réservation enregistrée avec succès !");
+      showSnackbar("Réservation enregistrée avec succès !", "success");
     } catch (error) {
       console.error("Erreur:", error);
-      alert(`Erreur lors de l'enregistrement: ${error.message}`);
+      showSnackbar(`Erreur lors de l'enregistrement: ${error.message}`, "error");
     } finally {
       setIsSubmitting(false);
     }

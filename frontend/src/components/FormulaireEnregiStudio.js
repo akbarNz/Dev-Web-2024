@@ -2,22 +2,24 @@ import { useState, useEffect } from "react";
 import Axios from "axios";
 import { Cloudinary } from "@cloudinary/url-gen";
 import { AdvancedImage } from "@cloudinary/react";
+import { useSnackbar } from "./SnackBar";
 
 const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
   const [users, setUsers] = useState([]);
   const [publicId, setPublicId] = useState("");
   const [villes, setVille] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
-    fetch("http://localhost:5001/api/proprietaires")
+    fetch(`/api/proprietaires`)
       .then((res) => res.json())
       .then((data) => {
         setUsers(data);
       })
       .catch((err) => console.error("Erreur chargement utilisateurs:", err));
 
-    fetch("http://localhost:5001/ville")
+    fetch(`/api/studio/villes`)
       .then((res) => res.json())
       .then((data) => {
         console.log("Données reçues pour villes:", data);
@@ -52,7 +54,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
       }));
     } catch (error) {
       console.error("Erreur lors de l'upload :", error);
-      alert("Erreur lors de l'upload de l'image");
+      showSnackbar("Erreur lors de l'upload de l'image", "error");
     } finally {
       setIsUploading(false);
     }
@@ -84,7 +86,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
       console.log("Données envoyées au serveur:", enregistrementData);
 
-      const response = await fetch("http://localhost:5001/api/studio/enregistrer", {
+      const response = await fetch(`/api/studio/enregistrer`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(enregistrementData),
@@ -97,10 +99,10 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
       const result = await response.json();
       console.log(result);
-      alert("Studio enregistré avec succès!");
+      showSnackbar("Studio enregistré avec succès!", "success");
     } catch (error) {
       console.error("Erreur lors de l'enregistrement :", error);
-      alert(`Erreur: ${error.message}`);
+      showSnackbar(`Erreur: ${error.message}`, "error");
     }
   };
 

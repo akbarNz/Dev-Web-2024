@@ -40,6 +40,26 @@ class StudioController {
         }
     }
 
+    static async getBestRatedStudios(req, res) {
+        try {
+            const { lat, lng, radius = 5, minRating = 4 } = req.query;
+            
+            const studios = await Studio.findNearbyBestRatedStudios(
+                parseFloat(lat),
+                parseFloat(lng),
+                parseFloat(radius),
+                parseFloat(minRating)
+            );
+
+            res.json(studios);
+        } catch (err) {
+            console.error('Error in getBestRatedStudios:', err);
+            res.status(500).json({
+                error: 'Error fetching best rated studios'
+            });
+        }
+    }
+
     static async getStudioById(req, res) {
         try {
             const { id } = req.params;

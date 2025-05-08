@@ -13,6 +13,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum RoleUtilisateurs {
+  admin       @map("admin")
+  proprietaire @map("propriétaire")
+  artiste     @map("artiste")
+
+  @@map("role_utilisateurs")
+}
+
 enum StatutStudio {
   en_attente @map("en attente")
   valide     @map("validé")
@@ -21,27 +29,112 @@ enum StatutStudio {
   @@map("statut_studio")
 }
 
-model Studio {
-    id              Int         @id @default(autoincrement())
-    nom             String      @db.VarChar(255)
-    description     String?     @db.Text
-    adresse         String      @db.VarChar(255)
-    latitude        Float       @db.DoublePrecision
-    longitude       Float       @db.DoublePrecision
-    prix_par_heure  Decimal     @db.Decimal(10,2)
-    equipements     Json?       
-    photo_url       String?     @db.VarChar(500)
-    proprietaire_id Int
-    statut          StatutStudio @default(en_attente)
-    date_creation   DateTime    @default(now()) @db.Timestamp()
-    code_postal     Int
+enum StatutReservation {
+  confirmee @map("confirmée")
+  annulee   @map("annulée")
+  modifiee  @map("modifiée")
 
-    @@map("studios")
+  @@map("statut_réservation")
+}
+
+model Client {
+  id                  Int       @id @default(autoincrement())
+  nom                 String
+  email               String    @unique
+  numero_telephone    String    @unique
+  photo_url          String?   @db.VarChar(500)
+  role               RoleUtilisateurs @default(artiste)
+  date_inscription   DateTime  @default(now())
+  verifie           Boolean   @default(false)
+  deux_facteur_active Boolean  @default(false)
+  avis              Avis[]
+  reservations      Reservation[]
+  favoris           Favoris[]
+
+  @@map("client")
+}
+
+model Proprio {
+  id                  Int       @id @default(autoincrement())
+  nom                 String
+  email               String    @unique
+  numero_telephone    String    @unique
+  photo_url          String?   @db.VarChar(500)
+  role               RoleUtilisateurs @default(proprietaire)
+  date_inscription   DateTime  @default(now())
+  verifie           Boolean   @default(false)
+  deux_facteur_active Boolean  @default(false)
+  studios            Studio[]
+
+  @@map("proprio")
+}
+
+model Studio {
+  id              Int           @id @default(autoincrement())
+  nom             String        @db.VarChar(255)
+  description     String?       @db.Text
+  adresse         String        @db.VarChar(255)
+  latitude        Float
+  longitude       Float
+  prix_par_heure Decimal       @db.Decimal(10,2)
+  equipements     Json?
+  photo_url       String?       @db.VarChar(500)
+  proprietaire    Proprio       @relation(fields: [proprietaire_id], references: [id], onDelete: Cascade)
+  proprietaire_id Int
+  statut          StatutStudio  @default(en_attente)
+  date_creation   DateTime      @default(now())
+  code_postal     Int
+  ville           Ville         @relation(fields: [code_postal], references: [code_postal], onDelete: Restrict)
+  avis            Avis[]
+  reservations    Reservation[]
+  favoris         Favoris[]
+
+  @@map("studio")
 }
 
 model Ville {
-    code_postal     Int      @id
-    ville           String
+  code_postal     Int      @id
+  ville           String
+  studios         Studio[]
 
-    @@map("villes")
+  @@map("villes")
+}
+
+model Avis {
+  id             Int      @id @default(autoincrement())
+  client         Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  client_id      Int
+  studio         Studio   @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  studio_id      Int
+  note           Int
+  date_creation  DateTime @default(now())
+
+  @@map("avis")
+}
+
+model Reservation {
+  id              Int               @id @default(autoincrement())
+  client          Client            @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  client_id       Int
+  studio          Studio            @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  studio_id       Int
+  date_reservation DateTime         @db.Date
+  nbr_personne    Int
+  heure_debut     DateTime         @db.Time
+  heure_fin       DateTime         @db.Time
+  statut          StatutReservation @default(confirmee)
+  prix_total      Decimal          @db.Decimal(10,2)
+
+  @@map("reservation")
+}
+
+model Favoris {
+  client          Client    @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  client_id       Int
+  studio          Studio    @relation(fields: [studio_id], references: [id], onDelete: Cascade)
+  studio_id       Int
+  date_ajout      DateTime  @default(now())
+
+  @@id([client_id, studio_id])
+  @@map("favoris")
 }

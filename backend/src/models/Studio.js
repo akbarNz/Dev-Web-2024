@@ -25,6 +25,37 @@ class Studio {
         }
     }
 
+    static async findNearbyBestRatedStudios(lat, lng, radius = 5, minRating = 4) {
+        try {
+            return await prisma.$queryRaw`
+                WITH StudioRatings AS (
+                    SELECT 
+                        s.*,
+                        ( 6371 * acos( cos( radians(${lat}) )
+                            * cos( radians(latitude) )
+                            * cos( radians(longitude) - radians(${lng}) )
+                            + sin( radians(${lat}) )
+                            * sin( radians(latitude) )
+                        ) ) AS distance,
+                        COALESCE(AVG(a.note)::numeric(10,2), 0) as rating,
+                        COUNT(a.id) as review_count
+                    FROM studio s
+                    LEFT JOIN avis a ON s.id = a.studio_id
+                    WHERE s.statut = 'validé'
+                    GROUP BY s.id
+                    HAVING COALESCE(AVG(a.note), 0) >= ${minRating}
+                )
+                SELECT * FROM StudioRatings
+                WHERE distance < ${radius}
+                ORDER BY rating DESC, review_count DESC, distance
+                LIMIT 10;
+            `;
+        } catch (err) {
+            throw new Error(`Error finding best rated studios: ${err.message}`);
+        }
+    }
+
+    
     static async findByName(name, lat, lng) {
         try {
             return await prisma.$queryRaw`

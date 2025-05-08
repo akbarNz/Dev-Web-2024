@@ -1,4 +1,4 @@
-INSERT INTO studios (
+INSERT INTO studio (
     nom, 
     description, 
     adresse, 

@@ -26,6 +26,23 @@ const validateStudioSearch = [
         .withMessage('City is required for city search'),
 ];
 
+const validateBestRatedSearch = [
+    check('lat')
+        .isFloat({ min: -90, max: 90 })
+        .withMessage('Invalid latitude'),
+    check('lng')
+        .isFloat({ min: -180, max: 180 })
+        .withMessage('Invalid longitude'),
+    check('radius')
+        .optional()
+        .isFloat({ min: 0 })
+        .withMessage('Radius must be positive'),
+    check('minRating')
+        .optional()
+        .isFloat({ min: 0, max: 5 })
+        .withMessage('Rating must be between 0 and 5')
+];
+
 const validateStudioCreation = [
     check('nom').notEmpty().trim()
         .withMessage('Studio name is required'),
@@ -52,5 +69,6 @@ const validate = (req, res, next) => {
 module.exports = {
     validateStudioSearch,
     validateStudioCreation,
-    validate
+    validate,
+    validateBestRatedSearch
 };

@@ -5,6 +5,7 @@ import GeolocationComponent from '../GeolocationComponent/GeolocationComponent';
 import FindStudio from '../FindStudioComponent';
 import Map from '../MapComponent/Map';
 import AboutApp from '../AboutAppComponent/AboutApp';
+import BestRatedStudios from '../BestRatedStudiosComponent/BestRatedStudios';
 import styles from './StudioFinder.module.css';
 
 const StudioFinder = () => {
@@ -14,6 +15,7 @@ const StudioFinder = () => {
     const [searchParams, setSearchParams] = useState(null);
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState(null);
+    const [bestRatedStudios, setBestRatedStudios] = useState([]);
 
     const handleLocationFound = useCallback((location) => {
         setUserLocation(location);
@@ -45,6 +47,15 @@ const StudioFinder = () => {
         setSearchParams(searchCriteria);
         fetchStudios(searchCriteria.criteria, searchCriteria.value, userLocation);
     }, [userLocation, isSearching, fetchStudios]);
+    
+    // Add this below your existing useEffect
+    useEffect(() => {
+        if (userLocation) {
+            // This is a placeholder until we implement the backend
+            // We'll replace this with actual API call later
+            console.log('Fetching best rated studios...');
+        }
+    }, [userLocation]);
 
     return (
         <div className={styles.landingPage}>
@@ -86,6 +97,15 @@ const StudioFinder = () => {
                     )}
                 </div>
                 <AboutApp />
+                <BestRatedStudios 
+                        studios={bestRatedStudios}
+                        userLocation={userLocation}
+                        onEnableLocation={() => {
+                            // This will use the existing geolocation logic
+                            const geoComponent = document.querySelector('[data-testid="geo-button"]');
+                            if (geoComponent) geoComponent.click();
+                        }}
+                    />
             </main>
         </div>
     );

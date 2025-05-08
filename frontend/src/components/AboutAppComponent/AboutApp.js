@@ -1,41 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Slider from 'react-slick';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { carouselData } from './data/carouselData';
 import styles from './AboutApp.module.css';
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
 
-// Import images directly using relative paths
-import studio1 from '../../assets/images/pexels-cristian-rojas-7586264.jpg';
-import studio2 from '../../assets/images/pexels-rdne-8198067.jpg';
-import studio3 from '../../assets/images/pexels-anthonyshkraba-production-8412396.jpg';
-
-const dummyCarouselData = [
-    {
-        id: 1,
-        artistName: 'John Doe',
-        studioName: 'Sonic Lab Brussels',
-        city: 'Brussels',
-        imageUrl: studio1
-    },
-    {
-        id: 2,
-        artistName: 'Jane Smith',
-        studioName: 'Beat Factory',
-        city: 'Brussels',
-        imageUrl: studio2
-    },
-    {
-        id: 3,
-        artistName: 'Mike Johnson',
-        studioName: 'Melody House',
-        city: 'Brussels',
-        imageUrl: studio3
-    }
-];
-
-const CustomArrow = ({ className, onClick, direction }) => (
+const CustomArrow = ({ onClick, direction }) => (
     <button
         className={`${styles.arrowButton} ${direction === 'prev' ? styles.prevArrow : styles.nextArrow}`}
         onClick={onClick}
@@ -45,6 +18,11 @@ const CustomArrow = ({ className, onClick, direction }) => (
         {direction === 'prev' ? <ArrowBackIosIcon /> : <ArrowForwardIosIcon />}
     </button>
 );
+
+CustomArrow.propTypes = {
+    onClick: PropTypes.func,
+    direction: PropTypes.oneOf(['prev', 'next']).isRequired
+};
 
 const AboutApp = () => {
     const settings = {
@@ -79,7 +57,7 @@ const AboutApp = () => {
 
             <aside className={styles.carousel}>
                 <Slider {...settings}>
-                    {dummyCarouselData.map(item => (
+                    {carouselData.map(item => (
                         <div key={item.id} className={styles.slide}>
                             <div className={styles.slideInfo}>
                                 <span className={styles.artistName}>{item.artistName}</span>

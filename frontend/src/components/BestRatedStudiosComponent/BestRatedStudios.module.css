@@ -1,0 +1,92 @@
+.container {
+    padding: 2rem;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    margin: 2rem 0;
+}
+
+.container h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    color: #333;
+    font-size: 1.8rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+.studioCard {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.studioCard:hover {
+    transform: translateY(-5px);
+}
+
+.imageContainer {
+    position: relative;
+    height: 200px;
+}
+
+.imageContainer img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rating {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.7);
+    color: #ffd700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.info {
+    padding: 1rem;
+}
+
+.info h3 {
+    margin: 0 0 0.5rem;
+    color: #333;
+}
+
+.info p {
+    margin: 0.25rem 0;
+    color: #666;
+}
+
+.price {
+    font-weight: bold;
+    color: #2196f3 !important;
+}
+
+.message {
+    text-align: center;
+    padding: 2rem;
+}
+
+.enableButton {
+    margin-top: 1rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.enableButton:hover {
+    background-color: #1976d2;
+}

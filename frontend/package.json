@@ -55,5 +55,16 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
+    },
+    "devDependencies": {
+        "@babel/preset-env": "^7.27.2",
+        "@babel/preset-react": "^7.27.1",
+        "babel-jest": "^29.7.0"
+    },
+    "jest": {
+    "moduleNameMapper": {
+      "^axios$": "axios/dist/node/axios.cjs",
+      "^@base-ui-components/react/dialog$": "@base-ui-components/react/cjs/dialog"
     }
+  }
 }

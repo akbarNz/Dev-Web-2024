@@ -1,8 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 import styles from './BestRatedStudios.module.css';
 
-const BestRatedStudios = ({ studios, userLocation, onEnableLocation }) => {
+const BestRatedStudios = ({ 
+    studios, 
+    userLocation, 
+    onEnableLocation, 
+    isLoading, 
+    error 
+}) => {
+    const navigate = useNavigate();
+
+    const handleBooking = (studioId) => {
+        navigate(`/studios/${studioId}/book`);
+    };
+
     if (!userLocation) {
         return (
             <section className={styles.container}>
@@ -15,6 +28,28 @@ const BestRatedStudios = ({ studios, userLocation, onEnableLocation }) => {
                     >
                         Enable Location
                     </button>
+                </div>
+            </section>
+        );
+    }
+
+    if (isLoading) {
+        return (
+            <section className={styles.container}>
+                <div className={styles.message}>
+                    <h2>Best Rated Studios Near You</h2>
+                    <p>Loading best rated studios...</p>
+                </div>
+            </section>
+        );
+    }
+
+    if (error) {
+        return (
+            <section className={styles.container}>
+                <div className={styles.message}>
+                    <h2>Best Rated Studios Near You</h2>
+                    <p className={styles.error}>{error}</p>
                 </div>
             </section>
         );
@@ -45,6 +80,12 @@ const BestRatedStudios = ({ studios, userLocation, onEnableLocation }) => {
                             <h3>{studio.nom}</h3>
                             <p>{studio.adresse}</p>
                             <p className={styles.price}>€{studio.prix_par_heure}/hour</p>
+                            <button 
+                                onClick={() => handleBooking(studio.id)}
+                                className={styles.bookButton}
+                            >
+                                Book Now
+                            </button>
                         </div>
                     </article>
                 ))}
@@ -68,7 +109,9 @@ BestRatedStudios.propTypes = {
         lat: PropTypes.number.isRequired,
         lng: PropTypes.number.isRequired
     }),
-    onEnableLocation: PropTypes.func.isRequired
+    onEnableLocation: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool,
+    error: PropTypes.string
 };
 
 export default BestRatedStudios;

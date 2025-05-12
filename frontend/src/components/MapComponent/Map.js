@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import { GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_ID } from '../config/maps';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -35,9 +36,14 @@ const createMarkerContent = (IconComponent, color) => {
 };
 
 const Map = ({ center, searchParams, studios }) => {
+    const navigate = useNavigate();
     const [selectedStudio, setSelectedStudio] = useState(null);
     const [mapInstance, setMapInstance] = useState(null);
     const [markers, setMarkers] = useState([]);
+
+    const handleBooking = (studioId) => {
+        navigate(`/studios/${studioId}/book`);
+    };
 
     const handleMapLoad = useCallback((map) => {
         setMapInstance(map);
@@ -123,18 +129,44 @@ const Map = ({ center, searchParams, studios }) => {
                             padding: '12px',
                             borderRadius: '8px',
                             boxShadow: '0 2px 6px rgba(0,0,0,0.3)',
-                            zIndex: 1000
+                            zIndex: 1000,
+                            minWidth: '200px'
                         }}
                     >
                         <h3>{selectedStudio.nom}</h3>
                         <p>{selectedStudio.adresse}</p>
                         <p>€{selectedStudio.prix_par_heure}/hour</p>
-                        <button 
-                            onClick={() => setSelectedStudio(null)}
-                            style={{ float: 'right' }}
-                        >
-                            Close
-                        </button>
+                        <div style={{ 
+                            display: 'flex', 
+                            justifyContent: 'space-between',
+                            marginTop: '8px'
+                        }}>
+                            <button 
+                                onClick={() => setSelectedStudio(null)}
+                                style={{
+                                    padding: '8px 16px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '4px',
+                                    backgroundColor: '#f5f5f5',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Close
+                            </button>
+                            <button 
+                                onClick={() => handleBooking(selectedStudio.id)}
+                                style={{
+                                    padding: '8px 16px',
+                                    backgroundColor: '#2196f3',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                Book Now
+                            </button>
+                        </div>
                     </div>
                 )}
             </GoogleMap>

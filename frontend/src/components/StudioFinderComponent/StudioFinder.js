@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { findNearbyStudios } from '../../services/studioService';
+import { findNearbyStudios, findBestRatedStudios } from '../../services/studioService';
 import Header from '../HeaderComponent';
 import GeolocationComponent from '../GeolocationComponent/GeolocationComponent';
 import FindStudio from '../FindStudioComponent';
@@ -16,6 +16,8 @@ const StudioFinder = () => {
     const [isSearching, setIsSearching] = useState(false);
     const [error, setError] = useState(null);
     const [bestRatedStudios, setBestRatedStudios] = useState([]);
+    const [isFetchingBestRated, setIsFetchingBestRated] = useState(false);
+    const [bestRatedError, setBestRatedError] = useState(null);
 
     const handleLocationFound = useCallback((location) => {
         setUserLocation(location);
@@ -47,15 +49,28 @@ const StudioFinder = () => {
         setSearchParams(searchCriteria);
         fetchStudios(searchCriteria.criteria, searchCriteria.value, userLocation);
     }, [userLocation, isSearching, fetchStudios]);
-    
-    // Add this below your existing useEffect
-    useEffect(() => {
-        if (userLocation) {
-            // This is a placeholder until we implement the backend
-            // We'll replace this with actual API call later
-            console.log('Fetching best rated studios...');
+
+    const fetchBestRatedStudios = useCallback(async () => {
+        if (!userLocation) return;
+
+        try {
+            setIsFetchingBestRated(true);
+            setBestRatedError(null);
+            const data = await findBestRatedStudios(userLocation);
+            setBestRatedStudios(data);
+        } catch (err) {
+            console.error('Error fetching best rated studios:', err);
+            setBestRatedError('Failed to fetch best rated studios');
+        } finally {
+            setIsFetchingBestRated(false);
         }
     }, [userLocation]);
+
+    useEffect(() => {
+        if (userLocation) {
+            fetchBestRatedStudios();
+        }
+    }, [userLocation, fetchBestRatedStudios]);
 
     return (
         <div className={styles.landingPage}>
@@ -98,14 +113,15 @@ const StudioFinder = () => {
                 </div>
                 <AboutApp />
                 <BestRatedStudios 
-                        studios={bestRatedStudios}
-                        userLocation={userLocation}
-                        onEnableLocation={() => {
-                            // This will use the existing geolocation logic
-                            const geoComponent = document.querySelector('[data-testid="geo-button"]');
-                            if (geoComponent) geoComponent.click();
-                        }}
-                    />
+                    studios={bestRatedStudios}
+                    userLocation={userLocation}
+                    onEnableLocation={() => {
+                        const geoComponent = document.querySelector('[data-testid="geo-button"]');
+                        if (geoComponent) geoComponent.click();
+                    }}
+                    isLoading={isFetchingBestRated}
+                    error={bestRatedError}
+                />
             </main>
         </div>
     );

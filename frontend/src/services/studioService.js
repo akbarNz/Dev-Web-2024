@@ -41,3 +41,29 @@ export const findNearbyStudios = async (criteria, searchValue, location) => {
         throw new Error('Failed to fetch studios');
     }
 };
+
+export const findBestRatedStudios = async (location, radius = 5, minRating = 4) => {
+    try {
+        
+        let url = new URL(`${API_URL}/studios/best-rated`);
+        const params = new URLSearchParams({
+            lat: location.lat.toString(),
+            lng: location.lng.toString(),
+            radius: radius.toString(),
+            minRating: minRating.toString()
+        });
+
+        url.search = params.toString();
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to fetch best rated studios');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching best rated studios:', error);
+        throw error;
+    }
+};

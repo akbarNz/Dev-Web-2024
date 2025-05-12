@@ -9,6 +9,7 @@ const App = () => (
             <Route path="/" element={<StudioFinder />} />
             <Route path="/signup" element={<div>Sign Up Page</div>} />
             <Route path="/login" element={<div>Login Page</div>} />
+            <Route path="/studios/:id/book" element={<div>Booking Page</div>} />
         </Routes>
     </BrowserRouter>
 );

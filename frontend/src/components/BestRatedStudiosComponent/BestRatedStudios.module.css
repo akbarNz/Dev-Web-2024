@@ -90,3 +90,24 @@
 .enableButton:hover {
     background-color: #1976d2;
 }
+
+.bookButton {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 1rem;
+    background-color: #2196f3;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.bookButton:hover {
+    background-color: #1976d2;
+}
+
+.bookButton:active {
+    transform: scale(0.98);
+}

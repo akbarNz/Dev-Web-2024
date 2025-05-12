@@ -44,6 +44,12 @@ class StudioController {
         try {
             const { lat, lng, radius = 5, minRating = 4 } = req.query;
             
+            if (!lat || !lng) {
+                return res.status(400).json({ 
+                    error: 'Latitude and longitude are required' 
+                });
+            }
+
             const studios = await Studio.findNearbyBestRatedStudios(
                 parseFloat(lat),
                 parseFloat(lng),
@@ -51,11 +57,23 @@ class StudioController {
                 parseFloat(minRating)
             );
 
-            res.json(studios);
+            // Transform BigInt values to regular numbers
+            const serializedStudios = studios.map(studio => ({
+                ...studio,
+                id: Number(studio.id),
+                prix_par_heure: parseFloat(studio.prix_par_heure),
+                proprietaire_id: Number(studio.proprietaire_id),
+                code_postal: Number(studio.code_postal),
+                distance: parseFloat(studio.distance),
+                rating: parseFloat(studio.rating),
+                review_count: Number(studio.review_count)
+            }));
+
+            res.json(serializedStudios);
         } catch (err) {
             console.error('Error in getBestRatedStudios:', err);
             res.status(500).json({
-                error: 'Error fetching best rated studios'
+                error: err.message || 'Error fetching best rated studios'
             });
         }
     }
@@ -63,20 +81,19 @@ class StudioController {
     static async getStudioById(req, res) {
         try {
             const { id } = req.params;
-            const studio = await Studio.findById(parseInt(id));
-
-            if (!studio) {
-                return res.status(404).json({
-                    error: 'Studio not found'
-                });
+            if (!id) {
+                return res.status(400).json({ error: 'Studio ID is required' });
             }
-
-            res.json(studio);
+            
+            const studio = await Studio.findById(parseInt(id));
+            if (!studio) {
+                return res.status(404).json({ error: 'Studio not found' });
+            }
+            
+            return res.json(studio);
         } catch (err) {
             console.error('Error in getStudioById:', err);
-            res.status(500).json({
-                error: 'Error fetching studio'
-            });
+            return res.status(500).json({ error: err.message });
         }
     }
 

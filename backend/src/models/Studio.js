@@ -1,4 +1,4 @@
-const { PrismaClient, Decimal } = require('@prisma/client');
+const { PrismaClient,Decimal } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 class Studio {
@@ -13,7 +13,7 @@ class Studio {
                             + sin( radians(${lat}) )
                             * sin( radians(latitude) )
                         ) ) AS distance
-                    FROM studios
+                    FROM studio
                     WHERE statut = 'validé'
                 )
                 SELECT * FROM StudioDistance
@@ -67,7 +67,7 @@ class Studio {
                             + sin( radians(${lat}) )
                             * sin( radians(latitude) )
                         ) ) AS distance
-                    FROM studios
+                    FROM studio
                     WHERE statut = 'validé'
                     AND LOWER(nom) LIKE LOWER(${`%${name}%`})
                 )
@@ -132,8 +132,14 @@ class Studio {
 
     static async findById(id) {
         try {
+            if (!id) {
+                throw new Error('Studio ID is required');
+            }
+            
             return await prisma.studio.findUnique({
-                where: { id: parseInt(id) }
+                where: { 
+                    id: typeof id === 'string' ? parseInt(id) : id 
+                }
             });
         } catch (err) {
             throw new Error(`Error finding studio by ID: ${err.message}`);

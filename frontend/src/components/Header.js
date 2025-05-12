@@ -65,18 +65,6 @@ const Header = ({
   };
   
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const response = await fetch("/api/menu-item");
-        const data = await response.json();
-        setMenuItems(data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des éléments du menu:", error);
-        setMenuItems([]);
-      }
-    };
-    
-    fetchMenuItems();
     fetchUsers();
     
     // user dans localStorage ? 

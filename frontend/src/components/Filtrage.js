@@ -4,7 +4,8 @@ import Rating from '@mui/material/Rating';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import { Dialog } from '@base-ui-components/react/dialog';
+import Dialog from '@mui/material/Dialog';
+
 
 const FilterForm = ({ filters, setFilters}) => {
   const [minValue, set_minValue] = useState(null);

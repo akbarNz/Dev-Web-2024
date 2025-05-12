@@ -107,124 +107,131 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
   };
 
   return (
-    <div className="enregi_form">
-      <h1>Enregistrer un studio</h1>
-      <form onSubmit={handleEnregistrementSubmit}>
-        {}
-        <label>
-          Photo du studio
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => uploadImage(e.target.files)}
-            disabled={isUploading}
+  <div className="enregi_form">
+    <h1>Enregistrer un studio</h1>
+    <form onSubmit={handleEnregistrementSubmit} data-testid="enregistrement-form">
+      <label htmlFor="photo">Photo du studio</label>
+      <input
+        id="photo"
+        type="file"
+        accept="image/*"
+        onChange={(e) => uploadImage(e.target.files)}
+        disabled={isUploading}
+      />
+      {isUploading && <p>Upload en cours...</p>}
+      {publicId && (
+        <div style={{ marginTop: "10px" }}>
+          <AdvancedImage
+            cldImg={img}
+            style={{ maxWidth: "200px", maxHeight: "200px" }}
           />
-          {isUploading && <p>Upload en cours...</p>}
-          {publicId && (
-            <div style={{ marginTop: "10px" }}>
-              <AdvancedImage
-                cldImg={img}
-                style={{ maxWidth: "200px", maxHeight: "200px" }}
-              />
-            </div>
-          )}
-        </label>
+        </div>
+      )}
 
-        <label>Propriétaire ?</label>
-        <select
-          name="artiste_id"
-          value={enregistrement.artiste_id}
-          onChange={handleEnregistrementChange}
-          required
-        >
-          <option value="">Sélectionnez votre nom</option>
-          {users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.nom}
-            </option>
-          ))}
-        </select>
-
-        <label>Nom du studio</label>
-        <input
-          type="text"
-          name="nom_studio"
-          value={enregistrement.nom_studio}
-          onChange={handleEnregistrementChange}
-          placeholder="Entrer le nom de votre studio"
-          required
-        />
-
-        <label>Description du studio</label>
-          <textarea
-          type="text"
-          name="description"
-          value={enregistrement.description}
-          onChange={handleEnregistrementChange}
-          placeholder="Entrer la description de votre studio"
-          required
-        />
-
-        <label>Adresse du studio</label>
-        <input
-          type="text"
-          name="adresse"
-          value={enregistrement.adresse}
-          onChange={handleEnregistrementChange}
-          required
-        />
-
-        <select
-          name="code_postal"
-          value={enregistrement.code_postal}
-          onChange={handleEnregistrementChange}
-          required
-        >
-          <option value="">Sélectionnez un code postal</option>
-          {villes.map((ville) => (
-            <option key={ville.code_postal} value={ville.code_postal}>
-              {ville.code_postal} -{" "}
-              {ville.nom || ville.nom_ville || ville.name || ville.ville}
-            </option>
-          ))}
-        </select>
-
-        <label>Prix par heure (€)</label>
-        <input
-          type="number"
-          name="prix_par_heure"
-          value={enregistrement.prix_par_heure}
-          onChange={handleEnregistrementChange}
-          required
-          min="0"
-          step="0.01"
-        />
-
-        <label>Equipements (séparés par des virgules)</label>
-        <input
-          type="text"
-          name="equipement"
-          value={enregistrement.equipement}
-          onChange={handleEnregistrementChange}
-          placeholder="Microphone, Casque, Console, Ampli..."
-          required
-        />
-        <small>Saisissez vos équipements séparés par des virgules</small>
-
-        <button type="submit" disabled={isUploading}>
-          {isUploading ? "Enregistrement en cours..." : "Enregistrer le studio"}
-        </button>
-      </form>
-      <button
-        id="backbutton"
-        type="button"
-        className="register-btn"
-        onClick={onBack}
+      <label htmlFor="proprietaire">Propriétaire ?</label>
+      <select
+        id="proprietaire"
+        name="artiste_id"
+        value={enregistrement.artiste_id}
+        onChange={handleEnregistrementChange}
+        required
       >
-        Retour
+        <option value="">Sélectionnez votre nom</option>
+        {users.map((user) => (
+          <option key={user.id} value={user.id}>
+            {user.nom}
+          </option>
+        ))}
+      </select>
+
+      <label htmlFor="nom_studio">Nom du studio</label>
+      <input
+        id="nom_studio"
+        type="text"
+        name="nom_studio"
+        value={enregistrement.nom_studio}
+        onChange={handleEnregistrementChange}
+        placeholder="Entrer le nom de votre studio"
+        required
+      />
+
+      <label htmlFor="description">Description du studio</label>
+      <textarea
+        id="description"
+        name="description"
+        value={enregistrement.description}
+        onChange={handleEnregistrementChange}
+        placeholder="Entrer la description de votre studio"
+        required
+      />
+
+      <label htmlFor="adresse">Adresse du studio</label>
+      <input
+        id="adresse"
+        type="text"
+        name="adresse"
+        value={enregistrement.adresse}
+        onChange={handleEnregistrementChange}
+        required
+      />
+
+      <label htmlFor="code_postal">Code postal</label>
+      <select
+        id="code_postal"
+        name="code_postal"
+        value={enregistrement.code_postal}
+        onChange={handleEnregistrementChange}
+        required
+      >
+        <option value="">Sélectionnez un code postal</option>
+        {villes.map((ville) => (
+          <option key={ville.code_postal} value={ville.code_postal}>
+            {ville.code_postal} -{" "}
+            {ville.nom || ville.nom_ville || ville.name || ville.ville}
+          </option>
+        ))}
+      </select>
+
+      <label htmlFor="prix_par_heure">Prix par heure (€)</label>
+      <input
+        id="prix_par_heure"
+        type="number"
+        name="prix_par_heure"
+        value={enregistrement.prix_par_heure}
+        onChange={handleEnregistrementChange}
+        required
+        min="0"
+        step="0.01"
+      />
+
+      <label htmlFor="equipement">Équipements (séparés par des virgules)</label>
+      <input
+        id="equipement"
+        type="text"
+        name="equipement"
+        value={enregistrement.equipement}
+        onChange={handleEnregistrementChange}
+        placeholder="Microphone, Casque, Console, Ampli..."
+        required
+      />
+      <small>Saisissez vos équipements séparés par des virgules</small>
+
+      <button type="submit" disabled={isUploading}>
+        {isUploading ? "Enregistrement en cours..." : "Enregistrer le studio"}
       </button>
-    </div>
-  );
+    </form>
+
+    <button
+      id="backbutton"
+      type="button"
+      className="register-btn"
+      onClick={onBack}
+    >
+      Retour
+    </button>
+  </div>
+);
+
 };
 
 export default EnregistrementForm;

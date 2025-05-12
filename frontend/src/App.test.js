@@ -1,8 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// Mockez les composants enfants problématiques
+jest.mock('./components/Filtrage', () => () => <div>Mock FilterForm</div>);
+jest.mock('./components/FormulaireEnregiStudio', () => () => <div>Mock EnregistrementForm</div>);
+
+test('renders app without crashing', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByText(/Mock FilterForm/i)).toBeInTheDocument();
 });

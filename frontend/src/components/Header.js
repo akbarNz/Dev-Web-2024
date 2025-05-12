@@ -5,9 +5,7 @@ const Header = ({
   setShowHistorique, 
   setShowFavoris, 
   setShowEnregistrement,
-  setShowReservationForm 
 }) => {
-  const [menuItems, setMenuItems] = useState([]);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [users, setUsers] = useState({
     artistes: [],
@@ -123,9 +121,6 @@ const Header = ({
             }}>Studio ▼</a>
             {isSubmenuOpen && (
               <ul className="submenu">
-                {menuItems.map((item, index) => (
-                  <li key={index}><a href={item.link}>{item.label}</a></li>
-                ))}
                 <li><a href="#" onClick={(e) => {
                   e.preventDefault();
                   setShowEnregistrement(true);

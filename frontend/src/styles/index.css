@@ -493,7 +493,7 @@ textarea {
 }
 
 button {
-  background-color: #007BFF;
+  background-color: rgb(25, 118, 210);
   color: white;
   padding: 10px 20px;
   border: none;
@@ -546,7 +546,7 @@ button:hover {
 }
 
 .filter-sidebar button {
-  background-color: #007BFF;
+  background-color: rgb(25, 118, 210);
   color: white;
   padding: 10px 20px;
   border: none;
@@ -1116,4 +1116,3 @@ button:hover {
     height: 120px;
   }
 }
-

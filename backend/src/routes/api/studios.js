@@ -6,10 +6,10 @@ const { validateStudioSearch, validate, validateBestRatedSearch } = require('../
 // Get studios based on search criteria
 router.get('/search', validateStudioSearch, validate, StudioController.getStudios);
 
-// Get studio by ID
-router.get('/:id', StudioController.getStudioById);
-
 // Get best rated studios nearby
 router.get('/best-rated', validateBestRatedSearch, validate, StudioController.getBestRatedStudios);
+
+// Get studio by ID
+router.get('/:id', StudioController.getStudioById);
 
 module.exports = router;

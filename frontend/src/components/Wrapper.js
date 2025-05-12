@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
+import { quality } from "@cloudinary/url-gen/actions/delivery";
 
 const StudioSection = () => {
   const [studios, setStudios] = useState([]);
@@ -34,7 +35,8 @@ const StudioSection = () => {
           }}
         >
           {duplicatedStudios.map((studio, index) => {
-            const img = cld.image(studio.photo_url);
+            const img = cld.image(studio.photo_url)
+            .delivery(quality(50));
             return (
               <div key={`${studio.id_stud}-${index}`} className="item">
                 <AdvancedImage cldImg={img} className="studio-photo" alt={`${studio.nom}`} />

@@ -447,20 +447,9 @@ input, textarea, select {
   box-sizing: border-box;
 }
 
-.enregi_form input,
-.enregi_form select,
-.enregi_form textarea {
-  padding: 12px 15px;
-  border-radius: 6px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background-color: white;
-}
-
 textarea {
   resize: vertical;
   height: 120px;
-  min-height: 120px;
 }
 
 button {

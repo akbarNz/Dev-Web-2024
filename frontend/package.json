@@ -2,7 +2,7 @@
     "name": "projet-dev",
     "version": "0.1.0",
     "private": true,
-    "proxy":"http://localhost:5001",
+    "proxy": "http://localhost:5001",
     "dependencies": {
         "@base-ui-components/react": "^1.0.0-alpha.8",
         "@cloudinary/react": "^1.14.1",
@@ -35,7 +35,7 @@
     "scripts": {
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test",
+        "test": "jest",
         "eject": "react-scripts eject"
     },
     "eslintConfig": {
@@ -55,5 +55,14 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
+    },
+    "devDependencies": {
+        "@babel/preset-env": "^7.27.2",
+        "@babel/preset-react": "^7.27.1",
+        "babel-jest": "^29.7.0",
+        "identity-obj-proxy": "^3.0.0",
+        "jest": "^27.5.1",
+        "react-test-renderer": "^19.1.0",
+        "whatwg-fetch": "^3.6.20"
     }
 }

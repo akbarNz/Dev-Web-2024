@@ -20,7 +20,7 @@ Une fois le projet télécharger et la base de donnée initialisée. Vous ouvrez
 ## Etape 4 :
 vous créer au niveau de votre /backend un fichier .env avec les informations suivantes : 
 
-`DATABASE_URL=postgres://USER:NOM_DB@localhost:PORT/mot_de_passe`
+`DATABASE_URL=postgres://USER:mot_de_passe@localhost:PORT/NOM_DB`
 
 ## Etape 5 :
 

@@ -463,21 +463,67 @@ textarea {
   min-height: 120px;
 }
 
-input:focus,
-select:focus,
-textarea:focus,
-.enregi_form input:focus,
-.enregi_form select:focus,
-.enregi_form textarea:focus {
-  outline: none;
-  border-color: #3498db;
-  box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+button {
+  background-color: rgb(25, 118, 210);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+/* Conteneur pour les formulaires */
+.form-container {
+  display: flex;
+  gap: 20px; /* Espace entre les deux formulaires */
+  padding: 20px;
+  max-width: 1200px; /* Largeur maximale du conteneur */
+  margin: 0 auto; /* Centrer le conteneur */
+}
+
+/* Formulaire de filtrage sur la gauche */
+.filter-sidebar {
+  width: 250px; /* Largeur du filtre */
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filter-sidebar h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.filter-sidebar label {
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
 }
 
 input[type="file"],
 .enregi_form input[type="file"] {
   background-color: #e9ecef;
   padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.filter-sidebar button {
+  background-color: rgb(25, 118, 210);
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  width: 100%;
   cursor: pointer;
 }
 

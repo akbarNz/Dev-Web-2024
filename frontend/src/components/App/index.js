@@ -10,6 +10,11 @@ const App = () => (
             <Route path="/signup" element={<div>Sign Up Page</div>} />
             <Route path="/login" element={<div>Login Page</div>} />
             <Route path="/studios/:id/book" element={<div>Booking Page</div>} />
+            {/* Footer page routes */}
+            <Route path="/contact" element={<div>Contact Us Page</div>} />
+            <Route path="/cookies" element={<div>Cookies Policy Page</div>} />
+            <Route path="/privacy" element={<div>Privacy Policy Page</div>} />
+            <Route path="/terms" element={<div>Terms & Conditions Page</div>} />
         </Routes>
     </BrowserRouter>
 );

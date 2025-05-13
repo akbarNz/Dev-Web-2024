@@ -6,6 +6,7 @@ import FindStudio from '../FindStudioComponent';
 import Map from '../MapComponent/Map';
 import AboutApp from '../AboutAppComponent/AboutApp';
 import BestRatedStudios from '../BestRatedStudiosComponent/BestRatedStudios';
+import Footer from '../FooterComponent/Footer';
 import styles from './StudioFinder.module.css';
 
 const StudioFinder = () => {
@@ -123,6 +124,7 @@ const StudioFinder = () => {
                     error={bestRatedError}
                 />
             </main>
+            <Footer />
         </div>
     );
 };

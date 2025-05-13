@@ -5,9 +5,7 @@ const Header = ({
   setShowHistorique, 
   setShowFavoris, 
   setShowEnregistrement,
-  setShowReservationForm 
 }) => {
-  const [menuItems, setMenuItems] = useState([]);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
   const [users, setUsers] = useState({
     artistes: [],
@@ -65,18 +63,6 @@ const Header = ({
   };
   
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const response = await fetch("/api/menu-item");
-        const data = await response.json();
-        setMenuItems(data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des éléments du menu:", error);
-        setMenuItems([]);
-      }
-    };
-    
-    fetchMenuItems();
     fetchUsers();
     
     // user dans localStorage ? 
@@ -135,9 +121,6 @@ const Header = ({
             }}>Studio ▼</a>
             {isSubmenuOpen && (
               <ul className="submenu">
-                {menuItems.map((item, index) => (
-                  <li key={index}><a href={item.link}>{item.label}</a></li>
-                ))}
                 <li><a href="#" onClick={(e) => {
                   e.preventDefault();
                   setShowEnregistrement(true);

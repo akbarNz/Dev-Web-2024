@@ -1,4 +1,4 @@
-const { validateStudioSearch, validateStudioCreation, validate } = require('../validation');
+const { validateStudioSearch, validateStudioCreation, validateBestRatedSearch, validate } = require('../validation');
 const { validationResult } = require('express-validator');
 
 describe('Validation Middleware', () => {
@@ -60,6 +60,42 @@ describe('Validation Middleware', () => {
             
             const errors = validationResult(mockReq);
             expect(errors.isEmpty()).toBe(true);
+        });
+    });
+
+    describe('validateBestRatedSearch', () => {
+        it('should validate latitude and longitude', async () => {
+            const req = {
+                query: {
+                    lat: '50.8503',
+                    lng: '4.3517',
+                    radius: '5',
+                    minRating: '4'
+                }
+            };
+
+            await Promise.all(validateBestRatedSearch.map(validation => (
+                validation.run(req)
+            )));
+
+            const result = validationResult(req);
+            expect(result.isEmpty()).toBeTruthy();
+        });
+
+        it('should reject invalid coordinates', async () => {
+            const req = {
+                query: {
+                    lat: '91',
+                    lng: '181'
+                }
+            };
+
+            await Promise.all(validateBestRatedSearch.map(validation => (
+                validation.run(req)
+            )));
+
+            const result = validationResult(req);
+            expect(result.isEmpty()).toBeFalsy();
         });
     });
 });

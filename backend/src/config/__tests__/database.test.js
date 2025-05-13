@@ -1,6 +1,8 @@
 // Test for database configuration
 // database.test.js
 const { pool, testConnection } = require('../database');
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
 
 describe('Database Configuration', () => {
     beforeAll(async () => {
@@ -23,5 +25,17 @@ describe('Database Configuration', () => {
 
     afterAll(async () => {
         await pool.end();
+    });
+});
+
+describe('Database Connection', () => {
+    it('should connect to test database successfully', async () => {
+        try {
+            await global.prisma.$connect();
+            const result = await global.prisma.$queryRaw`SELECT current_database()`;
+            expect(result[0].current_database).toBe('zikfreakdb_test');
+        } catch (error) {
+            fail('Database connection failed: ' + error.message);
+        }
     });
 });

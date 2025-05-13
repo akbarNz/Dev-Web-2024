@@ -19,7 +19,7 @@ describe('Studio Routes', () => {
 
     test('GET /api/studios/:id', async () => {
         const response = await request(app)
-            .get('/api/studios/22');
+            .get('/api/studios/1');
 
         expect(response.status).toBe(200);
     });

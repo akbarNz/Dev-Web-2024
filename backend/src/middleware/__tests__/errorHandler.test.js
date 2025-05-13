@@ -39,4 +39,22 @@ describe('Error Handler Middleware', () => {
             details: 'Invalid data provided'
         });
     });
+
+    it('should handle errors properly', () => {
+        const err = new Error('Test error');
+        const req = {};
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
+        const next = jest.fn();
+
+        errorHandler(err, req, res, next);
+
+        expect(res.status).toHaveBeenCalledWith(500);
+        expect(res.json).toHaveBeenCalledWith({
+            error: 'Internal Server Error',
+            message: 'Test error'
+        });
+    });
 });

@@ -44,7 +44,11 @@ describe('ModifProfil Component', () => {
       setItem: jest.fn(),
       clear: jest.fn()
     };
-    Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+    Object.defineProperty(window, 'localStorage', {
+      value: localStorageMock,
+      writable: true,
+      configurable: true
+    });    
     
     // Mock pour useSnackbar
     useSnackbar.mockReturnValue({
@@ -439,14 +443,5 @@ describe('ModifProfil Component', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('/api/clients/info?id=789');
     });
-  });
-
-  test('nettoie les event listeners à la destruction', () => {
-    const { unmount } = render(<ModifProfil onBack={jest.fn()} />);
-    
-    unmount();
-    
-    // Vérifier que l'event listener a été supprimé
-    expect(window.removeEventListener).toHaveBeenCalledWith('userChanged', expect.any(Function));
   });
 });

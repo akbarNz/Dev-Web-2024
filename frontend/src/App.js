@@ -7,6 +7,8 @@ import ModifProfil from "./components/ModifProfil";
 import Historique from "./components/Historique";
 import Favoris from "./components/Favoris";
 import Enregistrement from "./components/FormulaireEnregiStudio";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import { SnackbarProvider } from "./components/SnackBar";
 
 const App = () => {
@@ -39,12 +41,17 @@ const App = () => {
   const [showHistorique, setShowHistorique] = useState(false);
   const [showFavoris, setShowFavoris] = useState(false);
   const [showEnregistrementForm, setShowEnregistrementForm] = useState(false);
+  // Nouveaux états pour les modales d'authentification
+  const [showLogin, setShowLogin] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
 
   const handleShowProfile = () => {
     setShowProfileForm(true);
     setShowHistorique(false);
     setShowFavoris(false);
     setShowEnregistrementForm(false);
+    setShowLogin(false);
+    setShowRegister(false);
   };
 
   const handleShowHistorique = () => {
@@ -52,6 +59,8 @@ const App = () => {
     setShowProfileForm(false);
     setShowFavoris(false);
     setShowEnregistrementForm(false);
+    setShowLogin(false);
+    setShowRegister(false);
   };
 
   const handleShowFavoris = () => {
@@ -59,6 +68,8 @@ const App = () => {
     setShowHistorique(false);
     setShowProfileForm(false);
     setShowEnregistrementForm(false);
+    setShowLogin(false);
+    setShowRegister(false);
   };
 
   const handleShowEnregistrement = () => {
@@ -66,6 +77,26 @@ const App = () => {
     setShowFavoris(false);
     setShowHistorique(false);
     setShowProfileForm(false);
+    setShowLogin(false);
+    setShowRegister(false);
+  };
+
+  const handleShowLogin = () => {
+    setShowLogin(true);
+    setShowRegister(false);
+    setShowProfileForm(false);
+    setShowHistorique(false);
+    setShowFavoris(false);
+    setShowEnregistrementForm(false);
+  };
+
+  const handleShowRegister = () => {
+    setShowRegister(true);
+    setShowLogin(false);
+    setShowProfileForm(false);
+    setShowHistorique(false);
+    setShowFavoris(false);
+    setShowEnregistrementForm(false);
   };
 
   const ajouterAuFavoris = (studio) => {
@@ -80,6 +111,8 @@ const App = () => {
         setShowHistorique={handleShowHistorique}
         setShowFavoris={handleShowFavoris}
         setShowEnregistrement={handleShowEnregistrement}
+        setShowLogin={handleShowLogin}
+        setShowRegister={handleShowRegister}
       />
       
       {showHistorique && (
@@ -107,8 +140,17 @@ const App = () => {
           onBack={() => setShowEnregistrementForm(false)}
         />
       )}
+
+      {/* Nouvelles modales d'authentification */}
+      {showLogin && (
+        <Login onClose={() => setShowLogin(false)} />
+      )}
+
+      {showRegister && (
+        <Register onClose={() => setShowRegister(false)} />
+      )}
       
-      {!showProfileForm && !showHistorique && !showFavoris && !showEnregistrementForm && (
+      {!showProfileForm && !showHistorique && !showFavoris && !showEnregistrementForm && !showLogin && !showRegister && (
         <>
           <Wrapper />
           <div className="form-container">

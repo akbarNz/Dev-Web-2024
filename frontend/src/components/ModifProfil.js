@@ -6,7 +6,6 @@ import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
 import { useSnackbar } from "./SnackBar";
 
-
 const ModifProfil = ({ onBack }) => {
   const [profil, setProfil] = useState({
     id: "",
@@ -23,24 +22,43 @@ const ModifProfil = ({ onBack }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const { showSnackbar } = useSnackbar();
 
+  // Fonction pour déterminer si l'utilisateur est un artiste ou un propriétaire
+  const getUserType = (user) => {
+    // Pour le système JWT
+    if (user.type === 'client') return 'artiste';
+    if (user.type === 'proprio') return 'proprietaire';
+    
+    // Pour le système legacy
+    if (user.type === 'artiste') return 'artiste';
+    if (user.type === 'proprietaire') return 'proprietaire';
+    
+    // Valeur par défaut
+    return 'artiste';
+  };
 
-  // Fonction pour charger les données de l'utilisateur
-  const fetchUserData = async (user) => {
+  // Fonction pour charger les données de l'utilisateur (méthode legacy)
+  const fetchUserDataLegacy = async (user) => {
     if (!user) return;
     
     try {
       // Fetch les données selon le type d'utilisateur
-      const url = user.type === 'artiste' 
+      const userType = getUserType(user);
+      const url = userType === 'artiste' 
         ? `/api/clients/info?id=${user.id}`
         : `/api/proprietaires/info?id=${user.id}`;
       
       const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des données du profil');
+      }
+      
       const data = await response.json();
       
       setProfil({ 
         ...data, 
-        numero_telephone: `+${data.numero_telephone}`,
-        type: user.type
+        numero_telephone: data.numero_telephone.startsWith('+') ? data.numero_telephone : `+${data.numero_telephone}`,
+        type: userType
       });
       setPublicId(data.photo_url);
       setCurrentUser(user);
@@ -50,29 +68,110 @@ const ModifProfil = ({ onBack }) => {
       setFileToUpload(null);
     } catch (error) {
       console.error("Erreur lors de la récupération du profil :", error);
+      showSnackbar("Erreur lors de la récupération du profil", "error");
+    }
+  };
+
+  // Fonction pour charger les données de l'utilisateur (méthode JWT)
+  const fetchUserDataJWT = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const authUser = JSON.parse(localStorage.getItem('authUser'));
+      if (!authUser) return;
+      
+      // Déterminer le type d'utilisateur et l'URL
+      const userType = getUserType(authUser);
+      const url = userType === 'artiste' 
+        ? `/api/clients/me` 
+        : `/api/proprietaires/me`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Erreur lors de la récupération des données du profil');
+      }
+      
+      const data = await response.json();
+      
+      setProfil({ 
+        ...data, 
+        numero_telephone: data.numero_telephone.startsWith('+') ? data.numero_telephone : `+${data.numero_telephone}`,
+        type: userType
+      });
+      setPublicId(data.photo_url);
+      setCurrentUser(authUser);
+      
+      // Réinitialiser l'image locale et le fichier à télécharger
+      setLocalImage(null);
+      setFileToUpload(null);
+    } catch (error) {
+      console.error("Erreur lors de la récupération du profil JWT :", error);
+      // En cas d'erreur avec le système JWT, essayer avec le système legacy
+      const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+      if (userFromStorage) {
+        fetchUserDataLegacy(userFromStorage);
+      }
     }
   };
 
   useEffect(() => {
-    // Récupération de l'utilisateur courant depuis localStorage
-    const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
-    if (userFromStorage) {
-      setCurrentUser(userFromStorage);
-      fetchUserData(userFromStorage);
+    // Vérifier si l'utilisateur est authentifié avec JWT
+    const token = localStorage.getItem('token');
+    const authUser = localStorage.getItem('authUser');
+    
+    if (token && authUser) {
+      fetchUserDataJWT();
+    } else {
+      // Mode legacy si pas d'authentification JWT
+      const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+      if (userFromStorage) {
+        setCurrentUser(userFromStorage);
+        fetchUserDataLegacy(userFromStorage);
+      }
     }
     
-    // Écouter les changements d'utilisateur
+    // Écouter les changements d'utilisateur (legacy)
     const handleUserChange = (event) => {
       const newUser = event.detail;
       setCurrentUser(newUser);
-      fetchUserData(newUser);
+      fetchUserDataLegacy(newUser);
+    };
+    
+    // Écouter les changements d'authentification (JWT)
+    const handleAuthChange = () => {
+      const token = localStorage.getItem('token');
+      const authUser = localStorage.getItem('authUser');
+      
+      if (token && authUser) {
+        fetchUserDataJWT();
+      } else {
+        // Vider le profil si l'utilisateur est déconnecté
+        setProfil({
+          id: "",
+          photo_url: "",
+          nom: "",
+          email: "",
+          numero_telephone: "",
+          type: ""
+        });
+        setPublicId("");
+        setCurrentUser(null);
+      }
     };
     
     window.addEventListener('userChanged', handleUserChange);
+    window.addEventListener('authChanged', handleAuthChange);
     
     // Nettoyage
     return () => {
       window.removeEventListener('userChanged', handleUserChange);
+      window.removeEventListener('authChanged', handleAuthChange);
     };
   }, []);
 
@@ -87,6 +186,11 @@ const ModifProfil = ({ onBack }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!profil.id) {
+      showSnackbar("Impossible de mettre à jour le profil : ID manquant", "error");
+      return;
+    }
+
     let finalPublicId = publicId;
 
     // Si l'utilisateur a sélectionné une nouvelle image
@@ -100,26 +204,52 @@ const ModifProfil = ({ onBack }) => {
         finalPublicId = response.data.public_id;
       } catch (error) {
         console.error("Erreur lors de l'upload :", error);
+        showSnackbar("Erreur lors de l'upload de l'image", "error");
         return;
       }
     }
 
-    const formattedPhone = profil.numero_telephone.replace(/[\s+]/g, '');
+    // Formatage du numéro de téléphone
+    const formattedPhone = profil.numero_telephone?.replace(/[\s+]/g, '') || '';
     const updatedProfil = { ...profil, numero_telephone: formattedPhone, photo_url: finalPublicId };
 
     try {
-      // Utiliser la route appropriée selon le type d'utilisateur
-      const url = profil.type === 'artiste' 
-        ? `/api/clients/save`
-        : `/api/proprietaires/save`;
+      // Vérifier si l'utilisateur est authentifié avec JWT
+      const token = localStorage.getItem('token');
+      const authUser = localStorage.getItem('authUser');
       
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedProfil),
-      });
+      let response;
+      
+      if (token && authUser) {
+        // Utiliser les nouvelles routes protégées par JWT
+        const url = profil.type === 'artiste' 
+          ? `/api/clients/${profil.id}`
+          : `/api/proprietaires/${profil.id}`;
+        
+        response = await fetch(url, {
+          method: "PUT",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(updatedProfil),
+        });
+      } else {
+        // Utiliser les routes legacy
+        const url = profil.type === 'artiste' 
+          ? `/api/clients/save`
+          : `/api/proprietaires/save`;
+        
+        response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedProfil),
+        });
+      }
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
+      
+      const data = await response.json();
       
       showSnackbar("Profil mis à jour avec succès !", "success");
 
@@ -127,24 +257,51 @@ const ModifProfil = ({ onBack }) => {
       setLocalImage(null); // Nettoyer l'aperçu
       setFileToUpload(null);
       
-      // Mettre à jour les données dans localStorage
-      const updatedUser = {
-        ...currentUser,
-        nom: profil.nom
-      };
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser));
-      
-      // Déclencher l'événement avec les données mises à jour
-      const event = new CustomEvent('userUpdated', { detail: updatedUser });
-      window.dispatchEvent(event);
+      // Mettre à jour les données selon le mode d'authentification
+      if (token && authUser) {
+        // Mise à jour des données JWT
+        const updatedAuthUser = {
+          ...JSON.parse(localStorage.getItem('authUser')),
+          nom: profil.nom,
+          photo_url: finalPublicId
+        };
+        localStorage.setItem('authUser', JSON.stringify(updatedAuthUser));
+        
+        // Déclencher l'événement d'authentification
+        const authEvent = new CustomEvent('authChanged');
+        window.dispatchEvent(authEvent);
+      } else {
+        // Mise à jour des données legacy
+        const updatedUser = {
+          ...currentUser,
+          nom: profil.nom
+        };
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        
+        // Déclencher l'événement avec les données mises à jour
+        const event = new CustomEvent('userUpdated', { detail: updatedUser });
+        window.dispatchEvent(event);
+      }
       
     } catch (error) {
       console.error(error);
+      showSnackbar("Erreur lors de la mise à jour du profil", "error");
     }
   };
 
   const cld = new Cloudinary({ cloud: { cloudName: "dpszia6xf" } });
   const img = cld.image(publicId);
+
+  // Si aucun profil n'est chargé, afficher un message de chargement
+  if (!profil.id) {
+    return (
+      <div className="profil-container">
+        <div className="form-wrapper-profil">
+          <h2>Chargement du profil...</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="profil-container">

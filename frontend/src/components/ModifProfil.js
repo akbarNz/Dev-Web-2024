@@ -183,6 +183,25 @@ const ModifProfil = ({ onBack }) => {
     }
   };
 
+  // Fonction pour supprimer une image sur Cloudinary
+  const deleteCloudinaryImage = async (publicId) => {
+    if (!publicId) return;
+    
+    try {
+      const response = await fetch('/api/cloudinary/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: publicId })
+      });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de la suppression de l\'image:', await response.text());
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'image sur Cloudinary:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -192,6 +211,7 @@ const ModifProfil = ({ onBack }) => {
     }
 
     let finalPublicId = publicId;
+    let oldPublicId = publicId;
 
     // Si l'utilisateur a sélectionné une nouvelle image
     if (fileToUpload) {
@@ -249,7 +269,10 @@ const ModifProfil = ({ onBack }) => {
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
       
-      const data = await response.json();
+      // Si l'utilisateur a changé d'image et qu'il y avait une ancienne image, la supprimer
+      if (fileToUpload && oldPublicId && oldPublicId !== finalPublicId) {
+        await deleteCloudinaryImage(oldPublicId);
+      }
       
       showSnackbar("Profil mis à jour avec succès !", "success");
 
@@ -309,7 +332,7 @@ const ModifProfil = ({ onBack }) => {
         <h2>Modifier mon profil {profil.type === 'proprietaire' ? '(Propriétaire)' : '(Artiste)'}</h2>
         <form onSubmit={handleSubmit}>
           <label>
-            <div>
+            <div className="photo-upload-container">
               {localImage ? (
                 <img src={localImage} alt="Aperçu" className="profil-photo" />
               ) : publicId ? (
@@ -317,9 +340,11 @@ const ModifProfil = ({ onBack }) => {
               ) : (
                 <img src="logo512.png" alt="Photo de profil" className="profil-photo" />
               )}
+              <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
             </div>
-            <label id="profil_button" htmlFor="file-upload" className="register-btn">Changer de photo</label>
-            <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
+            <label id="profil_button" htmlFor="file-upload" className="register-btn">
+              Changer de photo
+            </label>
           </label>
 
           <label className="left_label">

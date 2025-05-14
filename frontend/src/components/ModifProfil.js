@@ -84,6 +84,25 @@ const ModifProfil = ({ onBack }) => {
     }
   };
 
+  // Fonction pour supprimer une image sur Cloudinary
+  const deleteCloudinaryImage = async (publicId) => {
+    if (!publicId) return;
+    
+    try {
+      const response = await fetch('/api/cloudinary/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: publicId })
+      });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de la suppression de l\'image:', await response.text());
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'image sur Cloudinary:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 

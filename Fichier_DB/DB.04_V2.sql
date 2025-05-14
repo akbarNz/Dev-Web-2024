@@ -16,7 +16,8 @@ CREATE TABLE Client (
     role role_utilisateurs NOT NULL DEFAULT 'artiste',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
-    deux_facteur_active BOOLEAN DEFAULT FALSE
+    deux_facteur_active BOOLEAN DEFAULT FALSE,
+    mot_de_passe VARCHAR(255)
 );
 
 CREATE TABLE Proprio (
@@ -28,7 +29,8 @@ CREATE TABLE Proprio (
      role role_utilisateurs NOT NULL DEFAULT 'propriétaire',
     date_inscription TIMESTAMP DEFAULT NOW(),
     verifie BOOLEAN DEFAULT FALSE,
-    deux_facteur_active BOOLEAN DEFAULT FALSE
+    deux_facteur_active BOOLEAN DEFAULT FALSE,
+    mot_de_passe VARCHAR(255)
 );
 
 CREATE TABLE Studio (

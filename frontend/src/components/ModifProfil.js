@@ -107,6 +107,7 @@ const ModifProfil = ({ onBack }) => {
     e.preventDefault();
 
     let finalPublicId = publicId;
+    let oldPublicId = publicId;
 
     // Si l'utilisateur a sélectionné une nouvelle image
     if (fileToUpload) {
@@ -129,8 +130,8 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Utiliser la route appropriée selon le type d'utilisateur
       const url = profil.type === 'artiste' 
-        ? `/api/clients/save`
-        : `/api/proprietaires/save`;
+        ? '/api/clients/save'
+        : '/api/proprietaires/save';
       
       const response = await fetch(url, {
         method: "POST",
@@ -139,6 +140,11 @@ const ModifProfil = ({ onBack }) => {
       });
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
+      
+      // Si l'utilisateur a changé d'image et qu'il y avait une ancienne image, la supprimer
+      if (fileToUpload && oldPublicId && oldPublicId !== finalPublicId) {
+        await deleteCloudinaryImage(oldPublicId);
+      }
       
       showSnackbar("Profil mis à jour avec succès !", "success");
 

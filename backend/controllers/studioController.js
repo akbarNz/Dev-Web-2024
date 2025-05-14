@@ -119,6 +119,14 @@ exports.registerStudio = async (req, res) => {
   }
 
   try {
+    // Vérifier si l'authentification JWT est utilisée
+    if (req.user) {
+      // Vérifier que l'utilisateur peut enregistrer ce studio
+      if (req.user.type !== 'proprio' || parseInt(req.user.id) !== parseInt(proprietaire_id)) {
+        return res.status(403).json({ message: "Accès non autorisé" });
+      }
+    }
+    
     const query = `
       INSERT INTO studio (nom, description, adresse, code_postal, prix_par_heure, equipements, photo_url, proprietaire_id)
       VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`;
@@ -133,5 +141,102 @@ exports.registerStudio = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Erreur serveur', details: err.message });
+  }
+};
+
+// Partie Historique des réservations
+
+exports.getHistoriqueReservations = async (req, res) => {
+  const artisteId = req.query.artiste;
+  if (!artisteId) return res.status(400).json({ error: "Paramètre artiste manquant" });
+
+  try {
+    const result = await pool.query(`
+      SELECT 
+        r.id,
+        r.date_reservation AS date,
+        r.heure_debut,
+        r.heure_fin,
+        r.nbr_personne,
+        r.prix_total,
+        r.statut,
+        s.id AS studio_id,
+        s.nom,
+        s.adresse,
+        s.photo_url
+      FROM reservation r
+      JOIN studio s ON r.studio_id = s.id
+      WHERE r.client_id = $1
+      ORDER BY r.date_reservation DESC
+    `, [artisteId]);
+    
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Erreur serveur");
+  }
+};
+
+// Nouvelle fonction pour récupérer les réservations avec authentification JWT
+exports.getUserReservations = async (req, res) => {
+  try {
+    const userId = req.params.id;
+    const userType = req.user.type;
+    
+    // Vérifier que l'utilisateur a accès à ces données
+    if (parseInt(req.user.id) !== parseInt(userId)) {
+      return res.status(403).json({ message: "Accès non autorisé" });
+    }
+    
+    // Récupérer les réservations de l'utilisateur
+    let query;
+    
+    if (userType === 'client') {
+      query = `
+        SELECT 
+          r.id,
+          r.date_reservation,
+          r.heure_debut,
+          r.heure_fin,
+          r.nbr_personne,
+          r.prix_total,
+          r.statut,
+          r.studio_id,
+          s.nom,
+          s.adresse,
+          s.photo_url
+        FROM reservation r
+        JOIN studio s ON r.studio_id = s.id
+        WHERE r.client_id = $1
+        ORDER BY r.date_reservation DESC
+      `;
+    } else if (userType === 'proprio') {
+      query = `
+        SELECT 
+          r.id,
+          r.date_reservation,
+          r.heure_debut,
+          r.heure_fin,
+          r.nbr_personne,
+          r.prix_total,
+          r.statut,
+          r.studio_id,
+          s.nom,
+          s.adresse,
+          s.photo_url
+        FROM reservation r
+        JOIN studio s ON r.studio_id = s.id
+        WHERE s.proprietaire_id = $1
+        ORDER BY r.date_reservation DESC
+      `;
+    } else {
+      return res.status(400).json({ message: "Type d'utilisateur invalide" });
+    }
+    
+    const result = await pool.query(query, [userId]);
+    res.json(result.rows);
+  } catch (error) {
+    console.error('Erreur lors de la récupération des réservations:', error);
+    res.status(500).json({ message: 'Erreur serveur' });
   }
 };

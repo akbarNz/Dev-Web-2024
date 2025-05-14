@@ -11,13 +11,49 @@ const ReservationForm = ({
   selectedEquipements,
 }) => {
   const [studios, setStudios] = useState([]);
-  const [users, setUsers] = useState([]);
   const [timeDifference, setTimeDifference] = useState(0);
   const [prixTotal, setPrixTotal] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
   const { showSnackbar } = useSnackbar();
 
+  // Récupérer l'utilisateur connecté
+  useEffect(() => {
+    const fetchCurrentUser = () => {
+      // Vérifier si l'utilisateur est authentifié avec JWT
+      const token = localStorage.getItem('token');
+      const authUser = localStorage.getItem('authUser');
+      
+      if (token && authUser) {
+        // Utilisateur authentifié avec JWT
+        const user = JSON.parse(authUser);
+        if (user.type === 'client') {
+          setCurrentUser(user);
+          setReservation(prev => ({
+            ...prev,
+            client_id: user.id
+          }));
+        } else {
+          showSnackbar("Seuls les artistes peuvent faire une réservation", "warning");
+        }
+      } else {
+        // Méthode legacy
+        const legacyUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (legacyUser && legacyUser.type === 'artiste') {
+          setCurrentUser(legacyUser);
+          setReservation(prev => ({
+            ...prev,
+            client_id: legacyUser.id
+          }));
+        } else {
+          showSnackbar("Veuillez vous connecter en tant qu'artiste pour réserver", "warning");
+        }
+      }
+    };
+
+    fetchCurrentUser();
+  }, [setReservation, showSnackbar]);
 
   // Initialisation des champs de réservation
   useEffect(() => {
@@ -32,20 +68,13 @@ const ReservationForm = ({
     }));
   }, [setReservation]);
 
-  // Chargement initial de tous les studios et des utilisateurs
+  // Chargement initial de tous les studios
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const [studioRes, userRes] = await Promise.all([
-          fetch(`/api/studio`),
-          fetch(`/api/clients/artistes`),
-        ]);
-        const [studioData, userData] = await Promise.all([
-          studioRes.json(),
-          userRes.json(),
-        ]);
+        const studioRes = await fetch(`/api/studio`);
+        const studioData = await studioRes.json();
         setStudios(studioData);
-        setUsers(userData);
       } catch (err) {
         console.error("Erreur chargement initial:", err);
       } finally {
@@ -131,10 +160,16 @@ const ReservationForm = ({
 
   const handleReservationSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!currentUser) {
+      showSnackbar("Vous devez être connecté pour faire une réservation", "error");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     const reservationData = {
-      client_id: parseInt(reservation.client_id),
+      client_id: parseInt(currentUser.id),
       studio_id: parseInt(reservation.studio_id),
       date_reservation: reservation.date_reservation,
       nbr_personne: parseInt(reservation.nbr_personne),
@@ -152,15 +187,45 @@ const ReservationForm = ({
         body: JSON.stringify({ nbr_personne: reservationData.nbr_personne }),
       });
 
-      const response = await fetch(`/api/reservations`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reservationData),
-      });
+      // Vérifier si l'utilisateur est authentifié avec JWT
+      const token = localStorage.getItem('token');
+      let response;
+      
+      if (token) {
+        // Utiliser la route sécurisée
+        response = await fetch(`/api/reservations/secure`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(reservationData),
+        });
+      } else {
+        // Utiliser l'ancienne route
+        response = await fetch(`/api/reservations`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(reservationData),
+        });
+      }
 
       if (!response.ok) throw new Error("Erreur backend");
 
       showSnackbar("Réservation enregistrée avec succès !", "success");
+      
+      // Réinitialiser le formulaire
+      setReservation({
+        client_id: currentUser.id,
+        studio_id: "",
+        date_reservation: "",
+        nbr_personne: 1,
+        heure_debut: "",
+        heure_fin: "",
+        prix_total: 0
+      });
+      setPrixTotal(0);
+      
     } catch (error) {
       console.error("Erreur:", error);
       showSnackbar(`Erreur lors de l'enregistrement: ${error.message}`, "error");
@@ -177,28 +242,22 @@ const ReservationForm = ({
     );
   }
 
+  // Si aucun utilisateur artiste n'est trouvé, afficher un message
+  if (!currentUser) {
+    return (
+      <div className="reservation-form">
+        <h1>Réserver un studio</h1>
+        <p>Vous devez être connecté en tant qu'artiste pour faire une réservation.</p>
+        <p>Veuillez vous connecter ou vous inscrire.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="reservation-form">
       <h1>Réserver un studio</h1>
+      <p>Connecté en tant que: <strong>{currentUser.nom}</strong></p>
       <form onSubmit={handleReservationSubmit}>
-        <InputLabel id="artiste-select-label">Votre nom</InputLabel>
-        <Select
-          sx={{ width: '100%', height: '45px', mb: 2 }}
-          labelId="artiste-select-label"
-          id="artiste-select"
-          name="client_id"
-          value={reservation.client_id || ""}
-          onChange={handleReservationChange}
-          required
-        >
-          <MenuItem value=""><em>Sélectionnez votre nom</em></MenuItem>
-          {users.map((user) => (
-            <MenuItem key={user.id} value={user.id.toString()}>
-              {user.nom}
-            </MenuItem>
-          ))}
-        </Select>
-
         <InputLabel id="studio-select-label">Choisir un studio</InputLabel>
         <Select
           sx={{ width: '100%', height: '45px', mb: 2 }}

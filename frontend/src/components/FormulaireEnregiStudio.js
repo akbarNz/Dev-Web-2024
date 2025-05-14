@@ -5,20 +5,51 @@ import { AdvancedImage } from "@cloudinary/react";
 import { useSnackbar } from "./SnackBar";
 
 const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
-  const [users, setUsers] = useState([]);
   const [publicId, setPublicId] = useState("");
   const [villes, setVille] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const { showSnackbar } = useSnackbar();
 
   useEffect(() => {
-    fetch(`/api/proprietaires`)
-      .then((res) => res.json())
-      .then((data) => {
-        setUsers(data);
-      })
-      .catch((err) => console.error("Erreur chargement utilisateurs:", err));
+    // Récupérer l'utilisateur connecté
+    const fetchCurrentUser = () => {
+      // Vérifier si l'utilisateur est authentifié avec JWT
+      const token = localStorage.getItem('token');
+      const authUser = localStorage.getItem('authUser');
+      
+      if (token && authUser) {
+        // Utilisateur authentifié avec JWT
+        const user = JSON.parse(authUser);
+        if (user.type === 'proprio') {
+          setCurrentUser(user);
+          setEnregistrement(prev => ({
+            ...prev,
+            artiste_id: user.id
+          }));
+        } else {
+          showSnackbar("Seuls les propriétaires peuvent enregistrer un studio", "error");
+          onBack(); // Retourner à la page précédente si ce n'est pas un propriétaire
+        }
+      } else {
+        // Méthode legacy
+        const legacyUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (legacyUser && legacyUser.type === 'proprietaire') {
+          setCurrentUser(legacyUser);
+          setEnregistrement(prev => ({
+            ...prev,
+            artiste_id: legacyUser.id
+          }));
+        } else {
+          showSnackbar("Seuls les propriétaires peuvent enregistrer un studio", "error");
+          onBack(); // Retourner à la page précédente si ce n'est pas un propriétaire
+        }
+      }
+    };
 
+    fetchCurrentUser();
+
+    // Récupérer la liste des villes
     fetch(`/api/studio/villes`)
       .then((res) => res.json())
       .then((data) => {
@@ -26,7 +57,7 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
         setVille(data);
       })
       .catch((err) => console.error("Erreur chargement villes:", err));
-  }, []);
+  }, [setEnregistrement, onBack, showSnackbar]);
 
   // Configuration Cloudinary
   const cld = new Cloudinary({ cloud: { cloudName: "dpszia6xf" } });
@@ -67,6 +98,12 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
 
   const handleEnregistrementSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!currentUser) {
+      showSnackbar("Vous devez être connecté pour enregistrer un studio", "error");
+      return;
+    }
+    
     try {
       const equipementsArray = enregistrement.equipement
         .split(",")
@@ -81,16 +118,33 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
         prix_par_heure: parseFloat(enregistrement.prix_par_heure),
         equipements: equipementsArray,
         photo_url: enregistrement.photo_url || "",
-        proprietaire_id: enregistrement.artiste_id
+        proprietaire_id: currentUser.id
       };
 
       console.log("Données envoyées au serveur:", enregistrementData);
 
-      const response = await fetch(`/api/studio/enregistrer`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(enregistrementData),
-      });
+      // Vérifier si l'utilisateur est authentifié avec JWT
+      const token = localStorage.getItem('token');
+      let response;
+      
+      if (token) {
+        // Utiliser la route sécurisée
+        response = await fetch(`/api/studio/secure/enregistrer`, {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify(enregistrementData),
+        });
+      } else {
+        // Utiliser l'ancienne route
+        response = await fetch(`/api/studio/enregistrer`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(enregistrementData),
+        });
+      }
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -100,15 +154,35 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
       const result = await response.json();
       console.log(result);
       showSnackbar("Studio enregistré avec succès!", "success");
+      onBack(); // Retourner à la page précédente après l'enregistrement
     } catch (error) {
       console.error("Erreur lors de l'enregistrement :", error);
       showSnackbar(`Erreur: ${error.message}`, "error");
     }
   };
 
+  // Si aucun utilisateur propriétaire n'est trouvé, ne pas afficher le formulaire
+  if (!currentUser) {
+    return (
+      <div className="enregi_form">
+        <h1>Accès non autorisé</h1>
+        <p>Vous devez être connecté en tant que propriétaire pour enregistrer un studio.</p>
+        <button
+          id="backbutton"
+          type="button"
+          className="register-btn"
+          onClick={onBack}
+        >
+          Retour
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="enregi_form">
       <h1>Enregistrer un studio</h1>
+      <p>Connecté en tant que: <strong>{currentUser.nom}</strong></p>
       <form onSubmit={handleEnregistrementSubmit}>
         {}
         <label>
@@ -129,21 +203,6 @@ const EnregistrementForm = ({ enregistrement, setEnregistrement, onBack }) => {
             </div>
           )}
         </label>
-
-        <label>Propriétaire ?</label>
-        <select
-          name="artiste_id"
-          value={enregistrement.artiste_id}
-          onChange={handleEnregistrementChange}
-          required
-        >
-          <option value="">Sélectionnez votre nom</option>
-          {users.map((user) => (
-            <option key={user.id} value={user.id}>
-              {user.nom}
-            </option>
-          ))}
-        </select>
 
         <label>Nom du studio</label>
         <input

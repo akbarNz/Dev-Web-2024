@@ -127,6 +127,7 @@ nav ul li > a:hover {
   padding: 0.5rem 0;
 }
 
+.submenu.visible,
 nav ul li:hover .submenu {
   opacity: 1;
   visibility: visible;
@@ -151,83 +152,121 @@ nav ul li:hover .submenu {
   padding-left: 1.8rem;
 }
 
-/* User Select Dropdown */
-.user-select-container {
-  margin: 0 15px;
-}
-
-.user-select {
-  margin: 2%;
-  padding: 8px 12px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  font-size: 14px;
-  min-width: 150px;
-  cursor: pointer;
-}
-
-.user-select:focus {
-  outline: none;
-  border-color: #666;
-  box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
-}
-
-.user-select optgroup {
-  font-weight: bold;
-}
-
-.user-select option {
-  padding: 5px;
-}
-
-/* Action Buttons */
-.nav-actions {
+/* Authentication Menu Styles */
+.auth-menu {
+  margin-left: auto;
   display: flex;
-  gap: 0.3rem; 
   align-items: center;
 }
 
-.register-btn, 
-.action-btn,
-.primary-btn {
+.auth-menu > a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  position: relative;
+  transition: var(--transition-normal);
+}
+
+.auth-menu > a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.auth-menu > a:hover::after {
+  width: 100%;
+}
+
+.auth-menu > a:hover {
+  color: var(--primary-color);
+}
+
+.auth-submenu {
+  right: 0;
+  left: auto;
+  min-width: 180px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.auth-btn {
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: 30px;
+  padding: 0.6rem 1.2rem;
+  transition: all 0.3s ease;
+  min-width: 110px;
+  text-align: center;
+}
+
+.login-btn {
+  background: var(--secondary-gradient);
+  color: white;
+  box-shadow: 0 4px 8px rgba(74, 107, 255, 0.3);
+}
+
+.login-btn:hover {
+  background: var(--secondary-hover-gradient);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(74, 107, 255, 0.4);
+}
+
+.register-btn {
   background: var(--primary-gradient);
   color: white;
-  border: none;
-  padding: 0.5rem 1.2rem; 
-  border-radius: 30px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-bounce);
   box-shadow: 0 4px 8px rgba(255, 87, 51, 0.3);
-  font-size: 0.9rem;
-  min-width: 90px;
-  width: 175px; 
-  text-align: center;
-  white-space: nowrap;
-  text-decoration: none;
-  display: inline-block;
 }
 
-.register-btn:hover,
-.action-btn:hover,
-.primary-btn:hover {
+.register-btn:hover {
+  background: var(--primary-hover-gradient);
   transform: translateY(-2px);
   box-shadow: 0 6px 12px rgba(255, 87, 51, 0.4);
-  background: var(--primary-hover-gradient);
 }
 
-#profil_button,
-.secondary-btn {
-  background: var(--secondary-gradient);
-  box-shadow: 0 4px 8px rgba(74, 107, 255, 0.3);
-  min-width: 80px; 
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--text-light);
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.5rem 0;
+  position: relative;
+  transition: var(--transition-normal);
 }
 
-#profil_button:hover,
-.secondary-btn:hover {
-  background: var(--secondary-hover-gradient);
-  box-shadow: 0 6px 12px rgba(74, 107, 255, 0.4);
+.nav-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--primary-color);
+  transition: width 0.3s ease;
+}
+
+.nav-btn:hover::after {
+  width: 100%;
+}
+
+.nav-btn:hover {
+  color: var(--primary-color);
 }
 
 .item, 
@@ -785,6 +824,322 @@ button:hover,
   align-items: center;
 }
 
+/* Auth Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.2s ease;
+}
+
+.close:hover {
+  color: var(--primary-color);
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(74, 107, 255, 0.1);
+}
+
+.error-message {
+  padding: 0.75rem;
+  margin-bottom: 1rem;
+  background-color: #ffebee;
+  color: #d32f2f;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.9rem;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(255, 87, 51, 0.2);
+}
+
+.submit-btn:hover {
+  background: var(--primary-hover-gradient);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(255, 87, 51, 0.3);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 87, 51, 0.2);
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.user-type-selector {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.type-btn {
+  flex: 1;
+  padding: 0.9rem;
+  background-color: #f5f5f5;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-btn.active {
+  background: var(--secondary-gradient);
+  color: white;
+  font-weight: 500;
+}
+
+.type-btn:hover:not(.active) {
+  background-color: #e0e0e0;
+}
+
+/* Styles pour l'historique et les favoris */
+.historique-container,
+.favoris-container,
+.empty-history,
+.empty-favoris,
+.error-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+  background-color: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.historique-container h2,
+.favoris-container h2,
+.empty-history h2,
+.empty-favoris h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.reservations-list,
+.favoris-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.reservation-card,
+.favori-card {
+  background-color: #f9f9f9;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reservation-card:hover,
+.favori-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.reservation-header,
+.favori-info {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.reservation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.3rem 0.7rem;
+  border-radius: 20px;
+}
+
+.status.confirmee {
+  background-color: #e3f8e3;
+  color: #2c8c2c;
+}
+
+.status.annulee {
+  background-color: #ffe7e7;
+  color: #c53030;
+}
+
+.status.modifiee {
+  background-color: #fff8e0;
+  color: #97710e;
+}
+
+.reservation-info,
+.favori-info {
+  padding: 1rem;
+}
+
+.favori-image {
+  height: 180px;
+  overflow: hidden;
+}
+
+.favori-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.reservation-actions,
+.favori-actions {
+  padding: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.favorite-btn,
+.remove-btn {
+  background: var(--secondary-gradient);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: auto;
+  width: auto;
+}
+
+.remove-btn {
+  background: var(--primary-gradient);
+}
+
+.favorite-btn:hover {
+  background: var(--secondary-hover-gradient);
+}
+
+.remove-btn:hover {
+  background: var(--primary-hover-gradient);
+}
+
+.back-btn {
+  display: block;
+  width: auto;
+  max-width: 200px;
+  margin: 1.5rem auto 0;
+  background: var(--dark-bg);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 30px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #555;
+}
+
+.empty-history p,
+.empty-favoris p,
+.error-container p {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-message {
+  color: #c53030;
+  font-weight: 500;
+}
+
 /* ------------ Responsive ------------ */
 
 @media (max-width: 1024px) {
@@ -832,6 +1187,21 @@ button:hover,
   .form-container {
     padding: 15px;
   }
+  
+  .modal-content {
+    max-width: 400px;
+    padding: 1.8rem;
+  }
+
+  .cardHistorique Card {
+    min-width: 800px !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .cardHistorique Card {
+    min-width: 600px !important;
+  }
 }
 
 @media (max-width: 768px) {
@@ -846,34 +1216,43 @@ button:hover,
   
   nav > a {
     order: 1;
+    margin-right: auto;
   }
   
   nav ul {
     order: 3;
     width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 0.8rem;
+    gap: 1.2rem;
+  }
+  
+  nav ul li.auth-menu {
+    margin-left: 0;
+  }
+  
+  .auth-menu {
+    margin-left: 0;
+    width: 100%;
     justify-content: center;
     margin-top: 0.5rem;
-    gap: 1rem;
   }
   
-  .nav-actions {
-    order: 2;
-    margin-left: auto;
-    gap: 0.8rem;
-  }
-  
-  .register-btn,
-  .action-btn {
-    font-size: 0.85rem;
-    padding: 0.4rem 0.8rem;
-  }
-  
-  .user-select-container {
-    margin: 10px 0;
-  }
-  
-  .user-select {
+  .auth-buttons {
     width: 100%;
+    justify-content: space-between;
+  }
+  
+  .auth-btn {
+    flex: 1;
+    max-width: 48%;
+  }
+  
+  .auth-menu .auth-submenu {
+    width: 200px;
+    right: auto;
+    left: 0;
   }
   
   .wrapper,
@@ -928,6 +1307,10 @@ button:hover,
     padding: 15px;
     margin: 8px;
   }
+
+  .cardHistorique Card {
+    min-width: 500px !important;
+  }
   
   .photo-historique {
     max-width: 500px;
@@ -959,6 +1342,169 @@ button:hover,
   .enregi_form button {
     padding: 12px 16px;
   }
+  
+  .modal-content {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+  
+  .user-type-selector {
+    margin-bottom: 1.2rem;
+  }
+  
+  .type-btn {
+    padding: 0.7rem;
+  }
+
+  .reservations-list,
+  .favoris-list {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 576px) {
+  header {
+    padding: 0.5rem 0.8rem;
+  }
+  
+  #logo {
+    width: 150px;
+    height: 80px;
+  }
+  
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  nav > a {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 0.8rem;
+  }
+  
+  nav ul {
+    width: 100%;
+    order: 2;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+  }
+  
+  nav ul li {
+    flex: 1 1 40%;
+  }
+  
+  nav ul li > a,
+  .nav-btn {
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .auth-menu {
+    flex: 1 1 100%;
+    margin-top: 0.5rem;
+  }
+
+  .auth-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .auth-btn {
+    max-width: 100%;
+  }
+  
+  .auth-menu > a {
+    justify-content: center;
+    font-weight: 600;
+  }
+  
+  .auth-submenu {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+  
+  .submenu li a {
+    font-size: 0.9rem;
+    padding: 0.6rem 1.2rem;
+  }
+  
+  .item,
+  .card {
+    flex: 0 0 180px;
+    height: 180px;
+  }
+  
+  .item img,
+  .card-img,
+  .studio-photo {
+    height: 120px;
+  }
+  
+  .form-wrapper-profil,
+  .form-wrapper,
+  .enregi_form {
+    padding: 1.2rem;
+    width: 100%;
+    margin: 1rem 0;
+  }
+  
+  h1,
+  .form-title {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  
+  .photo-historique {
+    max-width: 100%;
+  }
+
+  .cardHistorique Card {
+    min-width: 300px !important;
+  }
+  
+  .modal-content {
+    padding: 1.2rem;
+  }
+  
+  .close {
+    top: 10px;
+    right: 15px;
+  }
+  
+  .form-group label {
+    font-size: 0.9rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+  
+  .submit-btn {
+    padding: 0.75rem;
+    font-size: 0.95rem;
+  }
+  
+  .type-btn {
+    padding: 0.6rem;
+    font-size: 0.9rem;
+  }
+
+  .reservations-list,
+  .favoris-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .historique-container,
+  .favoris-container {
+    padding: 1rem;
+  }
 }
 
 @media (max-width: 480px) {
@@ -966,16 +1512,22 @@ button:hover,
     height: 40px;
   }
   
+  #logo {
+    width: 130px;
+    height: 70px;
+  }
+  
   nav ul {
-    gap: 0.8rem;
-  }
-  
-  nav ul li > a {
-    font-size: 0.9rem;
-  }
-  
-  .nav-actions {
     gap: 0.5rem;
+  }
+  
+  nav ul li {
+    flex: 1 1 45%;
+  }
+  
+  nav ul li > a,
+  .nav-btn {
+    font-size: 0.85rem;
   }
   
   .register-btn,
@@ -983,6 +1535,7 @@ button:hover,
     min-width: 70px;
     padding: 0.4rem 0.6rem;
     font-size: 0.8rem;
+    width: 100%;
   }
   
   .wrapper,
@@ -993,15 +1546,14 @@ button:hover,
   
   .item,
   .card {
-    flex: 0 0 180px;
-    height: 180px;
-    gap: 0.3rem;
+    flex: 0 0 170px;
+    height: 160px;
   }
   
   .item img,
   .card-img,
   .studio-photo {
-    height: 120px;
+    height: 110px;
   }
   
   .item h5,
@@ -1012,17 +1564,13 @@ button:hover,
   
   .scroll-container,
   .items-container {
-    gap: 1.5rem;
+    gap: 1.2rem;
   }
   
   .form-wrapper-profil,
-  .form-wrapper {
-    padding: 15px;
-  }
-  
-  h1,
-  .form-title {
-    font-size: 20px;
+  .form-wrapper,
+  .enregi_form {
+    padding: 1rem;
   }
   
   button,
@@ -1032,32 +1580,99 @@ button:hover,
   }
   
   .form-wrapper-profil button {
-    margin: 0 5%;
-  }
-  
-  .photo-historique {
-    max-width: 300px;
+    margin: 0 3%;
   }
   
   .CheckboxGrid {
     grid-template-columns: 1fr;
   }
   
-  .Actions {
-    flex-direction: column-reverse;
-    gap: 0.5rem;
-  }
-  
-  .enregi_form {
+  .modal-content {
     padding: 1rem;
   }
   
-  .enregi_form h1 {
-    font-size: 1.5rem;
+  .form-group {
+    margin-bottom: 1rem;
   }
   
-  .enregi_form button {
-    padding: 10px 14px;
+  .user-type-selector {
+    margin-bottom: 1rem;
+  }
+  
+  .type-btn {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .submit-btn {
+    padding: 0.7rem;
     font-size: 0.9rem;
+  }
+  
+  .error-message {
+    padding: 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .cardHistorique Card {
+    min-width: 280px !important;
+  }
+}
+
+/* Ajustements spécifiques pour les très petits écrans */
+@media (max-width: 360px) {
+  nav ul li {
+    flex: 1 1 100%;
+  }
+  
+  nav ul li > a,
+  .nav-btn {
+    justify-content: center;
+  }
+  
+  .item,
+  .card {
+    flex: 0 0 150px;
+    height: 150px;
+  }
+  
+  .item img,
+  .card-img,
+  .studio-photo {
+    height: 100px;
+  }
+  
+  h1,
+  .form-title {
+    font-size: 1.2rem;
+  }
+  
+  .modal-content {
+    padding: 0.8rem;
+  }
+  
+  .close {
+    top: 8px;
+    right: 12px;
+    font-size: 1.3rem;
+  }
+  
+  .form-group label {
+    font-size: 0.85rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+  
+  .type-btn {
+    padding: 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  .cardHistorique Card {
+    min-width: 250px !important;
   }
 }

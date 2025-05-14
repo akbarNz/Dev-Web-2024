@@ -1,0 +1,82 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Snapshot du rendu initial 1`] = `
+<DocumentFragment>
+  <aside
+    class="filter-sidebar"
+  >
+    <h2
+      class="titreFiltre"
+    >
+      Filtrer les studios
+    </h2>
+    <h3>
+      Prix par heure
+    </h3>
+    <div
+      class="App"
+    >
+      <div
+        data-testid="multi-slider"
+      >
+        SliderMock
+      </div>
+    </div>
+    <div
+      class="divOutput"
+    >
+      <div>
+        <span>
+           €
+        </span>
+        <span>
+           €
+        </span>
+      </div>
+    </div>
+    <h3>
+      Avis des clients
+    </h3>
+    <div
+      class="ratingStar"
+    >
+      <input
+        data-testid="rating"
+      />
+    </div>
+    <h3>
+      Choisissez vos équipements
+    </h3>
+    <div>
+      <button>
+        Sélectionner les équipements
+      </button>
+      <div>
+        <div />
+        <div>
+          <h2>
+            Choisissez les équipements
+          </h2>
+          <p>
+            Cochez les équipements que vous souhaitez ajouter.
+          </p>
+          <div
+            class="Content"
+          >
+            <div
+              class="MuiFormGroup-root CheckboxGrid css-1mac7pt-MuiFormGroup-root"
+            />
+          </div>
+          <div
+            class="Actions"
+          >
+            <button>
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</DocumentFragment>
+`;

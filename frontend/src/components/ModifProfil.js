@@ -332,7 +332,7 @@ const ModifProfil = ({ onBack }) => {
         <h2>Modifier mon profil {profil.type === 'proprietaire' ? '(Propriétaire)' : '(Artiste)'}</h2>
         <form onSubmit={handleSubmit}>
           <label>
-            <div>
+            <div className="photo-upload-container">
               {localImage ? (
                 <img src={localImage} alt="Aperçu" className="profil-photo" />
               ) : publicId ? (
@@ -340,9 +340,11 @@ const ModifProfil = ({ onBack }) => {
               ) : (
                 <img src="logo512.png" alt="Photo de profil" className="profil-photo" />
               )}
+              <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
             </div>
-            <label id="profil_button" htmlFor="file-upload" className="register-btn">Changer de photo</label>
-            <input id="file-upload" type="file" accept="image/*" onChange={handleFileChange} />
+            <label id="profil_button" htmlFor="file-upload" className="register-btn">
+              Changer de photo
+            </label>
           </label>
 
           <label className="left_label">

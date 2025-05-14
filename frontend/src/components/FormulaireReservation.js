@@ -193,7 +193,7 @@ const ReservationForm = ({
       
       if (token) {
         // Utiliser la route sécurisée
-        response = await fetch(`/api/reservations/secure`, {
+        response = await fetch(`/api/reservations`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
@@ -256,7 +256,7 @@ const ReservationForm = ({
   return (
     <div className="reservation-form">
       <h1>Réserver un studio</h1>
-      <p>Connecté en tant que: <strong>{currentUser.nom}</strong></p>
+      <p>Connecté en tant que: <strong>{currentUser.nom}</strong></p><br></br>
       <form onSubmit={handleReservationSubmit}>
         <InputLabel id="studio-select-label">Choisir un studio</InputLabel>
         <Select

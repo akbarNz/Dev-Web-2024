@@ -66,22 +66,19 @@ const Historique = ({ onBack }) => {
     const fetchHistorique = async () => {
       setLoading(true);
       try {
-        // Vérifier si l'utilisateur est authentifié par JWT
+        // Toujours utiliser la même route, mais ajouter l'en-tête d'autorisation si nécessaire
+        const url = `/api/reservations/historique?artiste=${userId}`;
         const token = localStorage.getItem('token');
-        const authUser = localStorage.getItem('authUser');
         
         let response;
-        
-        if (token && authUser) {
-          // Utiliser le nouveau endpoint avec authentification
-          response = await fetch(`/api/reservations/user/${userId}`, {
+        if (token) {
+          response = await fetch(url, {
             headers: {
               'Authorization': `Bearer ${token}`
             }
           });
         } else {
-          // Utiliser l'ancien endpoint
-          response = await fetch(`/api/reservations/historique?artiste=${userId}`);
+          response = await fetch(url);
         }
         
         if (!response.ok) {
@@ -235,10 +232,10 @@ const Historique = ({ onBack }) => {
           <div className="cardHistorique" key={index}>
             <Card sx={{minWidth: 1000}}>
               <CardContent sx={{display: 'flex', alignItems: 'center'}}>
-                <div style={{marginRight: '20px'}}>
-                  <AdvancedImage cldImg={img} className="photo-historique"/>
+                <div style={{marginRight: '20px', width: '40%', maxHeight: '300px', overflow: 'hidden'}}>
+                  <AdvancedImage cldImg={img} className="photo-historique" style={{width: '100%', objectFit: 'cover'}}/>
                 </div>
-                <div>
+                <div style={{flex: 1, textAlign: 'left'}}>
                   <Typography variant="h5" component="div" gutterBottom>
                     {nom} - Studio
                   </Typography>

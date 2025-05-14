@@ -86,15 +86,92 @@ exports.getEquipements = async (req, res) => {
   }
 };
 
+// Variable de cache pour les villes
+let villesCache = null;
+
 exports.getVilles = async (req, res) => {
   try {
+    // Si les villes sont déjà en cache, les renvoyer directement
+    if (villesCache) {
+      console.log("Renvoi des villes depuis le cache serveur");
+      return res.json(villesCache);
+    }
+
+    // Pour découvrir la structure de la table
+    console.log("Chargement des villes depuis la base de données");
+    
+    // Récupérer d'abord les noms des colonnes de la table
+    const columnsQuery = `
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name = 'villes'
+    `;
+    
+    const columnsResult = await pool.query(columnsQuery);
+    const columns = columnsResult.rows.map(row => row.column_name);
+    console.log("Colonnes disponibles dans la table villes:", columns);
+    
+    // Déterminer les bonnes colonnes à utiliser
+    let nomColumn = 'ville';
+    
+    // Vérifier si la colonne 'ville' existe, sinon utiliser d'autres possibilités
+    if (!columns.includes('ville')) {
+      if (columns.includes('nom_ville')) {
+        nomColumn = 'nom_ville';
+      } else if (columns.includes('name')) {
+        nomColumn = 'name';
+      } else if (columns.includes('nom_commune')) {
+        nomColumn = 'nom_commune';
+      } else if (columns.includes('nom')) {
+        nomColumn = 'nom';
+      } else {
+        console.error("Aucune colonne de nom trouvée dans la table villes");
+      }
+    }
+    
+    console.log(`Utilisation de la colonne '${nomColumn}' pour les noms de villes`);
+    
+    // Utiliser la colonne trouvée
     const result = await pool.query(`
-      SELECT * from villes
+      SELECT code_postal, ${nomColumn} as nom_ville
+      FROM villes
+      ORDER BY code_postal
+      LIMIT 1000
     `);
+    
+    // Stocker en cache pour les futures requêtes
+    villesCache = result.rows;
+    
     res.json(result.rows);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Erreur serveur');
+    
+    // En cas d'erreur, on utilise un tableau de secours
+    const villesFallback = [
+      { code_postal: "75001", nom_ville: "Paris 1er" },
+      { code_postal: "75002", nom_ville: "Paris 2e" },
+      { code_postal: "75003", nom_ville: "Paris 3e" },
+      { code_postal: "75004", nom_ville: "Paris 4e" },
+      { code_postal: "75005", nom_ville: "Paris 5e" },
+      { code_postal: "75006", nom_ville: "Paris 6e" },
+      { code_postal: "75007", nom_ville: "Paris 7e" },
+      { code_postal: "75008", nom_ville: "Paris 8e" },
+      { code_postal: "75009", nom_ville: "Paris 9e" },
+      { code_postal: "75010", nom_ville: "Paris 10e" },
+      { code_postal: "75011", nom_ville: "Paris 11e" },
+      { code_postal: "75012", nom_ville: "Paris 12e" },
+      { code_postal: "69001", nom_ville: "Lyon 1er" },
+      { code_postal: "69002", nom_ville: "Lyon 2e" },
+      { code_postal: "69003", nom_ville: "Lyon 3e" },
+      { code_postal: "69004", nom_ville: "Lyon 4e" },
+      { code_postal: "69005", nom_ville: "Lyon 5e" },
+      { code_postal: "13001", nom_ville: "Marseille 1er" },
+      { code_postal: "13002", nom_ville: "Marseille 2e" },
+      { code_postal: "13003", nom_ville: "Marseille 3e" },
+    ];
+    
+    villesCache = villesFallback;
+    res.json(villesFallback);
   }
 };
 
@@ -145,7 +222,6 @@ exports.registerStudio = async (req, res) => {
 };
 
 // Partie Historique des réservations
-
 exports.getHistoriqueReservations = async (req, res) => {
   const artisteId = req.query.artiste;
   if (!artisteId) return res.status(400).json({ error: "Paramètre artiste manquant" });

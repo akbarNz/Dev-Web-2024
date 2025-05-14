@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useCallback, useRef } from "react";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 
@@ -12,17 +12,35 @@ export const SnackbarProvider = ({ children }) => {
     message: "",
     severity: "info", // 'success', 'error', 'warning', 'info'
   });
+  
+  // Utiliser une ref pour éviter les mises à jour multiples
+  const pendingTimerRef = useRef(null);
 
-  const showSnackbar = (message, severity = "info") => {
+  // Mémoriser la fonction avec useCallback pour éviter les re-rendus inutiles
+  const showSnackbar = useCallback((message, severity = "info") => {
+    // Annuler tout timer en attente pour éviter les mises à jour multiples
+    if (pendingTimerRef.current) {
+      clearTimeout(pendingTimerRef.current);
+      pendingTimerRef.current = null;
+    }
+    
     setSnackbar({ open: true, message, severity });
-  };
+  }, []);
 
-  const handleClose = () => {
+  const handleClose = useCallback((event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
     setSnackbar((prev) => ({ ...prev, open: false }));
-  };
+  }, []);
+
+  // Valeur mémorisée pour le contexte
+  const contextValue = useCallback(() => ({
+    showSnackbar
+  }), [showSnackbar]);
 
   return (
-    <SnackbarContext.Provider value={{ showSnackbar }}>
+    <SnackbarContext.Provider value={contextValue()}>
       {children}
       <Snackbar
         open={snackbar.open}

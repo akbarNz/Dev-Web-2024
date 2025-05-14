@@ -84,10 +84,30 @@ const ModifProfil = ({ onBack }) => {
     }
   };
 
+  // Fonction pour supprimer une image sur Cloudinary
+  const deleteCloudinaryImage = async (publicId) => {
+    if (!publicId) return;
+    
+    try {
+      const response = await fetch('/api/cloudinary/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ public_id: publicId })
+      });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de la suppression de l\'image:', await response.text());
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression de l\'image sur Cloudinary:', error);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     let finalPublicId = publicId;
+    let oldPublicId = publicId;
 
     // Si l'utilisateur a sélectionné une nouvelle image
     if (fileToUpload) {
@@ -110,8 +130,8 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Utiliser la route appropriée selon le type d'utilisateur
       const url = profil.type === 'artiste' 
-        ? `/api/clients/save`
-        : `/api/proprietaires/save`;
+        ? '/api/clients/save'
+        : '/api/proprietaires/save';
       
       const response = await fetch(url, {
         method: "POST",
@@ -120,6 +140,11 @@ const ModifProfil = ({ onBack }) => {
       });
 
       if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
+      
+      // Si l'utilisateur a changé d'image et qu'il y avait une ancienne image, la supprimer
+      if (fileToUpload && oldPublicId && oldPublicId !== finalPublicId) {
+        await deleteCloudinaryImage(oldPublicId);
+      }
       
       showSnackbar("Profil mis à jour avec succès !", "success");
 

@@ -4,6 +4,7 @@ import App from './App';
 // Mockez les composants enfants problématiques
 jest.mock('./components/Filtrage', () => () => <div>Mock FilterForm</div>);
 jest.mock('./components/FormulaireEnregiStudio', () => () => <div>Mock EnregistrementForm</div>);
+jest.mock('./components/ModifProfil', () => () => <div>Mock ModifProfil</div>);
 
 test('renders app without crashing', () => {
   render(<App />);

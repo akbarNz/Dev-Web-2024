@@ -39,7 +39,7 @@ const Header = ({
     
     // Fermer les menus déroulants lors d'un clic à l'extérieur
     const handleClickOutside = (event) => {
-      if (isSubmenuOpen && !event.target.closest('li')) {
+      if (isSubmenuOpen && !event.target.closest('.studio-menu')) {
         setIsSubmenuOpen(false);
       }
       if (isAuthMenuOpen && !event.target.closest('.auth-menu')) {
@@ -92,8 +92,8 @@ const Header = ({
           <img id="logo" src="zikfreek_VF.png" alt="Logo" />
         </a>
         <ul>
-          <li>
-            <a href="#" onClick={toggleSubmenu}>Studio ▼</a>
+          <li className="studio-menu">
+            <a href="#" onClick={toggleSubmenu}>Studio {isSubmenuOpen ? '▲' : '▼'}</a>
             <ul className={`submenu ${isSubmenuOpen ? 'visible' : ''}`}>
               <li><a href="#" onClick={(e) => {
                 e.preventDefault();
@@ -124,7 +124,7 @@ const Header = ({
             {isAuthenticated ? (
               <>
                 <a href="#" onClick={toggleAuthMenu}>
-                  Connecté: {currentUser?.nom} ▼
+                  Connecté: {currentUser?.nom} {isAuthMenuOpen ? '▲' : '▼'}
                 </a>
                 <ul className={`submenu auth-submenu ${isAuthMenuOpen ? 'visible' : ''}`}>
                   <li><a href="#" onClick={(e) => {

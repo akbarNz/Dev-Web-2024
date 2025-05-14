@@ -124,7 +124,8 @@ nav ul li > a:hover {
   transform: translateY(15px);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 100;
-  padding: 0.5rem 0;
+  padding: 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .submenu.visible,
@@ -136,20 +137,36 @@ nav ul li:hover .submenu {
 
 .submenu li {
   display: block;
+  width: 100%;
+  margin-bottom: 0.4rem;
+}
+
+.submenu li:last-child {
+  margin-bottom: 0;
 }
 
 .submenu li a {
   color: var(--text-dark) !important;
-  padding: 0.7rem 1.5rem;
+  padding: 0.8rem 1.2rem;
   display: block;
   transition: all 0.2s ease;
   font-size: 1rem;
+  text-align: center;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  width: 100%;
 }
 
 .submenu li a:hover {
   background: var(--primary-gradient);
   color: white !important;
-  padding-left: 1.8rem;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 87, 51, 0.2);
+}
+
+.submenu li a:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 87, 51, 0.2);
 }
 
 /* Authentication Menu Styles */
@@ -194,7 +211,7 @@ nav ul li:hover .submenu {
 .auth-submenu {
   right: 0;
   left: auto;
-  min-width: 180px;
+  min-width: 200px;
 }
 
 .auth-buttons {
@@ -239,15 +256,17 @@ nav ul li:hover .submenu {
 }
 
 .nav-btn {
-  background: none;
-  border: none;
+  background: var(--secondary-gradient);
   color: var(--text-light);
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
   font-size: 1.1rem;
   font-weight: 500;
-  padding: 0.5rem 0;
+  padding: 0.6rem 1.2rem;
   position: relative;
-  transition: var(--transition-normal);
+  transition: var(--transition-bounce);
+  box-shadow: 0 2px 6px rgba(74, 107, 255, 0.3);
 }
 
 .nav-btn::after {
@@ -261,12 +280,16 @@ nav ul li:hover .submenu {
   transition: width 0.3s ease;
 }
 
-.nav-btn:hover::after {
-  width: 100%;
+.nav-btn:hover {
+  background: var(--secondary-hover-gradient);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(74, 107, 255, 0.5);
 }
 
-.nav-btn:hover {
-  color: var(--primary-color);
+.nav-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(74, 107, 255, 0.3);
 }
 
 .item, 
@@ -940,6 +963,18 @@ button:hover,
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .submenu {
+    width: 100%;
+    min-width: 200px;
+  }
+  
+  .submenu li a {
+    padding: 0.7rem 1rem;
+    font-size: 0.95rem;
+  }
 }
 
 .user-type-selector {

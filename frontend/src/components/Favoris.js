@@ -5,6 +5,8 @@ const Favoris = ({ onBack }) => {
   const [favorisList, setFavorisList] = useState([]);
   const { showSnackbar } = useSnackbar();
   const [currentUser, setCurrentUser] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
+
 
 
   useEffect(() => {
@@ -16,14 +18,18 @@ const Favoris = ({ onBack }) => {
       setFavorisList(data);
     } catch (err) {
       console.error("Erreur lors du fetch des favoris :", err);
+      showSnackbar('Erreur lors du chargement des favoris.', 'error');
     }
   };
 
   const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
-  if (userFromStorage) {
-    setCurrentUser(userFromStorage);
-    fetchFavoris(userFromStorage.id);
-  }
+    if (userFromStorage) {
+      setCurrentUser(userFromStorage);
+      fetchFavoris(userFromStorage.id);
+    } else {
+      showSnackbar("Utilisateur non identifié.", "error");
+    }
+
 
   const handleUserChange = (event) => {
     const newUser = event.detail;
@@ -64,29 +70,35 @@ const Favoris = ({ onBack }) => {
                 <td style={tdStyle}>{studio.adresse}</td>
                 <td style={tdStyle}>
                   <button
+                      data-testid={`retirer-${studio.studio_id}`}
                       style={{
                         padding: "6px 12px",
                         backgroundColor: "#e53935",
                         color: "#fff",
                         border: "none",
                         borderRadius: "4px",
-                        cursor: "pointer",
+                        cursor: loadingId === studio.studio_id ? "not-allowed" : "pointer",
+                        opacity: loadingId === studio.studio_id ? 0.6 : 1,
                       }}
-                      onClick={() =>
-                        retirerFavori(
-                          currentUser?.id,
-                          studio.studio_id,
-                          showSnackbar,
-                          () => {
-                            setFavorisList((prev) =>
-                              prev.filter((s) => s.studio_id !== studio.studio_id)
-                            );
-                          }
-                        )
-                      }
+                      disabled={loadingId === studio.studio_id}
+                      onClick={async () => {
+                        setLoadingId(studio.studio_id);
+                        await retirerFavori(
+                            currentUser?.id,
+                            studio.studio_id,
+                            showSnackbar,
+                            () => {
+                              setFavorisList((prev) =>
+                                  prev.filter((s) => s.studio_id !== studio.studio_id)
+                              );
+                            }
+                        );
+                        setLoadingId(null);
+                      }}
                   >
                     Retirer
                   </button>
+
                 </td>
               </tr>
             ))}
@@ -108,8 +120,8 @@ const Favoris = ({ onBack }) => {
             border: "none",
             borderRadius: "5px",
             cursor: "pointer",
-        }}
-        onClick={onBack}
+          }}
+          onClick={onBack}
       >
         Retour
       </button>
@@ -118,8 +130,8 @@ const Favoris = ({ onBack }) => {
 };
 
 const ajouterAuxFavoris = async (clientId, studioId, showSnackbar) => {
-    try {
-      const response = await fetch(`/api/favoris`, {
+  try {
+    const response = await fetch(`/api/favoris`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

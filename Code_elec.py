@@ -1,85 +1,145 @@
-from machine import Pin
-from time import sleep
+from machine import Pin, I2C, UART
+import time
+from ads1x15 import ADS1115
 
-bouton1 = Pin(2, Pin.IN, Pin.PULL_UP) 
-bouton2 = Pin(3, Pin.IN, Pin.PULL_UP) 
+# Configuration UART
+uart = UART(0, baudrate=115200)
+print("lancé !")
 
-led_rouge = Pin(11, Pin.OUT)
-led_verte = Pin(12, Pin.OUT)
+# I2C pour ADS1115
+i2c = I2C(1, scl=Pin(11), sda=Pin(10))
+print("Scan I2C:", i2c.scan())  # doit contenir 0x48
+GAIN = 1
+ads = ADS1115(i2c, address=0x48, gain=GAIN)
+THRESHOLD = 10000
 
-segments1 = [Pin(4, Pin.OUT), Pin(5, Pin.OUT), Pin(6, Pin.OUT), Pin(7, Pin.OUT),
-             Pin(8, Pin.OUT), Pin(9, Pin.OUT), Pin(10, Pin.OUT)]
+# Décodeur HEF4511BP
+decode_data_pins = [
+    Pin(2, Pin.OUT),
+    Pin(3, Pin.OUT),
+    Pin(6, Pin.OUT),
+    Pin(7, Pin.OUT)
+]
 
-segments2 = [Pin(13, Pin.OUT), Pin(14, Pin.OUT), Pin(15, Pin.OUT), Pin(16, Pin.OUT),
-             Pin(17, Pin.OUT), Pin(18, Pin.OUT), Pin(19, Pin.OUT)]
+bcd_digits = [
+    [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 0, 1, 1],
+    [0, 1, 0, 0], [0, 1, 0, 1], [0, 1, 1, 0], [0, 1, 1, 1],
+    [1, 0, 0, 0], [1, 0, 0, 1]
+]
 
+enable_left = Pin(4, Pin.OUT)   # afficheur gauche
+enable_right = Pin(26, Pin.OUT) # afficheur droit
 
-chiffres = {
-    0: [0, 0, 0, 0, 0, 0, 1], 1: [1, 0, 0, 1, 1, 1, 1],
-    2: [0, 0, 1, 0, 0, 1, 0], 3: [0, 0, 0, 0, 1, 1, 0],
-    4: [1, 0, 0, 1, 1, 0, 0], 5: [0, 1, 0, 0, 1, 0, 0],
-    6: [0, 1, 0, 0, 0, 0, 0], 7: [0, 0, 0, 1, 1, 1, 1],
-    8: [0, 0, 0, 0, 0, 0, 0], 9: [0, 0, 0, 0, 1, 0, 0]
-}
+led_red = Pin(9, Pin.OUT)
+led_green = Pin(8, Pin.OUT)
 
+capteur_bas_index = 0
+capteur_haut_index = 1
 
-limite = int(input("Quelle est la limite de personnes (<99) ? : "))
-compteur = 0
-dernier_bouton = None  
-sequence_complete = False  
+count = 0
+MAX_PEOPLE = 5
 
+# États de détection
+etat = 0  # 0: rien, 1: capteur bas d'abord, 2: capteur haut d'abord
+last_trigger_time = 0
+detection_timeout = 1000  # 1 seconde max entre deux déclenchements
 
-def afficher_chiffre(segments, chiffre):
-    chiffre = min(max(chiffre, 0), 9)  
-    for i in range(7):
-        segments[i].value(chiffres[chiffre][i])
+def set_digit(value):
+    if 0 <= value <= 9:
+        bits = bcd_digits[value]
+    else:
+        bits = [0, 0, 0, 0]  # Sécurité si hors plage
 
+    # Envoi dans l’ordre D3 → D0 vers GPIO7 → GPIO2
+    for pin, bit in zip(decode_data_pins[::-1], bits):
+        pin.value(bit)
 
-def mettre_a_jour_affichage():
-    afficher_chiffre(segments1, compteur % 10)
-    afficher_chiffre(segments2, (compteur // 10) % 10)
-    led_rouge.value(1 if compteur > limite else 0)
-    led_verte.value(0 if compteur > limite else 1)
-    print(f"Compteur: {compteur}")
+def update_display(value):
+    tens = value // 10
+    ones = value % 10
 
-def gerer_boutons():
-    global compteur, dernier_bouton, sequence_complete
+    # Afficheur droit = unité
+    enable_left.value(1)  # désactive gauche
+    enable_right.value(0)  # active droit
+    set_digit(ones)
+    time.sleep(0.004)
 
-    if bouton1.value() == 0 and dernier_bouton is None: 
-        sleep(0.005)  
-        if bouton1.value() == 0:
-            dernier_bouton = "B1"
-            print("Bouton 1 pressé, en attente du bouton 2...")
+    # Afficheur gauche = dizaine
+    enable_right.value(1)  # désactive droit
+    enable_left.value(0)  # active gauche
+    set_digit(tens)
+    time.sleep(0.004)
 
-    if bouton2.value() == 0 and dernier_bouton is None:
-        sleep(0.005)
-        if bouton2.value() == 0:
-            dernier_bouton = "B2"
-            print("Bouton 2 pressé, en attente du bouton 1...")
+    # Éteint tous pour éviter ghosting
+    enable_left.value(1)
+    enable_right.value(1)
 
-    if dernier_bouton == "B1" and bouton2.value() == 0:
-        sleep(0.005)
-        if bouton2.value() == 0:
-            compteur += 1
-            sequence_complete = True
-            print("Séquence validée : +1")
+def update_led():
+    if count > MAX_PEOPLE:
+        blink = (time.ticks_ms() % 1000) < 500
+        led_red.value(1 if blink else 0)
+        led_green.value(0)
+    else:
+        led_red.value(0)
+        led_green.value(1)
 
-    elif dernier_bouton == "B2" and bouton1.value() == 0:
-        sleep(0.005)
-        if bouton1.value() == 0:
-            compteur = max(0, compteur - 1)
-            sequence_complete = True
-            print("Séquence validée : -1")
+def check_uart_commands():
+    global MAX_PEOPLE
+    if uart.any():
+        command = uart.readline().decode('utf-8').strip()
+        if command.startswith("SET_LIMIT:"):
+            try:
+                new_limit = int(command.split(":")[1])
+                if new_limit > 0:
+                    MAX_PEOPLE = new_limit
+                    uart.write(f"LIMIT_UPDATED:{MAX_PEOPLE}\n".encode())
+                else:
+                    uart.write("ERROR:Limite doit être positive\n".encode())
+            except:
+                uart.write("ERROR:Format invalide\n".encode())
 
-    if sequence_complete:
-        while bouton1.value() == 0 or bouton2.value() == 0:
-            sleep(0.005)  
-        mettre_a_jour_affichage()
-        dernier_bouton = None
-        sequence_complete = False
-        print("Prêt pour une nouvelle séquence")
+print("Démarrage du système...")
+uart.write("SYSTEM_READY\n".encode())
 
-print("Prêt pour une nouvelle séquence")
 while True:
-    gerer_boutons()
-    sleep(0.1)
+    check_uart_commands()
+    update_display(count)
+    update_led()
+
+    val_bas = ads.read_single_ended(capteur_bas_index)
+    val_haut = ads.read_single_ended(capteur_haut_index)
+    now = time.ticks_ms()
+
+    print("Bas =", val_bas, " | Haut =", val_haut)  # Affichage continu
+
+    # Transition d’état
+    if etat == 0:
+        if val_bas > THRESHOLD:
+            etat = 1
+            last_trigger_time = now
+            print("Capteur bas déclenché en premier")
+        elif val_haut > THRESHOLD:
+            etat = 2
+            last_trigger_time = now
+            print("Capteur haut déclenché en premier")
+
+    elif etat == 1:  # bas a été déclenché en premier
+        if val_haut > THRESHOLD:
+            count += 1
+            print("Entrée détectée → Nombre de personnes :", count)
+            etat = 0
+            time.sleep(1)
+
+    elif etat == 2:  # haut a été déclenché en premier
+        if val_bas > THRESHOLD:
+            count = max(0, count - 1)
+            print("Sortie détectée → Nombre de personnes :", count)
+            etat = 0
+            time.sleep(1)
+
+    # Réinitialisation si trop de délai
+    if etat != 0 and time.ticks_diff(now, last_trigger_time) > detection_timeout:
+        print("Délai dépassé sans deuxième capteur → Reset état")
+        etat = 0
+
+    time.sleep(0.001)

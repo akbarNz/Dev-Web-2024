@@ -55,5 +55,14 @@
             "last 1 firefox version",
             "last 1 safari version"
         ]
+    },
+    "jest": {
+        "transformIgnorePatterns": [
+            "node_modules/(?!(axios|multi-range-slider-react|react-phone-number-input)/.*)"
+        ],
+        "moduleNameMapper": {
+            "^.+\\.(css|less|scss)$": "identity-obj-proxy",
+            "^@base-ui-components/react/dialog$": "<rootDir>/src/__mocks__/dialog.js"
+        }
     }
 }

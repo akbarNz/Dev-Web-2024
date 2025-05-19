@@ -1,8 +1,9 @@
+require('dotenv').config();
 const { initializeApp } = require("firebase/app");
 const { getFirestore } = require("firebase/firestore");
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDtwceY5HXb142zc5WV9diW6rHZ32zNtck",
+  apiKey: process.env.FIREBASE_API_KEY,
   authDomain: "dev-elec-projet.firebaseapp.com",
   projectId: "dev-elec-projet",
   storageBucket: "dev-elec-projet.appspot.com",

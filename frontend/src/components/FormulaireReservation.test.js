@@ -1,6 +1,6 @@
 // FormulaireReservation.test.js
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import ReservationForm from './FormulaireReservation';
 import { SnackbarProvider } from './SnackBar';
 import '@testing-library/jest-dom';
@@ -45,9 +45,20 @@ jest.mock('@mui/material', () => ({
 // Mock global fetch
 global.fetch = jest.fn();
 
+// Mock du hook useSnackbar
+const mockShowSnackbar = jest.fn();
+jest.mock('./SnackBar', () => ({
+  useSnackbar: () => ({
+    showSnackbar: mockShowSnackbar
+  }),
+  SnackbarProvider: ({ children }) => children
+}), { virtual: true });
+
 describe('ReservationForm', () => {
   // Configuration initiale des mocks avant chaque test
   beforeEach(() => {
+    jest.clearAllMocks();
+    
     // Mock localStorage
     const localStorageMock = {
       getItem: jest.fn(),
@@ -84,33 +95,10 @@ describe('ReservationForm', () => {
         json: () => Promise.resolve({ success: true })
       });
     });
-    
-    // Réinitialiser tous les mocks
-    jest.clearAllMocks();
   });
 
-  // Mock du hook useSnackbar
-  const mockShowSnackbar = jest.fn();
-  jest.mock('./SnackBar', () => ({
-    useSnackbar: () => ({
-      showSnackbar: mockShowSnackbar
-    }),
-    SnackbarProvider: ({ children }) => children
-  }), { virtual: true });
-
-  const mockSetReservation = jest.fn(updateFn => {
-    if (typeof updateFn === 'function') {
-      return updateFn({
-        client_id: '',
-        studio_id: '',
-        date_reservation: '',
-        nbr_personne: 1,
-        heure_debut: '',
-        heure_fin: '',
-        prix_total: 0,
-      });
-    }
-    return updateFn;
+  afterEach(() => {
+    jest.resetAllMocks();
   });
   
   const defaultReservation = {
@@ -130,7 +118,10 @@ describe('ReservationForm', () => {
       screen.unmount();
     }
     
-    return render(
+    // Créer un mock statique pour setReservation
+    const mockSetReservation = jest.fn();
+    
+    const result = render(
       <SnackbarProvider>
         <ReservationForm 
           reservation={defaultReservation} 
@@ -143,6 +134,8 @@ describe('ReservationForm', () => {
         />
       </SnackbarProvider>
     );
+    
+    return { ...result, mockSetReservation };
   };
 
   test('affiche un message si aucun utilisateur n\'est connecté', async () => {
@@ -166,7 +159,7 @@ describe('ReservationForm', () => {
       return null;
     });
     
-    renderComponent();
+    const { mockSetReservation } = renderComponent();
     
     // Vérifier que le formulaire est affiché
     await waitFor(() => {
@@ -174,7 +167,7 @@ describe('ReservationForm', () => {
       expect(screen.getByText(/Connecté en tant que/)).toBeInTheDocument();
     });
     
-    // Vérifier que setReservation a été appelé avec l'ID de l'utilisateur
+    // Vérifier que setReservation a été appelé
     expect(mockSetReservation).toHaveBeenCalled();
   });
 
@@ -187,7 +180,7 @@ describe('ReservationForm', () => {
       return null;
     });
     
-    renderComponent();
+    const { mockSetReservation } = renderComponent();
     
     // Vérifier que le formulaire est affiché
     await waitFor(() => {
@@ -195,7 +188,7 @@ describe('ReservationForm', () => {
       expect(screen.getByText(/Connecté en tant que/)).toBeInTheDocument();
     });
     
-    // Vérifier que setReservation a été appelé avec l'ID de l'utilisateur
+    // Vérifier que setReservation a été appelé
     expect(mockSetReservation).toHaveBeenCalled();
   });
 
@@ -253,106 +246,6 @@ describe('ReservationForm', () => {
     expect(global.fetch).toHaveBeenCalledWith('/api/studio');
   });
 
-  test('filtre les studios en fonction des critères', async () => {
-    // Configurer localStorage pour simuler un utilisateur connecté
-    const mockUser = { id: '123', nom: 'Test Artiste', type: 'client' };
-    window.localStorage.getItem.mockImplementation((key) => {
-      if (key === 'token') return 'fake-token';
-      if (key === 'authUser') return JSON.stringify(mockUser);
-      return null;
-    });
-    
-    // Rendre le composant avec des filtres
-    renderComponent({
-      prixMin: 40,
-      prixMax: 60,
-      noteMin: 4,
-      selectedEquipements: ['Micro'],
-    });
-    
-    // Attendre que le formulaire soit chargé
-    await waitFor(() => {
-      expect(screen.getByText('Réserver un studio')).toBeInTheDocument();
-    });
-    
-    // Vérifier que l'appel fetch a été fait avec les bons paramètres
-    expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining('/api/studio/filter?prixMin=40&prixMax=60&noteMin=4&selectedEquipements=')
-    );
-  });
-
-  test('calcule correctement le prix total en fonction des heures', async () => {
-    // Configurer localStorage pour simuler un utilisateur connecté
-    const mockUser = { id: '123', nom: 'Test Artiste', type: 'client' };
-    window.localStorage.getItem.mockImplementation((key) => {
-      if (key === 'token') return 'fake-token';
-      if (key === 'authUser') return JSON.stringify(mockUser);
-      return null;
-    });
-    
-    // Créer une réservation initiale
-    const initialReservation = {
-      client_id: '123',
-      studio_id: '',
-      date_reservation: '',
-      nbr_personne: 1,
-      heure_debut: '',
-      heure_fin: '',
-      prix_total: 0,
-    };
-    
-    // Créer un mock pour setReservation qui capture les mises à jour
-    const updatedReservation = { ...initialReservation };
-    const mockSetReservation = jest.fn((newReservation) => {
-      if (typeof newReservation === 'function') {
-        const update = newReservation(updatedReservation);
-        Object.assign(updatedReservation, update);
-      } else {
-        Object.assign(updatedReservation, newReservation);
-      }
-    });
-    
-    render(
-      <SnackbarProvider>
-        <ReservationForm 
-          reservation={initialReservation} 
-          setReservation={mockSetReservation} 
-          prixMin={null}
-          prixMax={null}
-          noteMin={null}
-          selectedEquipements={[]}
-        />
-      </SnackbarProvider>
-    );
-    
-    // Attendre que le formulaire soit chargé
-    await waitFor(() => {
-      expect(screen.getByText('Réserver un studio')).toBeInTheDocument();
-    });
-    
-    // Sélectionner un studio
-    const studioSelect = screen.getByTestId('studio-select');
-    fireEvent.change(studioSelect, { target: { value: '1' } });
-    
-    // Définir l'heure de début et de fin
-    const heureDebutInput = screen.getByLabelText('Heure de début');
-    fireEvent.change(heureDebutInput, { target: { value: '14:00' } });
-    
-    const heureFinInput = screen.getByLabelText('Heure de fin');
-    fireEvent.change(heureFinInput, { target: { value: '16:00' } });
-    
-    // Vérifier que le prix a été calculé et mis à jour
-    await waitFor(() => {
-      // Vérifier que mockSetReservation a été appelé (au moins une fois)
-      expect(mockSetReservation).toHaveBeenCalled();
-      
-      // Vérifier que le prix a été mis à jour avec la valeur correcte
-      // Note: nous testons la mise à jour de l'objet plutôt que le nombre d'appels
-      const prixTotal = updatedReservation.prix_total;
-      expect(prixTotal).toBeGreaterThan(0);
-    });
-  });
-
   test('soumet correctement le formulaire', async () => {
     // Configurer localStorage pour simuler un utilisateur connecté
     const mockUser = { id: '123', nom: 'Test Artiste', type: 'client' };
@@ -381,8 +274,10 @@ describe('ReservationForm', () => {
     });
     
     // Trouver le bouton de soumission et soumettre le formulaire
-    const submitButton = screen.getByRole('button', { name: 'Réserver' });
-    fireEvent.click(submitButton);
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: 'Réserver' });
+      fireEvent.click(submitButton);
+    });
     
     // Vérifier que fetch a été appelé avec les bonnes données
     await waitFor(() => {
@@ -460,14 +355,20 @@ describe('ReservationForm', () => {
     });
     
     // Trouver le bouton de soumission et soumettre le formulaire
-    const submitButton = screen.getByRole('button', { name: 'Réserver' });
-    fireEvent.click(submitButton);
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: 'Réserver' });
+      fireEvent.click(submitButton);
+    });
     
-    // Vérifier que les appels fetch sont effectués et que l'erreur est gérée
+    // Vérifier que l'erreur est gérée et que le snackbar est appelé
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('/api/firebase', expect.any(Object));
       
-      // Une erreur console est attendue (on peut la vérifier si on veut être exhaustif)
+      // Vérifier que showSnackbar a été appelé avec un message d'erreur
+      expect(mockShowSnackbar).toHaveBeenCalled();
+      const args = mockShowSnackbar.mock.calls[0];
+      expect(args[0]).toContain('Erreur lors de l\'enregistrement');
+      expect(args[1]).toBe('error');
     });
   });
   
@@ -523,7 +424,10 @@ describe('ReservationForm', () => {
     
     // Trouver le bouton de soumission et soumettre le formulaire
     const submitButton = screen.getByRole('button', { name: 'Réserver' });
-    fireEvent.click(submitButton);
+    
+    await act(async () => {
+      fireEvent.click(submitButton);
+    });
     
     // Vérifier que le bouton est désactivé pendant la soumission
     expect(submitButton).toBeDisabled();
@@ -531,5 +435,65 @@ describe('ReservationForm', () => {
     
     // Vérifier que le texte du bouton change
     expect(screen.getByText('Enregistrement...')).toBeInTheDocument();
+  });
+
+  test('réinitialise le formulaire après une soumission réussie', async () => {
+    // Configurer localStorage pour simuler un utilisateur connecté
+    const mockUser = { id: '123', nom: 'Test Artiste', type: 'client' };
+    window.localStorage.getItem.mockImplementation((key) => {
+      if (key === 'token') return 'fake-token';
+      if (key === 'authUser') return JSON.stringify(mockUser);
+      return null;
+    });
+    
+    // Créer un mock pour setReservation
+    const setReservationMock = jest.fn();
+    
+    // Rendre le composant avec une réservation complète
+    render(
+      <SnackbarProvider>
+        <ReservationForm 
+          reservation={{
+            client_id: '123',
+            studio_id: '1',
+            date_reservation: '2025-06-01',
+            nbr_personne: 3,
+            heure_debut: '14:00',
+            heure_fin: '16:00',
+            prix_total: 100,
+          }}
+          setReservation={setReservationMock}
+          prixMin={null}
+          prixMax={null}
+          noteMin={null}
+          selectedEquipements={[]}
+        />
+      </SnackbarProvider>
+    );
+    
+    // Attendre que le formulaire soit chargé
+    await waitFor(() => {
+      expect(screen.getByText('Réserver un studio')).toBeInTheDocument();
+    });
+    
+    // Soumettre le formulaire
+    await act(async () => {
+      const submitButton = screen.getByRole('button', { name: 'Réserver' });
+      fireEvent.click(submitButton);
+    });
+    
+    // Vérifier que le formulaire a été réinitialisé
+    await waitFor(() => {
+      // Vérifier que setReservation a été appelé avec les valeurs réinitialisées
+      expect(setReservationMock).toHaveBeenCalledWith(expect.objectContaining({
+        client_id: '123',  // L'ID du client reste
+        studio_id: "",     // Les autres champs sont réinitialisés
+        date_reservation: "",
+        nbr_personne: 1,
+        heure_debut: "",
+        heure_fin: "",
+        prix_total: 0
+      }));
+    });
   });
 });

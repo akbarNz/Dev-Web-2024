@@ -5,123 +5,44 @@ const Favoris = ({ onBack }) => {
   const [favorisList, setFavorisList] = useState([]);
   const { showSnackbar } = useSnackbar();
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [loadingId, setLoadingId] = useState(null);
+
+
 
   useEffect(() => {
-    // Vérifier si l'utilisateur est authentifié
-    const token = localStorage.getItem('token');
-    const authUser = localStorage.getItem('authUser');
-    
-    if (token && authUser) {
-      const user = JSON.parse(authUser);
-      setCurrentUser(user);
-      fetchFavoris(user.id, token);
-    } else {
-      // Mode legacy si pas d'authentification
-      const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
-      if (userFromStorage) {
-        setCurrentUser(userFromStorage);
-        fetchFavoris(userFromStorage.id);
-      }
-    }
-
-    const handleAuthChange = () => {
-      const token = localStorage.getItem('token');
-      const authUser = localStorage.getItem('authUser');
-      
-      if (token && authUser) {
-        const user = JSON.parse(authUser);
-        setCurrentUser(user);
-        fetchFavoris(user.id, token);
-      } else {
-        setCurrentUser(null);
-        setFavorisList([]);
-      }
-    };
-
-    // Support du mode legacy
-    const handleUserChange = (event) => {
-      const newUser = event.detail;
-      setCurrentUser(newUser);
-      fetchFavoris(newUser.id);
-    };
-
-    window.addEventListener('authChanged', handleAuthChange);
-    window.addEventListener('userChanged', handleUserChange);
-
-    return () => {
-      window.removeEventListener('authChanged', handleAuthChange);
-      window.removeEventListener('userChanged', handleUserChange);
-    };
-  }, []);
-
-  const fetchFavoris = async (userId, token = null) => {
-    setLoading(true);
+  const fetchFavoris = async (userId) => {
     try {
-      let response;
-      
-      if (token) {
-        // Utiliser le nouvel endpoint avec authentification
-        response = await fetch(`/api/favoris/user/${userId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-      } else {
-        // Utiliser l'ancien endpoint
-        response = await fetch(`/api/favoris?client=${userId}`);
-      }
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la récupération des favoris");
-      }
-      
+      const response = await fetch(`/api/favoris?client=${userId}`);
       const data = await response.json();
       console.log("Favoris récupérés :", data);
       setFavorisList(data);
     } catch (err) {
       console.error("Erreur lors du fetch des favoris :", err);
-      setError("Erreur lors de la récupération des favoris. Veuillez réessayer.");
-    } finally {
-      setLoading(false);
+      showSnackbar('Erreur lors du chargement des favoris.', 'error');
     }
   };
 
-  if (loading) {
-    return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <h2>Mes Studios Favoris</h2>
-        <p>Chargement de vos favoris...</p>
-      </div>
-    );
-  }
+  const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+    if (userFromStorage) {
+      setCurrentUser(userFromStorage);
+      fetchFavoris(userFromStorage.id);
+    } else {
+      showSnackbar("Utilisateur non identifié.", "error");
+    }
 
-  if (error) {
-    return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <h2>Mes Studios Favoris</h2>
-        <p style={{ color: "#e53935" }}>{error}</p>
-        <button
-          id="backbutton"
-          type="button"
-          className="register-btn"
-          style={{
-            marginTop: "20px",
-            padding: "10px 20px",
-            backgroundColor: "#ff5722",
-            color: "#fff",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-          }}
-          onClick={onBack}
-        >
-          Retour
-        </button>
-      </div>
-    );
-  }
+
+  const handleUserChange = (event) => {
+    const newUser = event.detail;
+    setCurrentUser(newUser);
+    fetchFavoris(newUser.id);
+  };
+
+  window.addEventListener('userChanged', handleUserChange);
+
+  return () => {
+    window.removeEventListener('userChanged', handleUserChange);
+  };
+}, []);
 
   return (
     <div style={{ padding: "20px", textAlign: "center" }}>
@@ -143,67 +64,64 @@ const Favoris = ({ onBack }) => {
             </tr>
           </thead>
           <tbody>
-            {favorisList.map((studio) => {
-              // Adapter au format de l'objet selon l'API utilisée
-              const studioId = studio.studio_id || studio.studio?.id;
-              const nom = studio.nom || studio.studio?.nom;
-              const adresse = studio.adresse || studio.studio?.adresse;
-              
-              return (
-                <tr key={studioId}>
-                  <td style={tdStyle}>{nom}</td>
-                  <td style={tdStyle}>{adresse}</td>
-                  <td style={tdStyle}>
-                    <button
+            {favorisList.map((studio) => (
+              <tr key={studio.studio_id}>
+                <td style={tdStyle}>{studio.nom}</td>
+                <td style={tdStyle}>{studio.adresse}</td>
+                <td style={tdStyle}>
+                  <button
+                      data-testid={`retirer-${studio.studio_id}`}
                       style={{
                         padding: "6px 12px",
                         backgroundColor: "#e53935",
                         color: "#fff",
                         border: "none",
                         borderRadius: "4px",
-                        cursor: "pointer",
+                        cursor: loadingId === studio.studio_id ? "not-allowed" : "pointer",
+                        opacity: loadingId === studio.studio_id ? 0.6 : 1,
                       }}
-                      onClick={() =>
-                        retirerFavori(
-                          currentUser?.id,
-                          studioId,
-                          showSnackbar,
-                          () => {
-                            setFavorisList((prev) =>
-                              prev.filter((s) => 
-                                (s.studio_id || s.studio?.id) !== studioId
-                              )
-                            );
-                          }
-                        )
-                      }
-                    >
-                      Retirer
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
+                      disabled={loadingId === studio.studio_id}
+                      onClick={async () => {
+                        setLoadingId(studio.studio_id);
+                        await retirerFavori(
+                            currentUser?.id,
+                            studio.studio_id,
+                            showSnackbar,
+                            () => {
+                              setFavorisList((prev) =>
+                                  prev.filter((s) => s.studio_id !== studio.studio_id)
+                              );
+                            }
+                        );
+                        setLoadingId(null);
+                      }}
+                  >
+                    Retirer
+                  </button>
+
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       ) : (
-        <p>Aucun favori pour l'instant.</p>
+          <p>Aucun favori pour l'instant.</p>
       )}
 
       <button
-        id="backbutton"
-        type="button"
-        className="register-btn"
-        style={{
-          marginTop: "20px",
-          padding: "10px 20px",
-          backgroundColor: "#ff5722",
-          color: "#fff",
-          border: "none",
-          borderRadius: "5px",
-          cursor: "pointer",
-        }}
-        onClick={onBack}
+          id="backbutton"
+          type="button"
+          className="register-btn"
+          style={{
+            marginTop: "20px",
+            padding: "10px 20px",
+            backgroundColor: "#ff5722",
+            color: "#fff",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+          onClick={onBack}
       >
         Retour
       </button>
@@ -211,57 +129,40 @@ const Favoris = ({ onBack }) => {
   );
 };
 
-// Ajuster la fonction ajouterAuxFavoris pour utiliser l'authentification JWT si disponible
 const ajouterAuxFavoris = async (clientId, studioId, showSnackbar) => {
   try {
-    const token = localStorage.getItem('token');
-    const headers = {
-      "Content-Type": "application/json"
-    };
-    
-    // Ajouter le token d'authentification s'il existe
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-    
     const response = await fetch(`/api/favoris`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({ client_id: clientId, studio_id: studioId })
-    });
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ client_id: clientId, studio_id: studioId })
+      });
 
-    const text = await response.text();
+      const text = await response.text();
 
-    if (response.status === 409) {
-      showSnackbar("Ce studio est déjà dans vos favoris.", "warning");
-      return;
+      if (response.status === 409) {
+        showSnackbar("Ce studio est déjà dans vos favoris.", "warning");
+        return;
+      }
+
+      if (!response.ok) throw new Error("Erreur API");
+
+      showSnackbar("Favori ajouté !", "success");
+    } catch (err) {
+      console.error("Erreur lors de l'ajout aux favoris :", err);
+      showSnackbar("Erreur lors de l'ajout du favori.", "error");
     }
+  };
 
-    if (!response.ok) throw new Error("Erreur API");
 
-    showSnackbar("Favori ajouté !", "success");
-  } catch (err) {
-    console.error("Erreur lors de l'ajout aux favoris :", err);
-    showSnackbar("Erreur lors de l'ajout du favori.", "error");
-  }
-};
-
-// Ajuster la fonction retirerFavori pour utiliser l'authentification JWT si disponible
 export async function retirerFavori(clientId, studioId, showSnackbar, onSuccess) {
   try {
-    const token = localStorage.getItem('token');
-    const headers = {
-      "Content-Type": "application/json"
-    };
-    
-    // Ajouter le token d'authentification s'il existe
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
-    
     const response = await fetch(`/api/favoris`, {
       method: "DELETE",
-      headers,
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({
         client_id: clientId,
         studio_id: studioId

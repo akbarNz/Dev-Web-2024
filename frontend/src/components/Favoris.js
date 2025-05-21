@@ -6,11 +6,51 @@ const Favoris = ({ onBack }) => {
   const { showSnackbar } = useSnackbar();
   const [currentUser, setCurrentUser] = useState(null);
   const [loadingId, setLoadingId] = useState(null);
-
-
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-  const fetchFavoris = async (userId) => {
+    // Vérifier si l'utilisateur est authentifié
+    const token = localStorage.getItem('token');
+    const authUser = localStorage.getItem('authUser');
+    
+    if (token && authUser) {
+      const user = JSON.parse(authUser);
+      setUserId(user.id);
+    } else {
+      // Utiliser le mode "legacy" si pas d'authentification
+      const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+      if (userFromStorage) {
+        setUserId(userFromStorage.id);
+      }
+    }
+
+    const handleAuthChange = () => {
+      const token = localStorage.getItem('token');
+      const authUser = localStorage.getItem('authUser');
+      
+      if (token && authUser) {
+        const user = JSON.parse(authUser);
+        setUserId(user.id);
+      }
+    };
+
+    // Support du mode legacy
+    const handleUserChange = (event) => {
+      const newUser = event.detail;
+      setUserId(newUser.id);
+    };
+
+    window.addEventListener('authChanged', handleAuthChange);
+    window.addEventListener('userChanged', handleUserChange);
+
+    return () => {
+      window.removeEventListener('authChanged', handleAuthChange);
+      window.removeEventListener('userChanged', handleUserChange);
+    };
+  }, [userId]);
+
+  useEffect(() => {
+  const fetchFavoris = async () => {
     try {
       const response = await fetch(`/api/favoris?client=${userId}`);
       const data = await response.json();
@@ -42,7 +82,7 @@ const Favoris = ({ onBack }) => {
   return () => {
     window.removeEventListener('userChanged', handleUserChange);
   };
-}, []);
+}, [userId]);
 
   return (
     <div style={{ padding: "20px", textAlign: "center" }}>

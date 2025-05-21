@@ -40,10 +40,19 @@ const Register = ({ onClose }) => {
     try {
       setError('');
       setLoading(true);
+
+      // Convertir les numéros belges commençant par 0 en 32...
+    let numero = formData.numero_telephone.trim();
+    if (/^0\d{8,9}$/.test(numero)) {
+      numero = '32' + numero.slice(1);
+    }
       
       // Supprimer la confirmation du mot de passe des données envoyées
       const { confirmation_mot_de_passe, ...userData } = formData;
       
+      // Remplacer le num par la valeur DB
+      userData.numero_telephone = numero;
+
       const endpoint = userType === 'client' 
         ? '/api/auth/register/client' 
         : '/api/auth/register/proprio';

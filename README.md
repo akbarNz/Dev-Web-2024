@@ -15,7 +15,7 @@ Vous ouvrer une exécuteur de commandes sql et vous y copier et coller les ligne
 
 Une fois le projet télécharger et la base de donnée initialisée. Vous ouvrez votre IDE et vous vous rendez dans le dossier /backend. Une fois dedans, vous y télécharger les dépendances : 
 
-`npm install` et `npm install firebase`
+`npm install` et `npm install firebase` et `npm install cloudinary`
 
 Puis aller dans le dossier /fontend. Une fois dedans, vous y télécharger les dépendances :
 

@@ -118,7 +118,6 @@ const App = () => {
       {showHistorique && (
         <Historique
           onBack={() => setShowHistorique(false)}
-          artisteId={4}
           ajouterAuFavoris={ajouterAuFavoris}
         />
       )}

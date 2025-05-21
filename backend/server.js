@@ -20,6 +20,9 @@ app.use('/api/favoris', require('./routes/favoris'));
 app.use('/api/avis', require('./routes/avis'));
 app.use('/api/villes', require('./routes/studio'));
 
+// Cloudinary
+app.use('/api/cloudinary', require('./routes/cloudinary'));
+
 app.get('/', async (req, res) => {res.json(['ok'])});
 
 const PORT = 5001;

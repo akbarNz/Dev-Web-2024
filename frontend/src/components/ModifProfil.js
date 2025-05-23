@@ -20,6 +20,7 @@ const ModifProfil = ({ onBack }) => {
   const [localImage, setLocalImage] = useState(null); // photo locale
   const [fileToUpload, setFileToUpload] = useState(null); // Fichier sélectionné
   const [currentUser, setCurrentUser] = useState(null);
+  const [userId, setUserId] = useState(null); // Ajout de userId comme dans Favoris/Historique
   const { showSnackbar } = useSnackbar();
 
   // Fonction pour déterminer si l'utilisateur est un artiste ou un propriétaire
@@ -36,18 +37,32 @@ const ModifProfil = ({ onBack }) => {
     return 'artiste';
   };
 
-  // Fonction pour charger les données de l'utilisateur (méthode legacy)
-  const fetchUserDataLegacy = async (user) => {
-    if (!user) return;
+  // Fonction pour charger les données de l'utilisateur
+  const fetchUserData = async (user) => {
+    if (!user || !user.id) return;
     
     try {
       // Fetch les données selon le type d'utilisateur
       const userType = getUserType(user);
+      
+      // Utiliser systématiquement l'ID spécifique comme dans Favoris.js et Historique.js
       const url = userType === 'artiste' 
         ? `/api/clients/info?id=${user.id}`
         : `/api/proprietaires/info?id=${user.id}`;
       
-      const response = await fetch(url);
+      // Ajouter le token si disponible, mais utiliser toujours la route avec ID
+      const token = localStorage.getItem('token');
+      let response;
+      
+      if (token) {
+        response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+      } else {
+        response = await fetch(url);
+      }
       
       if (!response.ok) {
         throw new Error('Erreur lors de la récupération des données du profil');
@@ -61,7 +76,6 @@ const ModifProfil = ({ onBack }) => {
         type: userType
       });
       setPublicId(data.photo_url);
-      setCurrentUser(user);
       
       // Réinitialiser l'image locale et le fichier à télécharger
       setLocalImage(null);
@@ -72,76 +86,25 @@ const ModifProfil = ({ onBack }) => {
     }
   };
 
-  // Fonction pour charger les données de l'utilisateur (méthode JWT)
-  const fetchUserDataJWT = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-      
-      const authUser = JSON.parse(localStorage.getItem('authUser'));
-      if (!authUser) return;
-      
-      // Déterminer le type d'utilisateur et l'URL
-      const userType = getUserType(authUser);
-      const url = userType === 'artiste' 
-        ? `/api/clients/me` 
-        : `/api/proprietaires/me`;
-      
-      const response = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des données du profil');
-      }
-      
-      const data = await response.json();
-      
-      setProfil({ 
-        ...data, 
-        numero_telephone: data.numero_telephone.startsWith('+') ? data.numero_telephone : `+${data.numero_telephone}`,
-        type: userType
-      });
-      setPublicId(data.photo_url);
-      setCurrentUser(authUser);
-      
-      // Réinitialiser l'image locale et le fichier à télécharger
-      setLocalImage(null);
-      setFileToUpload(null);
-    } catch (error) {
-      console.error("Erreur lors de la récupération du profil JWT :", error);
-      // En cas d'erreur avec le système JWT, essayer avec le système legacy
-      const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
-      if (userFromStorage) {
-        fetchUserDataLegacy(userFromStorage);
-      }
-    }
-  };
-
   useEffect(() => {
     // Vérifier si l'utilisateur est authentifié avec JWT
     const token = localStorage.getItem('token');
     const authUser = localStorage.getItem('authUser');
     
     if (token && authUser) {
-      fetchUserDataJWT();
+      const user = JSON.parse(authUser);
+      setUserId(user.id);
+      setCurrentUser(user);
+      fetchUserData(user);
     } else {
       // Mode legacy si pas d'authentification JWT
       const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
       if (userFromStorage) {
+        setUserId(userFromStorage.id);
         setCurrentUser(userFromStorage);
-        fetchUserDataLegacy(userFromStorage);
+        fetchUserData(userFromStorage);
       }
     }
-    
-    // Écouter les changements d'utilisateur (legacy)
-    const handleUserChange = (event) => {
-      const newUser = event.detail;
-      setCurrentUser(newUser);
-      fetchUserDataLegacy(newUser);
-    };
     
     // Écouter les changements d'authentification (JWT)
     const handleAuthChange = () => {
@@ -149,7 +112,10 @@ const ModifProfil = ({ onBack }) => {
       const authUser = localStorage.getItem('authUser');
       
       if (token && authUser) {
-        fetchUserDataJWT();
+        const user = JSON.parse(authUser);
+        setUserId(user.id);
+        setCurrentUser(user);
+        fetchUserData(user);
       } else {
         // Vider le profil si l'utilisateur est déconnecté
         setProfil({
@@ -162,16 +128,25 @@ const ModifProfil = ({ onBack }) => {
         });
         setPublicId("");
         setCurrentUser(null);
+        setUserId(null);
       }
     };
     
-    window.addEventListener('userChanged', handleUserChange);
+    // Écouter les changements d'utilisateur (legacy)
+    const handleUserChange = (event) => {
+      const newUser = event.detail;
+      setUserId(newUser.id);
+      setCurrentUser(newUser);
+      fetchUserData(newUser);
+    };
+    
     window.addEventListener('authChanged', handleAuthChange);
+    window.addEventListener('userChanged', handleUserChange);
     
     // Nettoyage
     return () => {
-      window.removeEventListener('userChanged', handleUserChange);
       window.removeEventListener('authChanged', handleAuthChange);
+      window.removeEventListener('userChanged', handleUserChange);
     };
   }, []);
 
@@ -236,18 +211,17 @@ const ModifProfil = ({ onBack }) => {
     try {
       // Vérifier si l'utilisateur est authentifié avec JWT
       const token = localStorage.getItem('token');
-      const authUser = localStorage.getItem('authUser');
       
       let response;
       
-      if (token && authUser) {
-        // Utiliser les nouvelles routes protégées par JWT
+      if (token) {
+        // Utiliser les routes existantes avec JWT
         const url = profil.type === 'artiste' 
-          ? `/api/clients/${profil.id}`
-          : `/api/proprietaires/${profil.id}`;
+          ? `/api/clients/save`
+          : `/api/proprietaires/save`;
         
         response = await fetch(url, {
-          method: "PUT",
+          method: "PUT", // <-- Correction ici
           headers: { 
             "Content-Type": "application/json",
             "Authorization": `Bearer ${token}`
@@ -261,7 +235,7 @@ const ModifProfil = ({ onBack }) => {
           : `/api/proprietaires/save`;
         
         response = await fetch(url, {
-          method: "POST",
+          method: "PUT", // <-- Correction ici aussi
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedProfil),
         });
@@ -283,6 +257,8 @@ const ModifProfil = ({ onBack }) => {
       setFileToUpload(null);
       
       // Mettre à jour les données selon le mode d'authentification
+      const authUser = localStorage.getItem('authUser');
+      
       if (token && authUser) {
         // Mise à jour des données JWT
         const updatedAuthUser = {
@@ -318,7 +294,7 @@ const ModifProfil = ({ onBack }) => {
   const img = cld.image(publicId);
 
   // Si aucun profil n'est chargé, afficher un message de chargement
-  if (!profil.id) {
+  if (!userId || !profil.id) {
     return (
       <div className="profil-container">
         <div className="form-wrapper-profil">

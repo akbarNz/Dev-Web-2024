@@ -9,21 +9,20 @@ const Favoris = ({ onBack }) => {
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
-    const fetchFavoris = async (id) => {
+    const fetchFavoris = async (clientId) => {
       try {
-        const response = await fetch(`/api/favoris?client=${id}`);
-        if (!response.ok) throw new Error("Erreur réseau");
-        const data = await response.json();
-        console.log("Favoris récupérés :", data);
+        const res = await fetch(`/api/favoris?client=${clientId}`);
+        if (!res.ok) throw new Error("Erreur HTTP");
+        const data = await res.json();
         setFavorisList(data);
       } catch (err) {
         console.error("Erreur lors du fetch des favoris :", err);
-        showSnackbar('Erreur lors du chargement des favoris.', 'error');
+        showSnackbar("Erreur lors du chargement des favoris.", "error");
       }
     };
 
-    const token = localStorage.getItem('token');
-    const authUser = localStorage.getItem('authUser');
+    const token = localStorage.getItem("token");
+    const authUser = localStorage.getItem("authUser");
 
     if (token && authUser) {
       const user = JSON.parse(authUser);
@@ -31,7 +30,7 @@ const Favoris = ({ onBack }) => {
       setCurrentUser(user);
       fetchFavoris(user.id);
     } else {
-      const userFromStorage = JSON.parse(localStorage.getItem('currentUser'));
+      const userFromStorage = JSON.parse(localStorage.getItem("currentUser"));
       if (userFromStorage) {
         setUserId(userFromStorage.id);
         setCurrentUser(userFromStorage);
@@ -42,8 +41,8 @@ const Favoris = ({ onBack }) => {
     }
 
     const handleAuthChange = () => {
-      const token = localStorage.getItem('token');
-      const authUser = localStorage.getItem('authUser');
+      const token = localStorage.getItem("token");
+      const authUser = localStorage.getItem("authUser");
 
       if (token && authUser) {
         const user = JSON.parse(authUser);
@@ -60,12 +59,12 @@ const Favoris = ({ onBack }) => {
       fetchFavoris(newUser.id);
     };
 
-    window.addEventListener('authChanged', handleAuthChange);
-    window.addEventListener('userChanged', handleUserChange);
+    window.addEventListener("authChanged", handleAuthChange);
+    window.addEventListener("userChanged", handleUserChange);
 
     return () => {
-      window.removeEventListener('authChanged', handleAuthChange);
-      window.removeEventListener('userChanged', handleUserChange);
+      window.removeEventListener("authChanged", handleAuthChange);
+      window.removeEventListener("userChanged", handleUserChange);
     };
   }, []);
 
@@ -158,9 +157,9 @@ const ajouterAuxFavoris = async (clientId, studioId, showSnackbar) => {
     const response = await fetch(`/api/favoris`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ client_id: clientId, studio_id: studioId })
+      body: JSON.stringify({ client_id: clientId, studio_id: studioId }),
     });
 
     if (response.status === 409) {
@@ -180,8 +179,8 @@ const ajouterAuxFavoris = async (clientId, studioId, showSnackbar) => {
 export const retirerFavori = async (clientId, studioId, showSnackbar, onSuccess) => {
   try {
     const response = await fetch(`/api/favoris`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ client_id: clientId, studio_id: studioId }),
     });
 

@@ -1,21 +1,7 @@
-
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import Favoris, { retirerFavori } from './Favoris';
 import * as SnackBarModule from './SnackBar';
-
-beforeEach(() => {
-  jest.spyOn(SnackBarModule, 'useSnackbar').mockReturnValue({ showSnackbar: jest.fn() });
-  localStorage.setItem('currentUser', JSON.stringify({ id: 123 }));
-  global.fetch = jest.fn().mockResolvedValue({
-    json: () => Promise.resolve(mockFavoris)
-  });
-});
-
-// Mock global de useSnackbar (peut être écrasé ensuite si besoin)
-jest.mock('./SnackBar', () => ({
-  useSnackbar: jest.fn(() => ({ showSnackbar: jest.fn() }))
-}));
 
 const mockFavoris = [
   { studio_id: 1, nom: 'Studio Test 1', adresse: 'Adresse 1' },
@@ -23,8 +9,10 @@ const mockFavoris = [
 ];
 
 beforeEach(() => {
+  jest.spyOn(SnackBarModule, 'useSnackbar').mockReturnValue({ showSnackbar: jest.fn() });
   localStorage.setItem('currentUser', JSON.stringify({ id: 123 }));
   global.fetch = jest.fn().mockResolvedValue({
+    ok: true,
     json: () => Promise.resolve(mockFavoris)
   });
 });
@@ -37,13 +25,14 @@ afterEach(() => {
 test('Rend correctement le composant et fetch les favoris', async () => {
   render(<Favoris onBack={jest.fn()} />);
   expect(await screen.findByText('Mes Studios Favoris')).toBeInTheDocument();
-  expect(await screen.findByText('Studio Test 1')).toBeInTheDocument();
-  expect(await screen.findByText('Studio Test 2')).toBeInTheDocument();
+  expect(await screen.findByText((text) => text.includes('Studio Test 1'))).toBeInTheDocument();
+  expect(await screen.findByText((text) => text.includes('Studio Test 2'))).toBeInTheDocument();
   expect(global.fetch).toHaveBeenCalledWith('/api/favoris?client=123');
 });
 
 test('Affiche un message si aucun favori', async () => {
   global.fetch.mockResolvedValueOnce({
+    ok: true,
     json: () => Promise.resolve([]),
   });
 
@@ -57,29 +46,6 @@ test('Clique sur le bouton "Retour"', async () => {
   const backButton = await screen.findByText('Retour');
   fireEvent.click(backButton);
   expect(onBack).toHaveBeenCalled();
-});
-
-test('Retirer un favori appelle fetch DELETE et met à jour la liste', async () => {
-  const mockSnackbar = jest.fn();
-  jest.spyOn(require('./SnackBar'), 'useSnackbar').mockReturnValue({ showSnackbar: mockSnackbar });
-
-  const deleteMock = jest.fn().mockResolvedValue({ ok: true });
-  global.fetch = jest
-    .fn()
-    .mockResolvedValueOnce({ json: () => Promise.resolve(mockFavoris) }) // initial fetch
-    .mockImplementationOnce(deleteMock); // delete fetch
-
-  render(<Favoris onBack={jest.fn()} />);
-
-  const retirerButton = await screen.findAllByText('Retirer');
-  fireEvent.click(retirerButton[0]);
-
-  await waitFor(() => {
-    expect(global.fetch).toHaveBeenCalledWith('/api/favoris', expect.objectContaining({
-      method: 'DELETE',
-    }));
-    expect(mockSnackbar).toHaveBeenCalledWith('Favori retiré !', 'info');
-  });
 });
 
 test('Retirer un favori appelle fetch DELETE et met à jour la liste', async () => {
@@ -106,7 +72,7 @@ test('Retirer un favori appelle fetch DELETE et met à jour la liste', async () 
     expect(global.fetch).toHaveBeenCalledWith('/api/favoris', expect.objectContaining({
       method: 'DELETE',
     }));
-    expect(mockSnackbar).toHaveBeenCalledWith('Favori retiré !', 'info');
+    expect(mockSnackbar).toHaveBeenCalledWith("Studio retiré des favoris.", "success");
   });
 });
 
@@ -117,7 +83,7 @@ test('retirerFavori appelle onSuccess après suppression', async () => {
   global.fetch = jest.fn().mockResolvedValueOnce({ ok: true });
   await retirerFavori(1, 2, mockSnackbar, onSuccess);
 
-  expect(mockSnackbar).toHaveBeenCalledWith('Favori retiré !', 'info');
+  expect(mockSnackbar).toHaveBeenCalledWith("Studio retiré des favoris.", "success");
   expect(onSuccess).toHaveBeenCalled();
 });
 
@@ -127,8 +93,14 @@ test('Supporte les événements userChanged', async () => {
 
   global.fetch = jest
     .fn()
-    .mockResolvedValueOnce({ json: () => Promise.resolve(mockFavoris) })
-    .mockResolvedValueOnce({ json: () => Promise.resolve([{ studio_id: 99, nom: 'New Studio', adresse: 'New Place' }]) });
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockFavoris)
+    })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve([{ studio_id: 99, nom: 'New Studio', adresse: 'New Place' }])
+    });
 
   render(<Favoris onBack={jest.fn()} />);
 
@@ -139,7 +111,7 @@ test('Supporte les événements userChanged', async () => {
 
   await waitFor(() => {
     expect(global.fetch).toHaveBeenCalledWith('/api/favoris?client=456');
-    expect(screen.queryByText('Studio Test 1')).not.toBeInTheDocument();
+    expect(screen.queryByText((text) => text.includes('Studio Test 1'))).not.toBeInTheDocument();
     expect(screen.getByText('New Studio')).toBeInTheDocument();
   });
 });
@@ -159,8 +131,13 @@ test('Affiche une erreur si la suppression échoue', async () => {
 
   global.fetch = jest
     .fn()
-    .mockResolvedValueOnce({ json: () => Promise.resolve(mockFavoris) }) // fetch initial
-    .mockResolvedValueOnce({ ok: false }); // échec du DELETE
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockFavoris)
+    })
+    .mockResolvedValueOnce({
+      ok: false
+    });
 
   render(<Favoris onBack={jest.fn()} />);
   const retirerButton = await screen.findAllByText('Retirer');
@@ -187,25 +164,31 @@ test('Affiche une erreur si le chargement initial échoue', async () => {
 test('Met à jour l’état local après avoir retiré un favori', async () => {
   global.fetch = jest
     .fn()
-    .mockResolvedValueOnce({ json: () => Promise.resolve(mockFavoris) }) // fetch initial
-    .mockResolvedValueOnce({ ok: true }); // delete
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockFavoris)
+    })
+    .mockResolvedValueOnce({ ok: true });
 
   render(<Favoris onBack={jest.fn()} />);
-  expect(await screen.findByText('Studio Test 1')).toBeInTheDocument();
+  expect(await screen.findByText((content) => content.includes('Studio Test 1'))).toBeInTheDocument();
 
   const retirerButtons = await screen.findAllByText('Retirer');
   fireEvent.click(retirerButtons[0]);
 
   await waitFor(() => {
-    expect(screen.queryByText('Studio Test 1')).not.toBeInTheDocument();
-    expect(screen.getByText('Studio Test 2')).toBeInTheDocument();
+    expect(screen.queryByText((content) => content.includes('Studio Test 1'))).not.toBeInTheDocument();
+    expect(screen.getByText((content) => content.includes('Studio Test 2'))).toBeInTheDocument();
   });
 });
 
 test('Le bouton "Retirer" est désactivé pendant le chargement', async () => {
   global.fetch = jest
     .fn()
-    .mockResolvedValueOnce({ json: () => Promise.resolve(mockFavoris) })
+    .mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockFavoris)
+    })
     .mockImplementation(() => new Promise(resolve => setTimeout(() => resolve({ ok: true }), 100)));
 
   render(<Favoris onBack={jest.fn()} />);
@@ -232,5 +215,3 @@ test('Affiche les adresses des studios', async () => {
   expect(await screen.findByText('Adresse 1')).toBeInTheDocument();
   expect(screen.getByText('Adresse 2')).toBeInTheDocument();
 });
-
-

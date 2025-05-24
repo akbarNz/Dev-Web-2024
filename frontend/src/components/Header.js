@@ -1,3 +1,4 @@
+// frontend/src/components/Header.js
 import React, { useState, useEffect } from "react";
 
 const Header = ({ 
@@ -5,178 +6,147 @@ const Header = ({
   setShowHistorique, 
   setShowFavoris, 
   setShowEnregistrement,
-  setShowReservationForm 
+  setShowLogin,        
+  setShowRegister      
 }) => {
-  const [menuItems, setMenuItems] = useState([]);
   const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
-  const [users, setUsers] = useState({
-    artistes: [],
-    proprietaires: []
-  });
-  const [selectedUser, setSelectedUser] = useState(null);
-  
-  // Fonction pour récupérer la liste des utilisateurs
-  const fetchUsers = async () => {
-    try {
-      // Fetch artistes
-      const artistesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/clients/artistes`);
-      const artistesData = await artistesResponse.json();
-      
-      // Fetch propriétaires
-      const proprietairesResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/proprietaires/`);
-      const proprietairesData = await proprietairesResponse.json();
-      
-      setUsers({
-        artistes: artistesData,
-        proprietaires: proprietairesData
-      });
-      
-      // user par défaut
-      if (!selectedUser && artistesData.length > 0) {
-        const defaultUser = {
-          id: artistesData[0].id,
-          nom: artistesData[0].nom,
-          type: 'artiste'
-        };
-        setSelectedUser(defaultUser);
-        localStorage.setItem('currentUser', JSON.stringify(defaultUser));
-      }
-      
-      // Si un utilisateur est déjà sélectionné, mettre à jour ses informations
-      if (selectedUser) {
-        const userType = selectedUser.type;
-        const userId = selectedUser.id;
-        const userList = userType === 'artiste' ? artistesData : proprietairesData;
-        const updatedUser = userList.find(user => user.id === userId);
-        
-        if (updatedUser) {
-          const refreshedUser = {
-            id: updatedUser.id,
-            nom: updatedUser.nom,
-            type: userType
-          };
-          setSelectedUser(refreshedUser);
-          localStorage.setItem('currentUser', JSON.stringify(refreshedUser));
-        }
-      }
-    } catch (error) {
-      console.error("Erreur lors de la récupération des utilisateurs:", error);
-    }
-  };
+  const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const response = await fetch("/api/menu-items");
-        const data = await response.json();
-        setMenuItems(data);
-      } catch (error) {
-        console.error("Erreur lors de la récupération des éléments du menu:", error);
-        setMenuItems([]);
-      }
-    };
+    // Vérifier si l'utilisateur est connecté
+    const token = localStorage.getItem('token');
+    const authUser = localStorage.getItem('authUser');
     
-    fetchMenuItems();
-    fetchUsers();
-    
-    // user dans localStorage ? 
-    const storedUser = localStorage.getItem('currentUser');
-    if (storedUser) {
-      setSelectedUser(JSON.parse(storedUser));
+    if (token && authUser) {
+      setIsAuthenticated(true);
+      setCurrentUser(JSON.parse(authUser));
     }
     
-    const handleUserUpdate = (event) => {
-      if (event.detail) {
-        // Mettre à jour l'utilisateur sélectionné avec les données de l'événement
-        setSelectedUser(event.detail);
+    const handleAuthChange = () => {
+      const token = localStorage.getItem('token');
+      const authUser = localStorage.getItem('authUser');
+      
+      if (token && authUser) {
+        setIsAuthenticated(true);
+        setCurrentUser(JSON.parse(authUser));
+      } else {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
       }
-      fetchUsers();
     };
     
-    window.addEventListener('userUpdated', handleUserUpdate);
+    // Fermer les menus déroulants lors d'un clic à l'extérieur
+    const handleClickOutside = (event) => {
+      if (isSubmenuOpen && !event.target.closest('.studio-menu')) {
+        setIsSubmenuOpen(false);
+      }
+      if (isAuthMenuOpen && !event.target.closest('.auth-menu')) {
+        setIsAuthMenuOpen(false);
+      }
+    };
     
-    // Update la liste
+    window.addEventListener('authChanged', handleAuthChange);
+    document.addEventListener('click', handleClickOutside);
+    
     return () => {
-      window.removeEventListener('userUpdated', handleUserUpdate);
+      window.removeEventListener('authChanged', handleAuthChange);
+      document.removeEventListener('click', handleClickOutside);
     };
-  }, []);
+  }, [isSubmenuOpen, isAuthMenuOpen]);
   
-  const toggleSubmenu = () => {
+  const toggleSubmenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsSubmenuOpen(!isSubmenuOpen);
+    // Fermer le menu d'authentification si ouvert
+    if (isAuthMenuOpen) setIsAuthMenuOpen(false);
   };
   
-  const handleUserChange = (e) => {
-    const [id, nom, type] = e.target.value.split('|');
-    const newUser = {
-      id: parseInt(id),
-      nom,
-      type
-    };
+  const toggleAuthMenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAuthMenuOpen(!isAuthMenuOpen);
+    // Fermer le menu studio si ouvert
+    if (isSubmenuOpen) setIsSubmenuOpen(false);
+  };
+  
+  const handleLogout = (e) => {
+    e.preventDefault();
+    localStorage.removeItem('token');
+    localStorage.removeItem('authUser');
+    setIsAuthenticated(false);
+    setCurrentUser(null);
+    setIsAuthMenuOpen(false);
     
-    setSelectedUser(newUser);
-    localStorage.setItem('currentUser', JSON.stringify(newUser));
-    
-    // évenement pour prévenir user a changé
-    const event = new CustomEvent('userChanged', { detail: newUser });
+    // Déclencher l'événement de changement d'authentification
+    const event = new CustomEvent('authChanged');
     window.dispatchEvent(event);
   };
 
   return (
     <header>
       <nav>
-        <a href="logo">
-          <img src="zikfreak_logo.png" alt="Logo" />
+        <a href="/">
+          <img id="logo" src="zikfreek_VF.png" alt="Logo" />
         </a>
         <ul>
-          <li>
-            <a href="#" onClick={(e) => {
-              e.preventDefault();
-              toggleSubmenu();
-            }}>Studio ▼</a>
-            {isSubmenuOpen && (
-              <ul className="submenu">
-                {menuItems.map((item, index) => (
-                  <li key={index}><a href={item.link}>{item.label}</a></li>
-                ))}
-                <li><a href="#" onClick={(e) => {
-                  e.preventDefault();
-                  setShowEnregistrement(true);
-                }}>Enregistrer un studio</a></li>
-              </ul>
+          <li className="studio-menu">
+            <a href="#" onClick={toggleSubmenu}>Studio {isSubmenuOpen ? '▲' : '▼'}</a>
+            <ul className={`submenu ${isSubmenuOpen ? 'visible' : ''}`}>
+              <li><a href="#" onClick={(e) => {
+                e.preventDefault();
+                setShowEnregistrement(true);
+                setIsSubmenuOpen(false);
+              }}>Enregistrer un studio</a></li>
+            </ul>
+          </li>
+          
+          {isAuthenticated ? (
+            <>
+              {/* Boutons d'historique et de favoris - visibles seulement si connecté */}
+              <li>
+                <button className="nav-btn" onClick={() => setShowHistorique(true)}>
+                  Historique
+                </button>
+              </li>
+              <li>
+                <button className="nav-btn" onClick={() => setShowFavoris(true)}>
+                  Favoris
+                </button>
+              </li>
+            </>
+          ) : null}
+          
+          {/* Menu d'authentification */}
+          <li className="auth-menu">
+            {isAuthenticated ? (
+              <>
+                <a href="#" onClick={toggleAuthMenu}>
+                  Connecté: {currentUser?.nom} {isAuthMenuOpen ? '▲' : '▼'}
+                </a>
+                <ul className={`submenu auth-submenu ${isAuthMenuOpen ? 'visible' : ''}`}>
+                  <li><a href="#" onClick={(e) => {
+                    e.preventDefault();
+                    setShowProfileForm(true);
+                    setIsAuthMenuOpen(false);
+                  }}>Modifier profil</a></li>
+                  <li><a href="#" onClick={handleLogout}>Déconnexion</a></li>
+                </ul>
+              </>
+            ) : (
+              <div className="auth-buttons">
+                <button className="auth-btn login-btn" onClick={() => setShowLogin(true)}>
+                  Connexion
+                </button>
+                <button className="auth-btn register-btn" onClick={() => setShowRegister(true)}>
+                  Inscription
+                </button>
+              </div>
             )}
           </li>
         </ul>
-        <button className="register-btn" onClick={() => setShowHistorique(true)}>
-          Historique
-        </button>
-        <button className="register-btn" onClick={() => setShowFavoris(true)}>
-          Favoris
-        </button>
-        <button id="profil_button" className="register-btn" onClick={() => setShowProfileForm(true)}>
-          Profil
-        </button>
-        <div className="user-select-container">
-          <select 
-            className="user-select" 
-            value={selectedUser ? `${selectedUser.id}|${selectedUser.nom}|${selectedUser.type}` : ''}
-            onChange={handleUserChange}
-          >
-            <optgroup label="Artistes">
-              {users.artistes.map(artiste => (
-                <option key={`artiste-${artiste.id}`} value={`${artiste.id}|${artiste.nom}|artiste`}>
-                  {artiste.nom}
-                </option>
-              ))}
-            </optgroup>
-            <optgroup label="Propriétaires">
-              {users.proprietaires.map(proprio => (
-                <option key={`proprio-${proprio.id}`} value={`${proprio.id}|${proprio.nom}|proprietaire`}>
-                  {proprio.nom}
-                </option>
-              ))}
-            </optgroup>
-          </select>
-        </div>
       </nav>
     </header>
   );

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Cloudinary } from '@cloudinary/url-gen';
 import { AdvancedImage } from '@cloudinary/react';
+import { quality } from "@cloudinary/url-gen/actions/delivery";
 
 const StudioSection = () => {
   const [studios, setStudios] = useState([]);
@@ -9,7 +10,7 @@ const StudioSection = () => {
   useEffect(() => {
     const fetchStudios = async () => {
       try {
-        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/studio?prixMin=0&prixMax=1000&noteMin=0`);
+        const response = await fetch(`/api/studio?prixMin=0&prixMax=1000&noteMin=0`);
         const data = await response.json();
         setStudios(data);
       } catch (error) {
@@ -34,10 +35,11 @@ const StudioSection = () => {
           }}
         >
           {duplicatedStudios.map((studio, index) => {
-            const img = cld.image(studio.photo_url);
+            const img = cld.image(studio.photo_url)
+            .delivery(quality(50));
             return (
               <div key={`${studio.id_stud}-${index}`} className="item">
-                <AdvancedImage cldImg={img} className="studio-photo" />
+                <AdvancedImage cldImg={img} className="studio-photo" alt={`${studio.nom}`} />
                 <h5>{studio.nom}</h5>
                 <h5>Prix : {studio.prix_par_heure}€/h</h5>
               </div>

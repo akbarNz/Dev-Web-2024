@@ -7,21 +7,25 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+// Routes d'authentification
+app.use('/api/auth', require('./routes/auth'));
+
+// Routes existantes
+app.use('/api/firebase', require('./routes/firebase'));
 app.use('/api/studio', require('./routes/studio'));
 app.use('/api/clients', require('./routes/client'));
 app.use('/api/proprietaires', require('./routes/proprio'));
 app.use('/api/reservations', require('./routes/reservation'));
 app.use('/api/favoris', require('./routes/favoris'));
 app.use('/api/avis', require('./routes/avis'));
+app.use('/api/villes', require('./routes/studio'));
 
-app.use(express.static(path.join(__dirname, 'public')));
+// Cloudinary
+app.use('/api/cloudinary', require('./routes/cloudinary'));
 
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
+app.get('/', async (req, res) => {res.json(['ok'])});
 
-const PORT = process.env.PORT || 5001;
+const PORT = 5001;
 app.listen(PORT, () => {
   console.log(`Serveur lancé sur http://localhost:${PORT}`);
 });

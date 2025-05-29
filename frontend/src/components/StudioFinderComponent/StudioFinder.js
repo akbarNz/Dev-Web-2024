@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { findNearbyStudios, findBestRatedStudios } from '../../services/studioService';
 import Header from '../HeaderComponent';
 import GeolocationComponent from '../GeolocationComponent/GeolocationComponent';
@@ -19,6 +19,7 @@ const StudioFinder = () => {
     const [bestRatedStudios, setBestRatedStudios] = useState([]);
     const [isFetchingBestRated, setIsFetchingBestRated] = useState(false);
     const [bestRatedError, setBestRatedError] = useState(null);
+    const mapRef = useRef(null);
 
     const handleLocationFound = useCallback((location) => {
         setUserLocation(location);
@@ -49,6 +50,11 @@ const StudioFinder = () => {
 
         setSearchParams(searchCriteria);
         fetchStudios(searchCriteria.criteria, searchCriteria.value, userLocation);
+        
+        // Scroll to map after small delay to ensure it's rendered
+        setTimeout(() => {
+            mapRef.current?.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
     }, [userLocation, isSearching, fetchStudios]);
 
     const fetchBestRatedStudios = useCallback(async () => {
@@ -75,54 +81,55 @@ const StudioFinder = () => {
 
     return (
         <div className={styles.landingPage}>
-            <Header />
+            {/* <Header /> */}
             <main className={styles.mainContent}>
-                <div className={styles.studioFinder}>
+                <div className={styles.findStudioSection}>
                     <GeolocationComponent onLocationFound={handleLocationFound} />
-                    
                     <FindStudio 
                         onSearch={handleSearch} 
                         userLocation={userLocation}
                         disabled={!userLocation || isSearching}
+                        isMapView={showMap}
                     />
-
-                    {error && (
-                        <div className={styles.error}>
-                            {error}
-                        </div>
-                    )}
-
-                    {isSearching && (
-                        <div className={styles.loading}>
-                            Searching for studios...
-                        </div>
-                    )}
-
-                    {showMap && !isSearching && studios.length === 0 && (
-                        <div className={styles.noResults}>
-                            No studios found for your search criteria
-                        </div>
-                    )}
-
-                    {showMap && searchParams && studios.length > 0 && (
-                        <Map 
-                            center={userLocation}
-                            studios={studios}
-                            searchParams={searchParams}
-                        />
-                    )}
                 </div>
-                <AboutApp />
-                <BestRatedStudios 
-                    studios={bestRatedStudios}
-                    userLocation={userLocation}
-                    onEnableLocation={() => {
-                        const geoComponent = document.querySelector('[data-testid="geo-button"]');
-                        if (geoComponent) geoComponent.click();
-                    }}
-                    isLoading={isFetchingBestRated}
-                    error={bestRatedError}
-                />
+
+                {(showMap || isSearching) && (
+                    <div className={styles.mapContainer} ref={mapRef}>
+                        {isSearching && (
+                            <div className={styles.loading}>
+                                Searching for studios...
+                            </div>
+                        )}
+                        
+                        {!isSearching && studios.length === 0 && (
+                            <div className={styles.noResults}>
+                                No studios found for your search criteria
+                            </div>
+                        )}
+                        
+                        {!isSearching && studios.length > 0 && (
+                            <Map 
+                                center={userLocation}
+                                studios={studios}
+                                searchParams={searchParams}
+                            />
+                        )}
+                    </div>
+                )}
+
+                <div className={styles.additionalContent}>
+                    {/* <AboutApp /> */}
+                    <BestRatedStudios 
+                        studios={bestRatedStudios}
+                        userLocation={userLocation}
+                        onEnableLocation={() => {
+                            const geoComponent = document.querySelector('[data-testid="geo-button"]');
+                            if (geoComponent) geoComponent.click();
+                        }}
+                        isLoading={isFetchingBestRated}
+                        error={bestRatedError}
+                    />
+                </div>
             </main>
             <Footer />
         </div>

@@ -1,10 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import styles from './FindStudio.module.css';
 
-const FindStudio = ({ onSearch, disabled }) => {
+const FindStudio = ({ onSearch, disabled, isMapView }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const [searchCriteria, setSearchCriteria] = useState('radius');
     const [searchValue, setSearchValue] = useState('');
+    const [componentHeight, setComponentHeight] = useState(window.screen.availHeight);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setComponentHeight(window.screen.availHeight);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleFilterClick = () => {
         setIsFilterOpen(!isFilterOpen);
@@ -15,23 +26,28 @@ const FindStudio = ({ onSearch, disabled }) => {
         setIsFilterOpen(false);
     };
 
-    const handleSearch = (e) => {
-        e.preventDefault(); // Prevent form submission
-        if (!disabled && searchValue.trim()) {
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter' && !disabled && searchValue.trim()) {
             onSearch({ criteria: searchCriteria, value: searchValue.trim() });
         }
     };
 
     return (
-        <div className={styles.findStudioContainer}>
-            <h2 className={styles.title}>Find a studio nearby in one click!</h2>
+        <div 
+            className={`${styles.findStudioContainer} ${isMapView ? styles.mapView : ''}`}
+            style={{ height: isMapView ? 'auto' : `${componentHeight}px` }}
+        >
+            <h2 className={`${styles.title} ${isMapView ? styles.mapViewTitle : ''}`}>
+                Find a studio nearby in one click!
+            </h2>
             
-            <form onSubmit={handleSearch} className={styles.searchContainer}>
+            <div className={`${styles.searchContainer} ${isMapView ? styles.mapViewSearch : ''}`}>
                 <div className={styles.searchWrapper}>
                     <input
                         type="text"
                         value={searchValue}
                         onChange={(e) => setSearchValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
                         placeholder={`Search by ${searchCriteria}...`}
                         className={styles.searchInput}
                         disabled={disabled}
@@ -42,14 +58,7 @@ const FindStudio = ({ onSearch, disabled }) => {
                         className={styles.filterButton}
                         disabled={disabled}
                     >
-                        🔍
-                    </button>
-                    <button 
-                        type="submit"
-                        className={styles.searchButton}
-                        disabled={disabled || !searchValue.trim()}
-                    >
-                        Search
+                        <FilterAltIcon />
                     </button>
                 </div>
                 
@@ -78,7 +87,7 @@ const FindStudio = ({ onSearch, disabled }) => {
                         </button>
                     </div>
                 )}
-            </form>
+            </div>
         </div>
     );
 };

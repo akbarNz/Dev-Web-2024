@@ -7,7 +7,8 @@ import MusicNoteIcon from '@mui/icons-material/MusicNote';
 
 const containerStyle = {
     width: '100%',
-    height: '400px'
+    height: '600px',
+    overflow: 'hidden'
 };
 
 const libraries = ['marker'];

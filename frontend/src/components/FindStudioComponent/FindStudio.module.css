@@ -1,21 +1,24 @@
 .findStudioContainer {
-    padding: 2rem;
+    /* padding: 2rem; */
     background-image: url('../../assets/images/pexels-tima-miroshnichenko-4988131.jpg');
     background-size: cover;
     background-position: center;
-    min-height: 300px;
+    /* background-attachment: fixed; */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     background-color: #f5f5f5; /* Fallback color */
+    min-height: 100vh; /* Fallback for older browsers */
+    height: 100%; /* Will be overridden by inline style */
 }
 
 .title {
-    color: #333;
+    font-family: 'Poppins', sans-serif;
+    color: #00F54F;
     margin-bottom: 2rem;
     text-align: center;
-    font-size: 2rem;
+    font-size: 3rem;
 }
 
 .searchContainer {
@@ -27,10 +30,12 @@
 .searchWrapper {
     display: flex;
     align-items: center;
-    background: white;
+    /* background: white; */
+    border: 2px solid #fff;
     border-radius: 25px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    padding-right: 0.5rem;
 }
 
 .searchInput {
@@ -39,14 +44,51 @@
     border: none;
     outline: none;
     font-size: 1rem;
+    background-color: transparent;
+    color: #fff;
+    font-family: 'Poppins', sans-serif;
+}
+
+.searchInput::placeholder {
+    color: #fff;  /* Semi-transparent white */
+    font-family: 'Poppins', sans-serif;
+}
+
+/* For Firefox */
+.searchInput::-moz-placeholder {
+    color: #fff;
+    opacity: 1;  /* Firefox adds opacity by default */
+}
+
+/* For Internet Explorer */
+.searchInput:-ms-input-placeholder {
+    color: #fff;
+}
+
+/* For Edge */
+.searchInput::-ms-input-placeholder {
+    color: #fff;
 }
 
 .filterButton {
     background: none;
     border: none;
-    padding: 1rem;
+    padding: 0.5rem;
     cursor: pointer;
-    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    transition: color 0.2s;
+}
+
+.filterButton:hover {
+    color: #00F54F;
+}
+
+.filterButton:disabled {
+    color: #ccc;
+    cursor: not-allowed;
 }
 
 .filterDropdown {
@@ -73,6 +115,8 @@
 
 .filterDropdown button:hover {
     background-color: #f5f5f5;
+    color: #00F54F;
+    font-family: 'Poppins', sans-serif;
 }
 
 .filterDropdown button.active {
@@ -80,21 +124,22 @@
     font-weight: bold;
 }
 
-.searchButton {
-    padding: 0.8rem 1.5rem;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 0 25px 25px 0;
-    cursor: pointer;
-    transition: background-color 0.2s;
+@media (min-width: 1024px) {
+    /* .mapView .title {
+        font-size: 1.8rem;
+    }
+
+    .mapView .searchContainer {
+        max-width: 90%;
+    } */
 }
 
-.searchButton:disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
+@media (max-width: 767px) {
+    /* .mapView .title {
+        font-size: 1.2rem;
+    }
 
-.searchButton:hover:not(:disabled) {
-    background-color: #45a049;
+    .mapView .searchContainer {
+        max-width: 100%;
+    } */
 }

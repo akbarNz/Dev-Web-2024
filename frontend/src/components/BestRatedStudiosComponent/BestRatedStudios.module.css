@@ -8,7 +8,7 @@
 .container h2 {
     text-align: center;
     margin-bottom: 2rem;
-    color: #333;
+    color: #00F54F;
     font-size: 1.8rem;
 }
 
@@ -46,7 +46,7 @@
     top: 10px;
     right: 10px;
     background: rgba(0,0,0,0.7);
-    color: #ffd700;
+    color: #00F54F;
     padding: 4px 8px;
     border-radius: 4px;
     font-weight: bold;

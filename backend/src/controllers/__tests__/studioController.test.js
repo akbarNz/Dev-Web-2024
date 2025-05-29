@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient, StatutStudio } = require('@prisma/client');
 const StudioController = require('../studioController');
 const Studio = require('../../models/Studio');
 
@@ -12,6 +12,7 @@ describe('StudioController', () => {
     let mockResponse;
     let testStudio;
     let testClient;
+    let testVille;
 
     beforeEach(() => {
         mockRequest = {
@@ -31,20 +32,17 @@ describe('StudioController', () => {
     });
 
     beforeAll(async () => {
-        // Create test data
-        testStudio = await global.prisma.studio.create({
-            data: {
-                nom: 'Test Studio',
-                adresse: 'Test Address',
-                latitude: 50.8503,
-                longitude: 4.3517,
-                prix_par_heure: 50,
-                code_postal: 1000,
-                statut: 'validé',
-                proprietaire_id: 1
+        // Create test ville first
+        testVille = await global.prisma.ville.findFirst();
+
+        // Use existing studio from seed data
+        testStudio = await global.prisma.studio.findFirst({
+            where: {
+                code_postal: testVille.code_postal
             }
         });
 
+        // Create test client
         testClient = await global.prisma.client.create({
             data: {
                 nom: 'Test Client',
@@ -71,6 +69,7 @@ describe('StudioController', () => {
         await global.prisma.avis.deleteMany();
         await global.prisma.studio.deleteMany();
         await global.prisma.client.deleteMany();
+        await global.prisma.ville.deleteMany();
     });
 
     describe('getNearbyStudios', () => {
@@ -143,6 +142,31 @@ describe('StudioController', () => {
             
             expect(result.length).toBeGreaterThan(0);
             expect(result[0].distance).toBeLessThan(5);
+        });
+    });
+
+    describe('getStudios', () => {
+        it('should return studios for the given postal code', async () => {
+            mockRequest.params = { code_postal: testVille.code_postal };
+
+            await StudioController.getStudios(mockRequest, mockResponse);
+
+            expect(mockResponse.json).toHaveBeenCalled();
+            const studios = mockResponse.json.mock.calls[0][0];
+            expect(Array.isArray(studios)).toBeTruthy();
+            expect(studios.length).toBeGreaterThan(0);
+            expect(studios[0].code_postal).toEqual(testVille.code_postal);
+        });
+
+        it('should return 404 if no studios found', async () => {
+            mockRequest.params = { code_postal: '9999' }; // Assuming 9999 has no studios
+
+            await StudioController.getStudios(mockRequest, mockResponse);
+
+            expect(mockResponse.status).toHaveBeenCalledWith(404);
+            expect(mockResponse.json).toHaveBeenCalledWith({
+                error: 'No studios found for the given postal code'
+            });
         });
     });
 });

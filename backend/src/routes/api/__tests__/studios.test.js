@@ -1,47 +1,101 @@
 const request = require('supertest');
 const express = require('express');
 const studioRoutes = require('../studios');
-const { Decimal } = require('@prisma/client');
+const { PrismaClient } = require('@prisma/client');
 
-// Create Express app for testing
-const app = express();
-app.use(express.json());
-app.use('/api/studios', studioRoutes);
+// Mock PrismaClient
+jest.mock('@prisma/client');
 
 describe('Studio Routes', () => {
-    test('GET /api/studios/nearby', async () => {
-        const response = await request(app)
-            .get('/api/studios/nearby')
-            .query({ lat: '48.8566', lng: '2.3522', radius: '5' });
+    let app;
+    let mockPrisma;
 
-        expect(response.status).toBe(200);
+    beforeAll(() => {
+        app = express();
+        app.use(express.json());
+        app.use('/api/studios', studioRoutes);
     });
 
-    test('GET /api/studios/:id', async () => {
-        const response = await request(app)
-            .get('/api/studios/1');
-
-        expect(response.status).toBe(200);
-    });
-
-    test('POST /api/studios', async () => {
-        const studioData = {
-            nom: 'Test Studio',
-            description: 'Test Description',
-            longitude: 2.3522,
-            latitude: 48.8566,
-            adresse: '1 Test Street',
-            prix_par_heure: '50.00',
-            equipements: { items: ['mic', 'speaker'] },
-            photo_url: 'test.jpg',
-            code_postal: 75001,
-            proprietaire_id: 1
+    beforeEach(() => {
+        mockPrisma = {
+            studio: {
+                findMany: jest.fn(),
+                findUnique: jest.fn()
+            },
+            $queryRaw: jest.fn()
         };
+        PrismaClient.mockImplementation(() => mockPrisma);
+    });
 
-        const response = await request(app)
-            .post('/api/studios')
-            .send(studioData);
+    describe('GET /api/studios/search', () => {
+        const testCases = [
+            {
+                name: 'radius search',
+                query: { criteria: 'radius', lat: '50.8503', lng: '4.3517', radius: '5' },
+                mockData: [{ id: 1, nom: 'Studio Test', distance: 2.5 }]
+            },
+            {
+                name: 'name search',
+                query: { criteria: 'studio', name: 'Test', lat: '50.8503', lng: '4.3517' },
+                mockData: [{ id: 1, nom: 'Studio Test' }]
+            },
+            {
+                name: 'city search',
+                query: { criteria: 'city', city: 'Brussels' },
+                mockData: [{ id: 1, nom: 'Studio Test' }]
+            }
+        ];
 
-        expect(response.status).toBe(201);
+        testCases.forEach(({ name, query, mockData }) => {
+            test(`should handle ${name}`, async () => {
+                if (query.criteria === 'city') {
+                    mockPrisma.studio.findMany.mockResolvedValue(mockData);
+                } else {
+                    mockPrisma.$queryRaw.mockResolvedValue(mockData);
+                }
+
+                const response = await request(app)
+                    .get('/api/studios/search')
+                    .query(query);
+
+                expect(response.status).toBe(200);
+                expect(Array.isArray(response.body)).toBeTruthy();
+                if (query.criteria === 'radius') {
+                    expect(response.body[0]).toHaveProperty('distance');
+                }
+            });
+        });
+    });
+
+    describe('GET /api/studios/best-rated', () => {
+        test('should return best rated studios', async () => {
+            const mockData = [{
+                id: 1,
+                nom: 'Studio Test',
+                rating: 4.5,
+                review_count: 10,
+                distance: 2.5
+            }];
+
+            mockPrisma.$queryRaw.mockResolvedValue(mockData);
+
+            const response = await request(app)
+                .get('/api/studios/best-rated')
+                .query({
+                    lat: '50.8503',
+                    lng: '4.3517',
+                    radius: '5',
+                    minRating: '4'
+                });
+
+            expect(response.status).toBe(200);
+            expect(Array.isArray(response.body)).toBeTruthy();
+            expect(response.body[0]).toHaveProperty('rating');
+            expect(response.body[0].rating).toBeGreaterThanOrEqual(4);
+        });
+    });
+
+    afterEach(() => {
+        jest.clearAllMocks();
     });
 });

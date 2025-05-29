@@ -3,10 +3,10 @@ const router = express.Router();
 const StudioController = require('../../controllers/studioController');
 const { validateStudioSearch, validate, validateBestRatedSearch } = require('../../middleware/validation');
 
-// Get studios based on search criteria
+// Search studios with various criteria (radius, name, city)
 router.get('/search', validateStudioSearch, validate, StudioController.getStudios);
 
-// Get best rated studios nearby
+// Get best rated studios
 router.get('/best-rated', validateBestRatedSearch, validate, StudioController.getBestRatedStudios);
 
 // Get studio by ID

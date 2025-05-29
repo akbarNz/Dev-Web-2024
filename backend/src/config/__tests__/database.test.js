@@ -1,13 +1,27 @@
 // Test for database configuration
 // database.test.js
-const { pool, testConnection } = require('../database');
+const { testConnection } = require('../database');
+const setupTestDatabase = require('../testSetup');
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 
 describe('Database Configuration', () => {
+    let prisma;
+
     beforeAll(async () => {
-        // Ensure database is ready before tests
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Initialize Prisma client with test database
+        prisma = new PrismaClient({
+            datasources: {
+                db: {
+                    url: process.env.TEST_DATABASE_URL
+                }
+            }
+        });
+
+        // Setup test database with sample data
+        const isSetup = await setupTestDatabase();
+        if (!isSetup) {
+            throw new Error('Failed to setup test database');
+        }
     });
 
     test('should connect to database successfully', async () => {
@@ -15,16 +29,22 @@ describe('Database Configuration', () => {
         expect(isConnected).toBe(true);
     });
 
-    test('should have required environment variables', () => {
-        expect(process.env.DB_USER).toBeDefined();
-        expect(process.env.DB_HOST).toBeDefined();
-        expect(process.env.DB_DATABASE).toBeDefined();
-        expect(process.env.DB_PASSWORD).toBeDefined();
-        expect(process.env.DB_PORT).toBeDefined();
+    test('should have sample data loaded', async () => {
+        // Test villes
+        const villes = await prisma.ville.findMany();
+        expect(villes.length).toBeGreaterThan(0);
+
+        // Test studios
+        const studios = await prisma.studio.findMany();
+        expect(studios.length).toBeGreaterThan(0);
+
+        // Test proprios
+        const proprios = await prisma.proprio.findMany();
+        expect(proprios.length).toBeGreaterThan(0);
     });
 
     afterAll(async () => {
-        await pool.end();
+        await prisma.$disconnect();
     });
 });
 

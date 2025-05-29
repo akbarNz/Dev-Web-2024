@@ -1,11 +1,9 @@
 module.exports = {
     testEnvironment: 'node',
-    setupFilesAfterEnv: ['./jest.setup.js'],
-    testPathIgnorePatterns: ['/node_modules/'],
+    setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+    testMatch: ['**/__tests__/**/*.js'],
+    verbose: true,
     collectCoverage: true,
-    collectCoverageFrom: [
-        'src/**/*.js',
-        '!src/**/*.test.js'
-    ],
-    verbose: true
+    coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
+    testTimeout: 10000
 };

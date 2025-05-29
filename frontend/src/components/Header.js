@@ -1,4 +1,4 @@
-// frontend/src/components/Header.js
+// frontend/src/components/Header.js - VERSION SÉCURISÉE
 import React, { useState, useEffect } from "react";
 
 const Header = ({ 
@@ -13,28 +13,60 @@ const Header = ({
   const [isAuthMenuOpen, setIsAuthMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   
-  useEffect(() => {
-    // Vérifier si l'utilisateur est connecté
+  // Fonction pour vérifier l'authentification avec l'API
+  const checkAuthStatus = async () => {
     const token = localStorage.getItem('token');
-    const authUser = localStorage.getItem('authUser');
     
-    if (token && authUser) {
-      setIsAuthenticated(true);
-      setCurrentUser(JSON.parse(authUser));
+    if (!token) {
+      setIsAuthenticated(false);
+      setCurrentUser(null);
+      setLoading(false);
+      return;
     }
     
-    const handleAuthChange = () => {
-      const token = localStorage.getItem('token');
-      const authUser = localStorage.getItem('authUser');
+    try {
+      const response = await fetch('/api/auth/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
       
-      if (token && authUser) {
+      if (response.ok) {
+        const data = await response.json();
         setIsAuthenticated(true);
-        setCurrentUser(JSON.parse(authUser));
+        setCurrentUser(data.user);
+        
+        // Mettre à jour le localStorage avec les vraies données du serveur
+        localStorage.setItem('authUser', JSON.stringify(data.user));
       } else {
+        // Token invalide ou expiré
+        localStorage.removeItem('token');
+        localStorage.removeItem('authUser');
         setIsAuthenticated(false);
         setCurrentUser(null);
       }
+    } catch (error) {
+      console.error('Erreur lors de la vérification de l\'authentification:', error);
+      // En cas d'erreur réseau, on peut garder l'état actuel
+      // ou déconnecter l'utilisateur selon votre préférence
+      setIsAuthenticated(false);
+      setCurrentUser(null);
+    }
+    
+    setLoading(false);
+  };
+  
+  useEffect(() => {
+    // Vérifier l'authentification au chargement
+    checkAuthStatus();
+    
+    const handleAuthChange = () => {
+      // Lors d'un changement d'auth, re-vérifier avec l'API
+      checkAuthStatus();
     };
     
     // Fermer les menus déroulants lors d'un clic à l'extérieur
@@ -54,7 +86,7 @@ const Header = ({
       window.removeEventListener('authChanged', handleAuthChange);
       document.removeEventListener('click', handleClickOutside);
     };
-  }, [isSubmenuOpen, isAuthMenuOpen]);
+  }, []);
   
   const toggleSubmenu = (e) => {
     e.preventDefault();
@@ -84,6 +116,22 @@ const Header = ({
     const event = new CustomEvent('authChanged');
     window.dispatchEvent(event);
   };
+
+  // Afficher un loader pendant la vérification
+  if (loading) {
+    return (
+      <header>
+        <nav>
+          <a href="/">
+            <img id="logo" src="zikfreek_VF.png" alt="Logo" />
+          </a>
+          <ul>
+            <li>Chargement...</li>
+          </ul>
+        </nav>
+      </header>
+    );
+  }
 
   return (
     <header>
